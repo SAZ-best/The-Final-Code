@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PermissionOS — Ubuntu 24.04 LTS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap');
+
+:root {
+  --ub-orange: #E95420;
+  --ub-orange-dark: #C4410C;
+  --ub-orange-light: #F2693D;
+  --ub-purple: #77216F;
+  --ub-aubergine: #2C001E;
+  --ub-warm-grey: #AEA79F;
+  --ub-cool-grey: #333333;
+  --panel: rgba(32,32,32,0.96);
+  --panel-hover: rgba(255,255,255,0.08);
+  --surface: #2C2C2C;
+  --surface2: #383838;
+  --surface3: #444;
+  --border: rgba(255,255,255,0.1);
+  --border2: rgba(255,255,255,0.06);
+  --text: #F8F8F8;
+  --text-muted: #AEA79F;
+  --text-dim: #666;
+  --accent: #E95420;
+  --accent2: #77216F;
+  --green: #3CA55C;
+  --red: #E05353;
+  --yellow: #E3B341;
+  --blue: #3584E4;
+  --mono: 'Ubuntu Mono', 'JetBrains Mono', monospace;
+  --sans: 'Ubuntu', 'Space Grotesk', sans-serif;
+  --shadow-win: 0 32px 80px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  --shadow-sm: 0 4px 16px rgba(0,0,0,0.4);
+  --radius: 12px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: var(--sans);
+  background: var(--ub-aubergine);
+  color: var(--text);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ══════════════════════════════════════════
+   GNOME TOP PANEL
+══════════════════════════════════════════ */
+#panel {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 32px;
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+}
+
+.panel-left { display:flex; align-items:center; gap:2px; padding-left:4px; }
+.panel-center { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; }
+.panel-right { display:flex; align-items:center; gap:4px; padding-right:8px; }
+
+.panel-btn {
+  padding: 0 10px;
+  height: 32px;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.panel-btn:hover { background: var(--panel-hover); }
+.panel-btn.active-app { color: white; font-weight: 600; }
+
+#panel-clock {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0 10px;
+  height: 32px;
+  display: flex; align-items: center;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+#panel-clock:hover { background: var(--panel-hover); }
+
+.panel-icon-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.85;
+  transition: background 0.15s, opacity 0.15s;
+}
+.panel-icon-btn:hover { background: var(--panel-hover); opacity: 1; }
+
+/* System menu */
+#system-menu {
+  display: none;
+  position: fixed;
+  top: 36px; right: 8px;
+  width: 280px;
+  background: #2C2C2C;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-win);
+  z-index: 2000;
+  overflow: hidden;
+  animation: popIn .15s cubic-bezier(.16,1,.3,1);
+}
+#system-menu.open { display: block; }
+
+.sm-header {
+  padding: 16px;
+  background: #222;
+  border-bottom: 1px solid var(--border2);
+}
+.sm-user-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.sm-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--ub-purple), var(--ub-orange));
+  display: flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.sm-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.sm-sub  { font-size: 11px; color: var(--text-muted); margin-top:2px; font-family: var(--mono); }
+
+.sm-sliders { padding: 12px 16px; display: flex; flex-direction:column; gap: 10px; border-bottom: 1px solid var(--border2); }
+.sm-slider-row { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-muted); }
+.sm-slider { flex:1; -webkit-appearance:none; height:3px; background:rgba(255,255,255,0.2); border-radius:2px; outline:none; cursor:pointer; }
+.sm-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:white; cursor:pointer; }
+
+.sm-toggles { padding: 8px 8px; display: grid; grid-template-columns:1fr 1fr 1fr; gap:6px; border-bottom: 1px solid var(--border2); }
+.sm-toggle {
+  display: flex; flex-direction:column; align-items:center; gap:4px;
+  padding: 10px 6px; border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,0.05); transition: background 0.15s;
+  font-size: 10px; color: var(--text-muted);
+}
+.sm-toggle:hover { background: rgba(255,255,255,0.1); }
+.sm-toggle.on { background: rgba(233,84,32,0.2); color: var(--ub-orange-light); }
+.sm-toggle-icon { font-size: 18px; }
+
+.sm-actions { display: flex; padding: 8px; gap: 4px; }
+.sm-action-btn {
+  flex: 1; padding: 8px; border-radius: 6px; cursor: pointer;
+  background: rgba(255,255,255,0.06); border: none; color: var(--text-muted);
+  font-family: var(--sans); font-size: 11px; text-align: center;
+  transition: all .15s; display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.sm-action-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+.sm-action-btn span { font-size:16px; }
+
+/* ══════════════════════════════════════════
+   DOCK (Ubuntu GNOME style)
+══════════════════════════════════════════ */
+#dock {
+  position: fixed;
+  left: 0; top: 32px; bottom: 0;
+  width: 64px;
+  background: rgba(20,20,20,0.88);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 8px;
+  gap: 2px;
+  z-index: 100;
+  border-right: 1px solid var(--border2);
+}
+
+.dock-sep { width: 36px; height: 1px; background: rgba(255,255,255,0.08); margin: 3px 0; flex-shrink:0; }
+
+.dock-item {
+  position: relative;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), background .15s;
+  flex-shrink: 0;
+}
+.dock-item:hover { transform: scale(1.14); background: rgba(255,255,255,0.06); }
+.dock-item:active { transform: scale(0.94); }
+.dock-item.locked { opacity: 0.3; cursor: not-allowed; pointer-events:none; }
+
+.dock-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: filter .15s;
+}
+.dock-item:hover .dock-icon { filter: brightness(1.1); }
+
+/* running dot */
+.dock-dot {
+  position: absolute;
+  bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: white; opacity: 0; transition: opacity .2s;
+}
+.dock-item.running .dock-dot { opacity: 0.8; }
+
+/* active bar */
+.dock-bar {
+  position: absolute;
+  left: -1px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 20px; border-radius: 0 3px 3px 0;
+  background: white; opacity: 0; transition: opacity .2s;
+}
+.dock-item.active .dock-bar { opacity: 1; }
+
+.dock-lock-badge {
+  position: absolute; bottom: 0; right: 0;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(0,0,0,0.7); font-size: 9px;
+  display: flex; align-items:center; justify-content:center;
+}
+
+/* ══════════════════════════════════════════
+   DESKTOP
+══════════════════════════════════════════ */
+#desktop {
+  position: fixed;
+  left: 64px; top: 32px; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 85%, rgba(233,84,32,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 85% 10%, rgba(119,33,111,0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, #1a0a12 0%, #0d0008 100%);
+  overflow: hidden;
+}
+
+/* Ubuntu wallpaper pattern */
+#desktop::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 80%, rgba(233,84,32,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(119,33,111,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Desktop icons grid */
+#desktop-icons {
+  position: absolute;
+  top: 16px; left: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: calc(100% - 80px);
+  align-content: flex-start;
+}
+
+.desk-icon {
+  width: 80px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 8px 4px;
+  border-radius: 8px; cursor: pointer;
+  transition: background .15s, transform .15s;
+  text-align: center;
+}
+.desk-icon:hover { background: rgba(255,255,255,0.08); transform: translateY(-1px); }
+.desk-icon:active { transform: scale(0.96); }
+.desk-icon.selected { background: rgba(233,84,32,0.2); outline: 1px solid rgba(233,84,32,0.5); }
+.desk-icon.multi-selected { background: rgba(233,84,32,0.18); outline: 2px solid rgba(233,84,32,0.6); }
+.desk-icon.home-icon { cursor: default; }
+.desk-icon.locked { opacity: 0.35; cursor: not-allowed; }
+
+.desk-icon-img {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 26px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.desk-icon-label {
+  font-size: 11px; color: var(--text); font-weight: 400;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  line-height: 1.3; max-width: 76px;
+  overflow: hidden; display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.desk-icon-lock { font-size: 9px; opacity: 0.6; }
+
+/* Multi-select bar */
+#ms-bar {
+  display: none;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 16px; gap: 12px;
+  align-items: center; z-index: 50;
+  font-size: 12px; color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
+  animation: popIn .15s ease; white-space:nowrap;
+}
+#ms-bar.visible { display: flex; }
+#ms-bar strong { color: var(--ub-orange-light); }
+.ms-btn {
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  color: var(--text-muted); font-family: var(--sans); font-size: 11px;
+  padding: 4px 12px; border-radius: 10px; cursor: pointer; transition: all .12s;
+}
+.ms-btn:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+.ms-btn.danger { border-color: rgba(224,83,83,0.4); color: var(--red); }
+.ms-btn.danger:hover { background: rgba(224,83,83,0.12); }
+
+/* Context menu */
+#ctx-menu {
+  display: none;
+  position: fixed; z-index: 9000;
+  background: #2a2a2a; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 4px;
+  min-width: 170px; box-shadow: var(--shadow-win);
+  animation: popIn .1s ease;
+}
+.ctx-item {
+  padding: 8px 14px; font-size: 13px; color: var(--text-muted);
+  border-radius: 5px; cursor: pointer;
+  display: flex; align-items:center; gap: 10px;
+  transition: background .1s;
+}
+.ctx-item:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.ctx-item.danger { color: var(--red); }
+.ctx-item.danger:hover { background: rgba(224,83,83,0.1); }
+.ctx-sep { height:1px; background: var(--border2); margin: 3px 0; }
+
+/* Progress bar (bottom) */
+#progress-area {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  display: flex; align-items: center; gap: 12px;
+}
+#progress-track {
+  flex: 1; height: 3px; background: rgba(255,255,255,0.1);
+  border-radius: 2px; overflow: hidden;
+}
+#progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ub-orange), var(--ub-purple));
+  border-radius: 2px; transition: width .5s ease;
+}
+#progress-label {
+  font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em; white-space:nowrap;
+}
+
+/* Rename input */
+.desk-rename-input {
+  background: rgba(255,255,255,0.1); border: 1px solid var(--ub-orange);
+  border-radius: 4px; color: var(--text); font-family: var(--sans); font-size: 10px;
+  text-align: center; width: 72px; padding: 2px 4px; outline: none;
+}
+
+/* New folder btn */
+#new-folder-btn {
+  position: absolute; top: 10px; right: 14px; z-index:10;
+  display: flex; align-items:center; gap:6px;
+  padding: 5px 14px; border-radius: 20px;
+  background: rgba(233,84,32,0.15); border: 1px solid rgba(233,84,32,0.35);
+  color: var(--ub-orange-light); font-family: var(--sans); font-size: 12px;
+  cursor: pointer; transition: all .15s; font-weight: 500;
+}
+#new-folder-btn:hover { background: rgba(233,84,32,0.28); border-color: rgba(233,84,32,0.6); }
+
+/* ══════════════════════════════════════════
+   APP OVERVIEW (Activities)
+══════════════════════════════════════════ */
+#app-overview {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(20px);
+  z-index: 3000;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+  animation: fadeIn .2s ease;
+}
+#app-overview.open { display: flex; }
+
+#app-overview-search-wrap {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 24px; padding: 0 18px;
+  display: flex; align-items:center; gap:10px;
+  width: 380px; margin-bottom: 32px;
+}
+#app-overview-search {
+  background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--sans); font-size: 15px;
+  width: 100%; padding: 11px 0; caret-color: var(--ub-orange);
+}
+#app-overview-search::placeholder { color: rgba(255,255,255,0.35); }
+
+#app-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 8px; max-width: 700px; width: 100%;
+  overflow-y: auto; padding: 0 16px 24px;
+  scrollbar-width: none;
+}
+.app-grid-item {
+  display: flex; flex-direction:column; align-items:center;
+  gap: 8px; padding: 16px 8px 12px;
+  border-radius: 14px; cursor: pointer;
+  transition: background .13s, transform .13s; text-align:center;
+}
+.app-grid-item:hover { background: rgba(255,255,255,0.1); transform: scale(1.06); }
+.app-grid-item:active { transform: scale(0.97); }
+.app-grid-icon {
+  width: 56px; height: 56px; border-radius: 15px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.app-grid-name {
+  font-size: 11px; color: rgba(255,255,255,0.8); font-weight:500;
+  line-height:1.3; word-break:break-word;
+}
+.app-section-label {
+  grid-column: 1/-1; font-size: 10px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(255,255,255,0.3);
+  padding: 12px 4px 4px; border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top:4px;
+}
+.app-section-label:first-child { border-top:none; margin-top:0; }
+#app-empty { display:none; padding:32px; text-align:center; color:rgba(255,255,255,0.3); font-size:13px; grid-column:1/-1; }
+
+/* ══════════════════════════════════════════
+   WINDOWS
+══════════════════════════════════════════ */
+#modal-container { position:fixed; inset:0; z-index:500; pointer-events:none; }
+#modal-container:not(:empty) { pointer-events:all; }
+
+.overlay {
+  position:fixed; inset:0;
+  background: rgba(0,0,0,0.45); backdrop-filter:blur(3px);
+  display:flex; align-items:center; justify-content:center;
+  animation: fadeIn .15s ease;
+}
+
+.window {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-win);
+  width: min(700px, 95vw);
+  max-height: 88vh;
+  display: flex; flex-direction:column;
+  animation: winIn .2s cubic-bezier(.16,1,.3,1);
+  overflow: hidden; border: 1px solid var(--border);
+}
+.window.wide { width: min(880px, 96vw); }
+.window.tall { max-height: 92vh; }
+
+@keyframes winIn { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:none; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes popIn  { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:none; } }
+@keyframes slideInRight { from { transform:translateX(100%); opacity:0; } to { transform:none; opacity:1; } }
+
+/* Window title bar — Adwaita style */
+.win-titlebar {
+  background: #353535;
+  padding: 0 12px;
+  height: 44px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+.win-btns { display:flex; gap:8px; margin-right:4px; }
+.win-btn {
+  width: 13px; height: 13px; border-radius: 50%; cursor: pointer;
+  transition: filter .15s; border: none; display:flex; align-items:center; justify-content:center;
+  font-size: 8px; color: transparent; transition: all .15s;
+}
+.win-btn:hover { filter: brightness(1.3); color: rgba(0,0,0,0.6); }
+.win-btn.close { background: #FF5F57; }
+.win-btn.min   { background: #FEBC2E; }
+.win-btn.max   { background: #28C840; }
+
+.win-title {
+  flex:1; text-align:center; font-size:13px; font-weight:500;
+  color: rgba(255,255,255,0.7); margin-right: 52px;
+}
+
+.win-body {
+  flex:1; overflow-y:auto; padding:20px 24px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+/* ── NAUTILUS-style file list ── */
+.file-list { display:flex; flex-direction:column; gap:2px; margin:12px 0; }
+.file-row {
+  display:flex; align-items:center; gap:12px; padding:9px 12px;
+  border-radius:6px; cursor:pointer; transition:background .1s;
+  font-family:var(--mono); font-size:13px;
+}
+.file-row:hover { background:rgba(255,255,255,0.07); }
+.file-row-icon { font-size:16px; }
+.file-row-name { flex:1; color:var(--blue); }
+.file-row-perm { font-size:11px; color:var(--text-dim); letter-spacing:.04em; }
+.file-row-size { font-size:11px; color:var(--text-dim); width:60px; text-align:right; }
+
+/* ── Perm chips ── */
+.perm-row { display:flex; gap:6px; margin:10px 0; flex-wrap:wrap; }
+.perm-chip {
+  font-family:var(--mono); font-size:11px;
+  padding:3px 10px; border-radius:4px; border:1px solid;
+}
+.perm-chip.r { color:#4ADE80; border-color:rgba(74,222,128,.4); background:rgba(74,222,128,.08); }
+.perm-chip.w { color:#60A5FA; border-color:rgba(96,165,250,.4); background:rgba(96,165,250,.08); }
+.perm-chip.x { color:#C084FC; border-color:rgba(192,132,252,.4); background:rgba(192,132,252,.08); }
+.perm-chip.no { color:var(--text-dim); border-color:rgba(255,255,255,.1); background:transparent; text-decoration:line-through; }
+
+/* ── Task panel ── */
+.task-panel {
+  background:rgba(233,84,32,.07); border:1px solid rgba(233,84,32,.25);
+  border-radius:8px; padding:16px; margin-top:16px;
+}
+.task-title { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ub-orange-light); margin-bottom:8px; font-weight:600; }
+.task-desc { font-size:13px; color:var(--text-muted); line-height:1.7; margin-bottom:14px; }
+.task-btn {
+  background:transparent; border:1px solid var(--ub-orange); color:var(--ub-orange-light);
+  font-family:var(--sans); font-size:12px; padding:7px 18px; border-radius:6px;
+  cursor:pointer; transition:all .15s; font-weight:500;
+}
+.task-btn:hover { background:rgba(233,84,32,.15); }
+.task-btn.done { border-color:var(--green); color:var(--green); cursor:default; }
+
+/* ── Section heading ── */
+.sh {
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-dim); margin:20px 0 8px; font-weight:600;
+}
+.sh:first-child { margin-top:0; }
+
+/* ── Description block ── */
+.desc-block {
+  font-size:13px; color:var(--text-muted); line-height:1.8;
+  border-left:3px solid var(--ub-orange); padding-left:12px;
+  margin:10px 0;
+}
+
+/* ── Credentials card ── */
+.cred-card {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  border-radius:8px; overflow:hidden; margin:10px 0;
+}
+.cred-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:9px 14px; border-bottom:1px solid rgba(255,255,255,.06);
+  font-family:var(--mono); font-size:12px;
+}
+.cred-row:last-child { border-bottom:none; }
+.cred-label { color:var(--text-muted); }
+.cred-value { color:var(--green); font-weight:600; }
+
+/* ── Chmod grid ── */
+.chmod-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0;
+}
+.chmod-cell {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:8px; padding:12px; text-align:center;
+  font-family:var(--mono); font-size:12px;
+}
+.chmod-who { font-size:10px; color:var(--text-dim); margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em; }
+.chmod-bits { font-size:16px; color:var(--text); letter-spacing:.08em; }
+.chmod-val { font-size:18px; color:var(--ub-orange-light); font-weight:700; margin-top:4px; }
+
+code {
+  font-family:var(--mono); background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1); padding:1px 7px; border-radius:4px;
+  font-size:12px; color:#C084FC;
+}
+
+/* ── Profile card ── */
+.profile-card {
+  background:linear-gradient(135deg, rgba(233,84,32,.1), rgba(119,33,111,.1));
+  border:1px solid rgba(233,84,32,.3); border-radius:12px;
+  padding:20px; margin:10px 0; display:flex; gap:16px; align-items:center;
+}
+.profile-avatar-big {
+  width:60px; height:60px; border-radius:50%;
+  background:linear-gradient(135deg,var(--ub-purple),var(--ub-orange));
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; flex-shrink:0;
+  border:2px solid rgba(233,84,32,.4);
+}
+.profile-name { font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.profile-badge {
+  font-size:10px; padding:2px 8px; border-radius:10px;
+  background:rgba(233,84,32,.2); border:1px solid rgba(233,84,32,.4);
+  color:var(--ub-orange-light); margin-left:8px; font-weight:600; letter-spacing:.04em;
+}
+.profile-detail { font-family:var(--mono); font-size:11px; color:var(--text-muted); line-height:1.9; }
+
+/* ── Final screen ── */
+.final-screen { text-align:center; padding:24px 16px; }
+.final-emoji { font-size:56px; margin-bottom:16px; }
+.final-title { font-size:26px; font-weight:700; color:var(--green); margin-bottom:8px; }
+.final-sub { font-size:13px; color:var(--text-muted); line-height:1.8; margin-bottom:20px; }
+
+/* ══════════════════════════════════════════
+   TERMINAL (GNOME Terminal style)
+══════════════════════════════════════════ */
+.term-window { background:#1A1A1A; }
+.term-titlebar { background:#2D2D2D; }
+
+.term-toolbar {
+  display:flex; align-items:center; gap:8px; padding:6px 12px;
+  background:#242424; border-bottom:1px solid rgba(0,0,0,.4);
+}
+.term-tab {
+  padding:4px 14px; border-radius:4px; font-size:12px;
+  background:rgba(255,255,255,.1); color:var(--text-muted);
+  cursor:pointer; display:flex; align-items:center; gap:6px;
+}
+.term-tab-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+
+.term-body {
+  background:#0D0D0D; font-family:var(--mono); font-size:13px;
+  height:380px; overflow-y:auto; padding:12px 16px;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent;
+  flex:1; line-height:1.65;
+}
+.t-line { margin:0; }
+.t-ps1 { color:#4ADE80; }
+.t-ps1-host { color:#60A5FA; }
+.t-ps1-path { color:#C084FC; }
+.t-cmd { color:#F8F8F8; }
+.t-out { color:#9CA3AF; }
+.t-err { color:#F87171; }
+.t-ok  { color:#4ADE80; }
+.t-info { color:#60A5FA; }
+.t-file { color:#93C5FD; }
+.t-dir  { color:#4ADE80; font-weight:700; }
+.t-perm-x { color:#C084FC; }
+.t-perm-r { color:#4ADE80; }
+.t-perm-w { color:#60A5FA; }
+
+.term-input-row {
+  display:flex; align-items:center; gap:4px;
+  padding:8px 16px; border-top:1px solid rgba(255,255,255,.05);
+  background:#0D0D0D;
+}
+.term-ps1-label { font-family:var(--mono); font-size:13px; white-space:nowrap; }
+#term-input {
+  flex:1; background:transparent; border:none; outline:none;
+  color:var(--text); font-family:var(--mono); font-size:13px;
+  caret-color:#4ADE80;
+}
+
+/* ══════════════════════════════════════════
+   NANO EDITOR
+══════════════════════════════════════════ */
+#nano-overlay {
+  position:fixed; inset:0; z-index:4000;
+  display:flex; flex-direction:column; font-family:var(--mono);
+  animation: fadeIn .1s ease;
+}
+#nano-topbar {
+  background:#2D2D2D; color:var(--text-muted); padding:4px 14px;
+  font-size:12px; display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid rgba(0,0,0,.4);
+}
+#nano-filename { color:#C084FC; font-weight:700; }
+#nano-editor {
+  flex:1; background:#0D0D0D; color:#F8F8F8; border:none; outline:none;
+  padding:14px 16px; font-family:var(--mono); font-size:13px;
+  line-height:1.75; resize:none; scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.1) transparent; caret-color:#4ADE80;
+}
+#nano-statusbar {
+  background:#0D0D0D; border-top:1px solid rgba(255,255,255,.06);
+  padding:5px 14px; color:var(--text-dim); font-size:11px;
+  display:flex; justify-content:space-between;
+}
+#nano-bottombar {
+  background:#2D2D2D; padding:4px 14px; display:flex; gap:16px;
+  border-top:1px solid rgba(0,0,0,.3);
+}
+.nano-sc { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-muted); }
+.nano-key {
+  background:#444; border:1px solid rgba(255,255,255,.15); border-radius:3px;
+  padding:1px 6px; color:var(--text); font-size:10px; font-weight:700;
+}
+#nano-saved-msg { color:var(--green); font-weight:700; opacity:0; transition:opacity .3s; }
+#nano-saved-msg.show { opacity:1; }
+
+/* ══════════════════════════════════════════
+   FILE MANAGER (Nautilus style)
+══════════════════════════════════════════ */
+.fm-win { display:flex; flex-direction:column; }
+.fm-titlebar { background:#353535; }
+
+.fm-header-bar {
+  display:flex; align-items:center; gap:8px; padding:8px 12px;
+  background:#2C2C2C; border-bottom:1px solid rgba(0,0,0,.35); flex-shrink:0;
+}
+.fm-nav-btn {
+  width:28px; height:28px; border-radius:6px; border:none;
+  background:rgba(255,255,255,.07); color:var(--text-muted);
+  font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .12s;
+}
+.fm-nav-btn:hover { background:rgba(255,255,255,.14); color:var(--text); }
+.fm-nav-btn:disabled { opacity:.3; cursor:default; pointer-events:none; }
+
+.fm-path-bar {
+  flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.09);
+  border-radius:20px; padding:4px 14px; font-family:var(--mono);
+  font-size:12px; color:#C084FC; cursor:pointer; transition:all .15s;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+}
+.fm-path-bar:hover { background:rgba(255,255,255,.11); }
+
+.fm-search-wrap {
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1);
+  border-radius:16px; padding:0 12px; display:flex; align-items:center; gap:6px;
+  transition:border-color .15s;
+}
+.fm-search-wrap:focus-within { border-color:rgba(233,84,32,.5); }
+.fm-search {
+  background:transparent; border:none; outline:none;
+  color:var(--text); font-family:var(--sans); font-size:12px;
+  width:130px; padding:5px 0; caret-color:var(--ub-orange);
+}
+.fm-search::placeholder { color:rgba(255,255,255,.3); }
+
+.fm-view-btns { display:flex; gap:2px; }
+.fm-vbtn {
+  width:28px; height:28px; border-radius:5px; border:none; cursor:pointer;
+  background:rgba(255,255,255,.06); color:var(--text-dim); font-size:13px;
+  display:flex; align-items:center; justify-content:center; transition:all .12s;
+}
+.fm-vbtn:hover { background:rgba(255,255,255,.12); color:var(--text); }
+.fm-vbtn.active { background:rgba(233,84,32,.25); color:var(--ub-orange-light); }
+
+.fm-body { display:flex; flex:1; overflow:hidden; }
+
+.fm-sidebar {
+  width:170px; flex-shrink:0; background:#242424;
+  border-right:1px solid rgba(0,0,0,.3); padding:8px 6px;
+  overflow-y:auto; display:flex; flex-direction:column; gap:1px;
+}
+.fm-sb-section {
+  font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-dim); padding:10px 10px 4px; font-weight:600;
+}
+.fm-sb-item {
+  display:flex; align-items:center; gap:9px; padding:7px 10px;
+  border-radius:6px; font-size:13px; color:var(--text-muted);
+  cursor:pointer; transition:all .1s;
+}
+.fm-sb-item:hover { background:rgba(255,255,255,.07); color:var(--text); }
+.fm-sb-item.active { background:rgba(233,84,32,.18); color:#F2693D; }
+.fm-sb-icon { font-size:15px; flex-shrink:0; }
+
+.fm-content {
+  flex:1; overflow-y:auto; padding:10px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(82px,1fr));
+  gap:4px; align-content:start;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.fm-content.list { display:flex; flex-direction:column; gap:1px; padding:6px; }
+
+.fm-item {
+  display:flex; flex-direction:column; align-items:center;
+  gap:5px; padding:10px 6px 8px; border-radius:8px;
+  cursor:pointer; transition:background .1s; text-align:center;
+}
+.fm-item:hover { background:rgba(255,255,255,.07); }
+.fm-item.fm-sel { background:rgba(59,130,246,.15); outline:1px solid rgba(59,130,246,.4); }
+.fm-item-icon { font-size:30px; line-height:1; }
+.fm-item-name {
+  font-size:11px; color:var(--text); line-height:1.3;
+  max-width:78px; overflow:hidden; display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.fm-item.list {
+  flex-direction:row; padding:6px 10px; text-align:left; gap:10px;
+  border-radius:5px;
+}
+.fm-item.list .fm-item-icon { font-size:17px; }
+.fm-item.list .fm-item-name { font-size:13px; max-width:none; flex:1; -webkit-line-clamp:1; }
+.fm-item-perm { font-family:var(--mono); font-size:10px; color:var(--text-dim); margin-left:auto; }
+.fm-item-size { font-size:11px; color:var(--text-dim); width:60px; text-align:right; flex-shrink:0; }
+
+.fm-statusbar {
+  height:28px; padding:0 14px; border-top:1px solid rgba(0,0,0,.3);
+  font-size:11px; color:var(--text-dim); display:flex;
+  align-items:center; justify-content:space-between; flex-shrink:0;
+  background:#272727;
+}
+
+/* ══════════════════════════════════════════
+   NOTIFICATIONS
+══════════════════════════════════════════ */
+.notif {
+  position:fixed; bottom:16px; right:16px; z-index:9999;
+  background:#2C2C2C; border:1px solid rgba(255,255,255,.12);
+  border-left:3px solid var(--ub-orange);
+  border-radius:8px; padding:12px 16px;
+  font-size:13px; color:var(--text); max-width:300px;
+  box-shadow:var(--shadow-win);
+  animation:slideInRight .25s ease, fadeOut .3s ease 2.7s forwards;
+}
+@keyframes fadeOut { to { opacity:0; transform:translateX(20px); } }
+
+/* ══════════════════════════════════════════
+   ADMIN MODE
+══════════════════════════════════════════ */
+body.admin-mode #desktop {
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 85%, rgba(224,83,83,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 85% 10%, rgba(150,20,20,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, #140505 0%, #080003 100%);
+}
+body.admin-mode #panel { border-bottom-color:rgba(224,83,83,.3); background:rgba(22,4,4,.96); }
+body.admin-mode #dock { background:rgba(18,2,2,.9); border-right-color:rgba(224,83,83,.15); }
+body.admin-mode #panel-appname { color:var(--red); }
+
+body.admin-mode #progress-fill { background:linear-gradient(90deg,var(--red),#7c0a0a); }
+
+/* Admin pulse badge */
+body.admin-mode #panel-level-badge {
+  animation:adminPulse 1.8s ease-in-out infinite;
+}
+@keyframes adminPulse { 0%,100%{box-shadow:0 0 0 0 rgba(224,83,83,0);} 50%{box-shadow:0 0 0 5px rgba(224,83,83,.25);} }
+
+body.admin-mode #dock-admin .dock-icon { box-shadow:0 0 20px rgba(224,83,83,.5); animation:adminGlow 2s ease-in-out infinite; }
+@keyframes adminGlow { 0%,100%{box-shadow:0 0 14px rgba(224,83,83,.4);} 50%{box-shadow:0 0 28px rgba(224,83,83,.7);} }
+body.admin-mode #dock-admin::after {
+  content:'👑'; position:absolute; top:-3px; font-size:11px;
+  animation:crownBounce 1.5s ease-in-out infinite;
+}
+@keyframes crownBounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+
+/* admin scan line */
+body.admin-mode #desktop::before {
+  content:''; position:absolute; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(224,83,83,.5),transparent);
+  animation:adminScan 5s linear infinite; pointer-events:none; z-index:5;
+}
+@keyframes adminScan { from{top:0;} to{top:100%;} }
+
+/* panel level badge */
+#panel-level-badge {
+  font-family:var(--mono); font-size:10px; padding:2px 8px;
+  border-radius:10px; letter-spacing:.05em; font-weight:600;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+  color:var(--text-muted);
+}
+#panel-level-badge.user  { color:#60A5FA; border-color:rgba(96,165,250,.3); background:rgba(96,165,250,.1); }
+#panel-level-badge.admin { color:var(--red); border-color:rgba(224,83,83,.4); background:rgba(224,83,83,.1); }
+
+/* ══════════════════════════════════════════
+   VM MANAGER / ISO BUILDER
+══════════════════════════════════════════ */
+.vm-sidebar {
+  width:200px; flex-shrink:0; background:#1e1e1e;
+  border-right:1px solid rgba(255,255,255,.07);
+  display:flex; flex-direction:column; padding:8px 0; overflow-y:auto;
+}
+.vm-sidebar-section {
+  font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-dim); padding:12px 14px 4px; font-weight:600;
+}
+.vm-sidebar-item {
+  display:flex; align-items:center; gap:10px; padding:9px 14px;
+  font-size:13px; color:var(--text-muted); cursor:pointer;
+  border-left:3px solid transparent; transition:all .12s;
+}
+.vm-sidebar-item:hover { background:rgba(255,255,255,.05); color:var(--text); }
+.vm-sidebar-item.active { background:rgba(233,84,32,.1); color:var(--ub-orange-light); border-left-color:var(--ub-orange); }
+.vm-sidebar-item .vm-si-badge {
+  margin-left:auto; font-size:9px; padding:2px 6px; border-radius:8px;
+  background:rgba(255,255,255,.08); color:var(--text-dim); font-family:var(--mono);
+}
+.vm-toolbar {
+  display:flex; align-items:center; gap:8px; padding:10px 16px;
+  background:#2a2a2a; border-bottom:1px solid rgba(0,0,0,.35); flex-shrink:0; flex-wrap:wrap;
+}
+.vm-tool-btn {
+  display:flex; align-items:center; gap:6px; padding:6px 14px;
+  border-radius:7px; border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06); color:var(--text-muted);
+  font-family:var(--sans); font-size:12px; font-weight:500;
+  cursor:pointer; transition:all .13s; white-space:nowrap;
+}
+.vm-tool-btn:hover { background:rgba(255,255,255,.12); color:var(--text); }
+.vm-tool-btn.primary { background:rgba(233,84,32,.2); border-color:rgba(233,84,32,.45); color:var(--ub-orange-light); }
+.vm-tool-btn.primary:hover { background:rgba(233,84,32,.32); }
+.vm-tool-btn.green-btn { background:rgba(60,165,92,.15); border-color:rgba(60,165,92,.35); color:#3CA55C; }
+.vm-tool-btn.green-btn:hover { background:rgba(60,165,92,.28); }
+.vm-tool-btn:disabled { opacity:.4; cursor:not-allowed; pointer-events:none; }
+.vm-content-area { flex:1; overflow-y:auto; padding:16px;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent; }
+.vm-card {
+  background:#252525; border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:14px 16px; margin-bottom:8px;
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer; transition:all .15s;
+}
+.vm-card:hover { background:#2c2c2c; border-color:rgba(255,255,255,.14); }
+.vm-card.selected { border-color:rgba(233,84,32,.5); background:rgba(233,84,32,.06); }
+.vm-card-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.vm-card-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.vm-card-sub { font-size:11px; color:var(--text-muted); font-family:var(--mono); }
+.vm-card-status {
+  display:flex; align-items:center; gap:6px; padding:4px 10px;
+  border-radius:16px; font-size:11px; font-weight:600; flex-shrink:0;
+}
+.vm-card-status.running { background:rgba(60,165,92,.15); color:#3CA55C; border:1px solid rgba(60,165,92,.3); }
+.vm-card-status.stopped { background:rgba(255,255,255,.06); color:var(--text-dim); border:1px solid rgba(255,255,255,.1); }
+.vm-card-status.building { background:rgba(233,84,32,.12); color:var(--ub-orange-light); border:1px solid rgba(233,84,32,.3); }
+.vm-card-status .vm-dot { width:6px; height:6px; border-radius:50%; }
+.vm-card-status.running .vm-dot { background:#3CA55C; box-shadow:0 0 6px rgba(60,165,92,.6); animation:vmPulse 1.5s infinite; }
+.vm-card-status.building .vm-dot { background:var(--ub-orange); animation:vmPulse .8s infinite; }
+.vm-card-status.stopped .vm-dot { background:#555; }
+@keyframes vmPulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.iso-panel {
+  background:linear-gradient(135deg,rgba(233,84,32,.04),rgba(119,33,111,.04));
+  border:1px solid rgba(255,255,255,.08); border-radius:12px;
+  padding:18px; margin-bottom:12px;
+}
+.iso-panel-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.iso-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.iso-field { display:flex; flex-direction:column; gap:5px; }
+.iso-field label { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); font-weight:600; }
+.iso-field select, .iso-field input[type=text], .iso-field input[type=number] {
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  border-radius:7px; padding:7px 11px; color:var(--text);
+  font-family:var(--sans); font-size:13px; outline:none; transition:border-color .15s;
+}
+.iso-field select:focus,.iso-field input:focus { border-color:rgba(233,84,32,.5); }
+.iso-field select option { background:#222; }
+.iso-progress-wrap {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:10px; padding:16px; margin-top:12px;
+}
+.iso-progress-title { font-size:12px; color:var(--text-muted); margin-bottom:10px; font-family:var(--mono); }
+.iso-progress-bar-bg { height:5px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; margin-bottom:10px; }
+.iso-progress-bar-fill {
+  height:100%; border-radius:3px; width:0%;
+  background:linear-gradient(90deg,var(--ub-orange),var(--ub-purple));
+  transition:width .5s ease; box-shadow:0 0 8px rgba(233,84,32,.4);
+}
+.iso-steps { display:flex; flex-direction:column; gap:5px; margin-top:10px; }
+.iso-step { display:flex; align-items:center; gap:8px; font-size:11px; font-family:var(--mono); color:var(--text-dim); transition:color .3s; }
+.iso-step.done { color:var(--green); }
+.iso-step.active { color:var(--ub-orange-light); }
+.iso-step-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; background:rgba(255,255,255,.15); transition:all .3s; }
+.iso-step.done .iso-step-dot { background:var(--green); }
+.iso-step.active .iso-step-dot { background:var(--ub-orange); animation:vmPulse .8s infinite; }
+.vm-specs-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
+.vm-spec-cell { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 12px; }
+.vm-spec-label { color:var(--text-dim); margin-bottom:2px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+.vm-spec-val { color:var(--text); font-family:var(--mono); font-weight:600; font-size:13px; }
+.vm-slider { flex:1; -webkit-appearance:none; height:4px; background:rgba(255,255,255,.12); border-radius:2px; outline:none; cursor:pointer; }
+.vm-slider::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:white; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,.5); }
+.vm-slider-val { font-family:var(--mono); font-size:12px; color:var(--ub-orange-light); width:50px; text-align:right; }
+.vm-console {
+  background:#070707; border:1px solid rgba(255,255,255,.08); border-radius:8px;
+  padding:12px 14px; font-family:var(--mono); font-size:11px; line-height:1.8;
+  color:#4ADE80; max-height:150px; overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.vm-tab-bar { display:flex; border-bottom:1px solid rgba(255,255,255,.07); background:#222; flex-shrink:0; }
+.vm-tab { padding:10px 18px; font-size:12px; font-weight:500; color:var(--text-dim); cursor:pointer; border-bottom:2px solid transparent; transition:all .13s; }
+.vm-tab:hover { color:var(--text); }
+.vm-tab.active { color:var(--ub-orange-light); border-bottom-color:var(--ub-orange); }
+.vm-empty-state { text-align:center; padding:48px 24px; }
+.vm-empty-icon { font-size:52px; margin-bottom:14px; opacity:.5; }
+.vm-empty-title { font-size:16px; font-weight:600; color:var(--text-muted); margin-bottom:6px; }
+.vm-empty-sub { font-size:12px; color:var(--text-dim); margin-bottom:20px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ GNOME PANEL ══════════ -->
+<div id="panel">
+  <div class="panel-left">
+    <div class="panel-btn" onclick="toggleOverview()" id="panel-activities-btn">Attività</div>
+    <div class="panel-btn active-app" id="panel-appname">PermissionOS</div>
+  </div>
+  <div class="panel-center">
+    <div id="panel-clock" onclick="toggleSystemMenu()">00:00</div>
+  </div>
+  <div class="panel-right">
+    <div class="panel-icon-btn" title="Rete">📶</div>
+    <div class="panel-icon-btn" title="Audio">🔊</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:0 6px;height:32px;cursor:pointer;border-radius:4px;transition:background .15s;" onclick="toggleSystemMenu()" id="panel-systray-btn" onmouseover="this.style.background='var(--panel-hover)'" onmouseout="this.style.background=''">
+      <div id="panel-user-dot" style="width:7px;height:7px;border-radius:50%;background:var(--text-dim);flex-shrink:0;"></div>
+      <span style="font-size:12px;color:var(--text-muted);font-family:var(--mono);" id="panel-username">ospite</span>
+      <span id="panel-level-badge">GUEST</span>
+      <span style="font-size:9px;opacity:.5;">▾</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SYSTEM MENU ══════════ -->
+<div id="system-menu">
+  <div class="sm-header">
+    <div class="sm-user-row">
+      <div class="sm-avatar" id="sm-avatar">👤</div>
+      <div>
+        <div class="sm-name" id="sm-name">ospite</div>
+        <div class="sm-sub" id="sm-sub">/home/ospite</div>
+      </div>
+    </div>
+  </div>
+  <div class="sm-sliders">
+    <div class="sm-slider-row"><span>🔊</span><input type="range" class="sm-slider" value="75"></div>
+    <div class="sm-slider-row"><span>🔆</span><input type="range" class="sm-slider" value="80"></div>
+  </div>
+  <div class="sm-toggles">
+    <div class="sm-toggle on" id="tog-wifi" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">📶</span>WiFi
+    </div>
+    <div class="sm-toggle" id="tog-bt" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">🔵</span>BT
+    </div>
+    <div class="sm-toggle" id="tog-dnd" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">🔕</span>DnD
+    </div>
+    <div class="sm-toggle on" id="tog-dark" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">🌙</span>Dark
+    </div>
+    <div class="sm-toggle" id="tog-vpn" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">🔒</span>VPN
+    </div>
+    <div class="sm-toggle" id="tog-apt" onclick="this.classList.toggle('on')">
+      <span class="sm-toggle-icon">📦</span>APT
+    </div>
+  </div>
+  <div class="sm-actions">
+    <button class="sm-action-btn" onclick="closeSystemMenu();openUserProfile()"><span>👤</span>Profilo</button>
+    <button class="sm-action-btn" onclick="closeSystemMenu();openSettings()"><span>⚙️</span>Impostaz.</button>
+    <button class="sm-action-btn" onclick="closeSystemMenu();resetSession()" style="color:var(--red)"><span>↺</span>Reset</button>
+  </div>
+</div>
+
+<!-- ══════════ DOCK ══════════ -->
+<div id="dock">
+  <!-- Ubuntu logo / overview -->
+  <div class="dock-item" id="dock-overview-btn" onclick="toggleOverview()" title="Mostra Applicazioni" style="border-radius:50%;">
+    <div class="dock-icon" style="border-radius:50%;background:var(--ub-orange);">
+      <svg width="26" height="26" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#E95420"/><circle cx="16" cy="10" r="4" fill="white" opacity=".92"/><circle cx="10" cy="22" r="4" fill="white" opacity=".92"/><circle cx="22" cy="22" r="4" fill="white" opacity=".92"/></svg>
+    </div>
+  </div>
+  <div class="dock-sep"></div>
+
+  <!-- Nautilus / File Manager -->
+  <div class="dock-item running" id="dock-fm" onclick="openFileManager()" title="File Manager">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#1565C0,#1976D2);">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><rect x="2" y="8" width="28" height="20" rx="3" fill="#1976D2"/><path d="M2 13h28" stroke="rgba(255,255,255,.3)" stroke-width="1"/><rect x="2" y="8" width="12" height="5" rx="2" fill="#2196F3"/><rect x="6" y="17" width="6" height="7" rx="1" fill="rgba(255,255,255,.7)"/><rect x="14" y="17" width="6" height="7" rx="1" fill="rgba(255,255,255,.7)"/><rect x="22" y="17" width="6" height="7" rx="1" fill="rgba(255,255,255,.7)"/></svg>
+    </div>
+    <div class="dock-dot"></div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="dock-item running" id="dock-term" onclick="openTerminal()" title="Terminale">
+    <div class="dock-icon" style="background:#300A24;">
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="4" fill="#300A24"/><text x="4" y="22" font-family="monospace" font-size="14" font-weight="bold" fill="#4ADE80">$_</text></svg>
+    </div>
+    <div class="dock-dot"></div>
+  </div>
+
+  <!-- Text Editor -->
+  <div class="dock-item" id="dock-editor" onclick="openGedit()" title="Editor di Testo">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#4A4A8A,#6A6ABC);">
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect x="3" y="3" width="26" height="26" rx="4" fill="rgba(255,255,255,.1)"/><path d="M8 10h16M8 14h12M8 18h14M8 22h10" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity=".8"/><circle cx="25" cy="25" r="7" fill="#4CAF50"/><path d="M22 25l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="dock-dot"></div>
+  </div>
+
+  <div class="dock-sep"></div>
+
+  <!-- Lezioni (cartelle) -->
+  <div class="dock-item" id="dock-guest" onclick="openFolder('guest')" title="Ospite — Lezione 1">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#374151,#4B5563);">👤</div>
+    <div class="dock-bar"></div>
+    <div class="dock-dot"></div>
+  </div>
+  <div class="dock-item locked" id="dock-user" onclick="openFolder('user')" title="Utente — Lezione 2">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#1a365d,#2563EB);">🧑‍💻</div>
+    <div class="dock-lock-badge">🔒</div>
+    <div class="dock-bar"></div>
+    <div class="dock-dot"></div>
+  </div>
+  <div class="dock-item locked" id="dock-edit" onclick="openFolder('edit')" title="chmod — Lezione 3">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#14532d,#16A34A);">✏️</div>
+    <div class="dock-lock-badge">🔒</div>
+    <div class="dock-bar"></div>
+    <div class="dock-dot"></div>
+  </div>
+  <div class="dock-item locked" id="dock-admin" onclick="openFolder('admin')" title="Root — Lezione 4">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#7f1d1d,#B91C1C);">🔑</div>
+    <div class="dock-lock-badge">🔒</div>
+    <div class="dock-bar"></div>
+    <div class="dock-dot"></div>
+  </div>
+
+  <div class="dock-sep"></div>
+
+  <!-- Chrome -->
+  <div class="dock-item" onclick="launchApp('chrome')" title="Google Chrome">
+    <div class="dock-icon" style="background:white;padding:4px;">
+      <svg viewBox="0 0 48 48" width="28" height="28" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="10" fill="#fff"/><path d="M24 14h22a24 24 0 0 0-22-14z" fill="#EA4335"/><path d="M2 24A22 22 0 0 0 13 43L24 24z" fill="#34A853"/><path d="M46 24H24l11 19A22 22 0 0 0 46 24z" fill="#FBBC05"/><circle cx="24" cy="24" r="8" fill="white"/><circle cx="24" cy="24" r="6" fill="#1A73E8"/></svg>
+    </div>
+  </div>
+
+  <!-- Spotify -->
+  <div class="dock-item" onclick="launchApp('spotify')" title="Spotify">
+    <div class="dock-icon" style="background:#191414;padding:4px;">
+      <svg viewBox="0 0 48 48" width="28" height="28" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#1DB954"/><path d="M33.5 33.2c-.4.6-1.1.8-1.7.4-4.7-2.9-10.6-3.5-17.5-1.9-.7.2-1.3-.3-1.5-.9-.2-.7.3-1.3.9-1.5 7.6-1.7 14.1-1 19.4 2.2.6.4.8 1.2.4 1.7zm2.2-5c-.5.7-1.4.9-2.1.5-5.4-3.3-13.6-4.3-19.9-2.3-.8.2-1.6-.2-1.8-1-.2-.8.2-1.6 1-1.8 7.3-2.2 16.3-1.1 22.4 2.6.7.4.9 1.3.4 2zm.2-5.2c-6.4-3.8-17-4.2-23.1-2.3-.9.3-1.9-.2-2.2-1.1-.3-.9.2-1.9 1.1-2.2 7-2.1 18.6-1.7 25.9 2.7.9.5 1.2 1.6.7 2.5-.5.8-1.6 1.1-2.4.4z" fill="white"/></svg>
+    </div>
+  </div>
+
+  <!-- VM Manager -->
+  <div class="dock-item" onclick="openVMManager()" title="VM Manager / ISO Builder" id="dock-vm">
+    <div class="dock-icon" style="background:linear-gradient(135deg,#1a2744,#2563EB);">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="5" width="28" height="18" rx="3" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
+        <rect x="5" y="8" width="22" height="12" rx="2" fill="#0D0D0D"/>
+        <text x="7" y="17" font-family="monospace" font-size="7" font-weight="bold" fill="#4ADE80">VM</text>
+        <rect x="10" y="23" width="12" height="3" rx="1" fill="rgba(255,255,255,.3)"/>
+        <circle cx="26" cy="6" r="5" fill="#3CA55C"/>
+        <path d="M24 6l1.2 1.2L28 4.5" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="dock-dot"></div>
+  </div>
+
+  <div style="flex:1"></div>
+  <div class="dock-sep"></div>
+
+  <!-- Cestino -->
+  <div class="dock-item" id="dock-trash" onclick="openTrash()" title="Cestino"
+       ondragover="trashDragOver(event)" ondragleave="trashDragLeave()" ondrop="trashDrop(event)">
+    <div class="dock-icon" id="trash-icon" style="background:linear-gradient(135deg,#2a1a1a,#5a2d2d);">🗑️</div>
+    <div class="dock-dot"></div>
+  </div>
+</div>
+
+<!-- ══════════ DESKTOP ══════════ -->
+<div id="desktop">
+
+  <!-- Context menu -->
+  <div id="ctx-menu">
+    <div class="ctx-item" id="ctx-open" onclick="ctxOpen()">📂 Apri</div>
+    <div class="ctx-item" id="ctx-rename" onclick="ctxRename()">✏️ Rinomina</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑️ Sposta nel Cestino</div>
+  </div>
+
+  <!-- Multi-select bar -->
+  <div id="ms-bar">
+    <strong id="ms-count">0</strong> selezionati
+    <button class="ms-btn" onclick="msSelectAll()">Tutto</button>
+    <button class="ms-btn danger" onclick="msDeleteSelected()">🗑️ Elimina</button>
+    <button class="ms-btn" onclick="exitMultiselect()">✕</button>
+  </div>
+
+  <!-- Desktop icons -->
+  <div id="desktop-icons">
+    <!-- Home folder (fixed) -->
+    <div class="desk-icon home-icon" id="desk-home" onclick="desktopIconClick(event,'home')" ondblclick="openFileManager()">
+      <div class="desk-icon-img" style="background:linear-gradient(135deg,#1565C0,#2196F3);">🏠</div>
+      <div class="desk-icon-label">Home</div>
+    </div>
+    <!-- User-created folders added dynamically here -->
+  </div>
+
+  <!-- New folder button -->
+  <button id="new-folder-btn" onclick="createNewFolder()">＋ Nuova Cartella</button>
+
+  <!-- Progress -->
+  <div id="progress-area">
+    <span id="progress-label" style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;">GUEST</span>
+    <div id="progress-track"><div id="progress-fill" style="width:25%"></div></div>
+    <span style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.25);" id="progress-steps">1/4</span>
+  </div>
+</div>
+
+<!-- ══════════ APP OVERVIEW ══════════ -->
+<div id="app-overview" onclick="closeOverview(event)">
+  <div id="app-overview-search-wrap" onclick="event.stopPropagation()">
+    <span style="font-size:16px;opacity:.5;">🔍</span>
+    <input id="app-overview-search" type="text" placeholder="Cerca applicazione…" oninput="filterOverview(this.value)" autocomplete="off" spellcheck="false">
+  </div>
+  <div id="app-grid" onclick="event.stopPropagation()">
+    <div class="app-section-label">PermissionOS — Lezioni</div>
+    <div class="app-grid-item" onclick="closeOverview();openFolder('guest')">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#374151,#4B5563);">👤</div>
+      <div class="app-grid-name">Ospite</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openFolder('user')">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#1a365d,#2563EB);">🧑‍💻</div>
+      <div class="app-grid-name">Utente</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openFolder('edit')">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#14532d,#16A34A);">✏️</div>
+      <div class="app-grid-name">chmod</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openFolder('admin')">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#7f1d1d,#B91C1C);">🔑</div>
+      <div class="app-grid-name">Root</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openTerminal()">
+      <div class="app-grid-icon" style="background:#300A24;font-family:monospace;font-size:14px;font-weight:700;color:#4ADE80;">$_</div>
+      <div class="app-grid-name">Terminale</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openFileManager()">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#1565C0,#1976D2);">🗂️</div>
+      <div class="app-grid-name">File Manager</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openGedit()">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#4A4A8A,#6A6ABC);">📝</div>
+      <div class="app-grid-name">Editor Testo</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openUserProfile()">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,var(--ub-purple),var(--ub-orange));">🪪</div>
+      <div class="app-grid-name">Profilo</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();createNewFolder()">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#134E4A,#0D9488);">📁</div>
+      <div class="app-grid-name">Nuova Cartella</div>
+    </div>
+    <div class="app-section-label">Applicazioni</div>
+    <div class="app-grid-item" onclick="closeOverview();launchApp('chrome')">
+      <div class="app-grid-icon" style="background:white;padding:6px;"><svg viewBox="0 0 48 48" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="10" fill="#fff"/><path d="M24 14h22a24 24 0 0 0-22-14z" fill="#EA4335"/><path d="M2 24A22 22 0 0 0 13 43L24 24z" fill="#34A853"/><path d="M46 24H24l11 19A22 22 0 0 0 46 24z" fill="#FBBC05"/><circle cx="24" cy="24" r="8" fill="white"/><circle cx="24" cy="24" r="6" fill="#1A73E8"/></svg></div>
+      <div class="app-grid-name">Chrome</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();launchApp('spotify')">
+      <div class="app-grid-icon" style="background:#191414;padding:4px;"><svg viewBox="0 0 48 48" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#1DB954"/><path d="M33.5 33.2c-.4.6-1.1.8-1.7.4-4.7-2.9-10.6-3.5-17.5-1.9-.7.2-1.3-.3-1.5-.9-.2-.7.3-1.3.9-1.5 7.6-1.7 14.1-1 19.4 2.2.6.4.8 1.2.4 1.7zm2.2-5c-.5.7-1.4.9-2.1.5-5.4-3.3-13.6-4.3-19.9-2.3-.8.2-1.6-.2-1.8-1-.2-.8.2-1.6 1-1.8 7.3-2.2 16.3-1.1 22.4 2.6.7.4.9 1.3.4 2zm.2-5.2c-6.4-3.8-17-4.2-23.1-2.3-.9.3-1.9-.2-2.2-1.1-.3-.9.2-1.9 1.1-2.2 7-2.1 18.6-1.7 25.9 2.7.9.5 1.2 1.6.7 2.5-.5.8-1.6 1.1-2.4.4z" fill="white"/></svg></div>
+      <div class="app-grid-name">Spotify</div>
+    </div>
+    <div class="app-grid-item" onclick="closeOverview();openVMManager()">
+      <div class="app-grid-icon" style="background:linear-gradient(135deg,#1a2744,#2563EB);display:flex;align-items:center;justify-content:center;font-size:24px;">🖥️</div>
+      <div class="app-grid-name">VM Manager</div>
+    </div>
+    <div id="app-empty">Nessuna app trovata</div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL CONTAINER ══════════ -->
+<div id="modal-container"></div>
+
+<script>
+'use strict';
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+const state = {
+  level: parseInt(localStorage.getItem('perm_level')||'0'),
+  username: localStorage.getItem('perm_user')||'ospite',
+  password: localStorage.getItem('perm_pass')||'',
+  tasksCompleted: JSON.parse(localStorage.getItem('perm_tasks')||'{}'),
+  userFolders: JSON.parse(localStorage.getItem('perm_folders')||'[]'),
+  fileContents: {
+    'readme.txt':`Benvenuto in PermissionOS!\n\nQuesto file è leggibile da tutti (r--).\nNon puoi modificarlo come Ospite.\n\nPermessi: -r--r--r--\nProprietario: root\n\nPer avanzare: completa il task in questa cartella.`,
+    'info.txt':`Sistema: PermissionOS v2.0\nKernel: 6.8.0-ubuntu\nDistro: Ubuntu 24.04 LTS (Noble Numbat)\nArchitettura: x86_64\nUptimme: 0h 03m\n\n[read-only per ospiti]`,
+    'note.txt':`Appunti utente:\n- Studia i permessi Linux\n- Esercitati con chmod\n- Diventa admin!\n\nPermessi: -rw-r--r--\nSolo l'utente può scrivere.`,
+    'script.sh':`#!/bin/bash\n# Script di sistema\necho "Avvio sistema..."\necho "Permessi verificati"\nexit 0\n\n# Permessi: -rwxr-x---\n# Solo owner può eseguire`,
+    'config.cfg':`[sistema]\ndebug=false\nlog_level=info\nmax_users=10\n\n[Questo file è scrivibile solo da admin]\nPermessi: -rw-------`,
+    'secret.txt':`ACCESSO AMMINISTRATORE SBLOCCATO!\n\nHai completato tutto il percorso.\nUsername: ${localStorage.getItem('perm_user')||'admin_user'}\nLivello: ROOT\n\nPermessi: -rwx------`
+  },
+  termCwd: '~',
+};
+
+function saveState() {
+  localStorage.setItem('perm_level', state.level);
+  localStorage.setItem('perm_user', state.username);
+  localStorage.setItem('perm_pass', state.password);
+  localStorage.setItem('perm_tasks', JSON.stringify(state.tasksCompleted));
+  localStorage.setItem('perm_folders', JSON.stringify(state.userFolders||[]));
+}
+
+// ══════════════════════════════════════
+//  GENERATORS
+// ══════════════════════════════════════
+function generateUsername() {
+  const a=['fast','dark','blue','swift','cyber','neo','solar','delta'];
+  const n=['hawk','wolf','node','byte','pixel','root','shell','core'];
+  return a[Math.random()*a.length|0]+'_'+n[Math.random()*n.length|0]+(Math.random()*90+10|0);
+}
+function generatePassword() {
+  const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
+  return Array.from({length:12},()=>c[Math.random()*c.length|0]).join('');
+}
+
+// ══════════════════════════════════════
+//  UI UPDATE
+// ══════════════════════════════════════
+const LEVEL_NAMES = ['GUEST','USER','EDITOR','ADMIN'];
+const LEVEL_LABELS = ['Ospite','Utente','Editor','Amministratore'];
+
+function updateUI() {
+  const lvl = state.level;
+  document.getElementById('panel-username').textContent = state.username;
+  document.getElementById('panel-level-badge').textContent = LEVEL_NAMES[lvl];
+  document.getElementById('panel-level-badge').className = 'panel-level-badge'+(lvl===0?'':lvl>=3?' admin':' user');
+  document.getElementById('sm-name').textContent = state.username;
+  document.getElementById('sm-sub').textContent = `/home/${state.username}`;
+  document.getElementById('panel-user-dot').style.background = lvl===0?'var(--text-dim)':lvl>=3?'var(--red)':'var(--blue)';
+
+  // Dock unlock
+  [{id:'dock-user',req:1},{id:'dock-edit',req:2},{id:'dock-admin',req:3}].forEach(({id,req})=>{
+    const el=document.getElementById(id);
+    if(el&&lvl>=req){el.classList.remove('locked');el.querySelector('.dock-lock-badge')?.remove();}
+  });
+  document.getElementById('dock-guest')?.classList.toggle('active',lvl===0);
+
+  // Progress
+  document.getElementById('progress-fill').style.width=((lvl+1)/4*100)+'%';
+  document.getElementById('progress-label').textContent = LEVEL_NAMES[lvl];
+  document.getElementById('progress-steps').textContent = `${lvl+1}/4`;
+
+  // Secret file
+  state.fileContents['secret.txt']=`ACCESSO AMMINISTRATORE SBLOCCATO!\n\nHai completato tutto il percorso.\nUsername: ${state.username}\nLivello: ROOT\n\nPermessi: -rwx------`;
+
+  // Admin mode
+  document.body.classList.toggle('admin-mode', lvl>=3);
+  document.getElementById('panel-appname').style.color = lvl>=3?'var(--red)':'';
+}
+
+// ══════════════════════════════════════
+//  PANEL
+// ══════════════════════════════════════
+function toggleSystemMenu() {
+  document.getElementById('system-menu').classList.toggle('open');
+}
+function closeSystemMenu() {
+  document.getElementById('system-menu').classList.remove('open');
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#system-menu')&&!e.target.closest('#panel-systray-btn')&&!e.target.closest('#panel-clock')) closeSystemMenu();
+  if(!e.target.closest('#ctx-menu')) hideCtxMenu();
+});
+
+// Clock
+function updateClock() {
+  const n=new Date();
+  document.getElementById('panel-clock').textContent =
+    `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ══════════════════════════════════════
+//  APP OVERVIEW
+// ══════════════════════════════════════
+function toggleOverview() {
+  const ov=document.getElementById('app-overview');
+  if(ov.classList.contains('open')){closeOverview();}
+  else{ov.classList.add('open');setTimeout(()=>document.getElementById('app-overview-search').focus(),80);}
+}
+function closeOverview(e) {
+  if(e&&e.target!==document.getElementById('app-overview'))return;
+  document.getElementById('app-overview').classList.remove('open');
+  document.getElementById('app-overview-search').value='';
+  filterOverview('');
+}
+function filterOverview(q) {
+  const items=document.querySelectorAll('.app-grid-item');
+  const labels=document.querySelectorAll('.app-section-label');
+  const lq=q.toLowerCase().trim();
+  let vis=0;
+  items.forEach(el=>{
+    const nm=el.querySelector('.app-grid-name').textContent.toLowerCase();
+    const show=!lq||nm.includes(lq);
+    el.style.display=show?'':'none';
+    if(show)vis++;
+  });
+  labels.forEach(l=>{l.style.display=lq?'none':'';});
+  document.getElementById('app-empty').style.display=vis===0?'block':'none';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOverview({target:document.getElementById('app-overview')});closeSystemMenu();}});
+
+// ══════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════
+function showModal(html,wide=false,tall=false) {
+  const c=document.getElementById('modal-container');
+  c.innerHTML=`<div class="overlay"><div class="window${wide?' wide':''}${tall?' tall':''}">${html}</div></div>`;
+  c.querySelector('.overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+}
+function closeModal() { document.getElementById('modal-container').innerHTML=''; }
+function winTitlebar(title) {
+  return `<div class="win-titlebar"><div class="win-btns"><div class="win-btn close" onclick="closeModal()"></div><div class="win-btn min"></div><div class="win-btn max"></div></div><div class="win-title">${title}</div></div>`;
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function notify(msg) {
+  const el=document.createElement('div'); el.className='notif'; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),3100);
+}
+
+// ══════════════════════════════════════
+//  LAUNCH EXTERNAL APPS
+// ══════════════════════════════════════
+function launchApp(id) {
+  const urls={chrome:'https://www.google.com',spotify:'https://open.spotify.com'};
+  if(urls[id]) window.open(urls[id],'_blank');
+}
+
+function openSettings() {
+  showModal(`
+    ${winTitlebar('⚙️ Impostazioni — GNOME Settings')}
+    <div class="win-body">
+      <div class="sh">Aspetto</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0;">
+        ${['#1a0a12','#0d1117','#0a1628','#0a1a0a'].map((bg,i)=>`
+          <div onclick="document.getElementById('desktop').style.background='radial-gradient(ellipse 120% 100% at 50% 50%,${bg} 0%,#000 100%)'"
+               style="height:60px;border-radius:8px;background:${bg};border:2px solid rgba(255,255,255,${i===0?.3:.1});cursor:pointer;display:flex;align-items:flex-end;padding:6px;">
+            <span style="font-size:9px;color:rgba(255,255,255,.5);">${['Ubuntu','Dark','Blue','Green'][i]}</span>
+          </div>`).join('')}
+      </div>
+      <div class="sh">Lingua e Regione</div>
+      <div class="cred-card">
+        <div class="cred-row"><span class="cred-label">Lingua</span><span class="cred-value">Italiano (IT)</span></div>
+        <div class="cred-row"><span class="cred-label">Tastiera</span><span class="cred-value">it — Italiano</span></div>
+        <div class="cred-row"><span class="cred-label">Fuso orario</span><span class="cred-value">Europe/Rome (UTC+2)</span></div>
+      </div>
+      <div class="sh">Informazioni di sistema</div>
+      <div class="cred-card">
+        <div class="cred-row"><span class="cred-label">Distro</span><span class="cred-value">Ubuntu 24.04 LTS</span></div>
+        <div class="cred-row"><span class="cred-label">Kernel</span><span class="cred-value">6.8.0-36-generic</span></div>
+        <div class="cred-row"><span class="cred-label">GNOME</span><span class="cred-value">46.0</span></div>
+        <div class="cred-row"><span class="cred-label">CPU</span><span class="cred-value">Intel Core i5 (sim)</span></div>
+        <div class="cred-row"><span class="cred-label">RAM</span><span class="cred-value">8 GB</span></div>
+        <div class="cred-row"><span class="cred-label">Disco</span><span class="cred-value">256 GB SSD</span></div>
+      </div>
+      <button class="task-btn" style="margin-top:14px;" onclick="closeModal()">Chiudi</button>
+    </div>`);
+}
+
+// ══════════════════════════════════════
+//  GEDIT (text editor)
+// ══════════════════════════════════════
+function openGedit(filename, content) {
+  const fn = filename || 'senza_nome.txt';
+  const c = content || '';
+  showModal(`
+    ${winTitlebar('📝 ' + fn + ' — Editor di testo')}
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="display:flex;gap:4px;padding:6px 10px;background:#2C2C2C;border-bottom:1px solid rgba(0,0,0,.3);">
+        <button onclick="geditSave('${fn}')" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--text-muted);font-family:var(--sans);font-size:12px;padding:5px 14px;border-radius:5px;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.14)'" onmouseout="this.style.background='rgba(255,255,255,.07)'">💾 Salva</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--text-muted);font-family:var(--sans);font-size:12px;padding:5px 14px;border-radius:5px;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.14)'" onmouseout="this.style.background='rgba(255,255,255,.07)'">✕ Chiudi</button>
+      </div>
+      <textarea id="gedit-area" spellcheck="false" style="flex:1;background:#1A1A1A;color:#F8F8F8;border:none;outline:none;padding:16px;font-family:var(--mono);font-size:13px;line-height:1.75;resize:none;min-height:380px;scrollbar-width:thin;caret-color:#4ADE80;">${escHtml(c)}</textarea>
+      <div style="padding:4px 14px;background:#2C2C2C;font-family:var(--mono);font-size:10px;color:var(--text-dim);border-top:1px solid rgba(0,0,0,.3);">Ubuntu 24.04 LTS • ${fn} • UTF-8 • Unix (LF)</div>
+    </div>`, false, true);
+}
+function geditSave(fn) {
+  const val = document.getElementById('gedit-area')?.value || '';
+  if(state.fileContents[fn] !== undefined) state.fileContents[fn] = val;
+  notify('💾 "'+fn+'" salvato.');
+  if(!state.tasksCompleted.user && fn === 'note.txt') { setTimeout(completeUserTask, 300); }
+}
+
+// ══════════════════════════════════════
+//  FOLDER SYSTEM
+// ══════════════════════════════════════
+function openFolder(name) {
+  const req={user:1,edit:2,admin:3};
+  if(req[name]&&state.level<req[name]) { notify('🔒 Cartella bloccata. Completa i task precedenti!'); return; }
+  document.querySelectorAll('.dock-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('dock-'+name)?.classList.add('active');
+  if(name==='guest') showGuestFolder();
+  else if(name==='user') showUserFolder();
+  else if(name==='edit') showEditFolder();
+  else if(name==='admin') showAdminFolder();
+}
+
+function showGuestFolder() {
+  const done=state.tasksCompleted.guest;
+  showModal(`
+    ${winTitlebar('📁 Cartella Ospite — /home/guest')}
+    <div class="win-body">
+      <div class="sh">Cosa sono i permessi Linux?</div>
+      <div class="desc-block">
+        In Linux ogni file ha 3 tipi di permesso: <strong>read (r)</strong>, <strong>write (w)</strong>, <strong>execute (x)</strong>.<br>
+        Ogni tipo si applica a 3 categorie: <em>owner</em>, <em>group</em>, <em>others</em>.<br>
+        Come ospite puoi <strong>solo leggere</strong> i file in questa cartella.
+      </div>
+      <div class="sh">File nella cartella</div>
+      <div class="file-list">
+        <div class="file-row" onclick="viewFile('readme.txt')"><span class="file-row-icon">📄</span><span class="file-row-name">readme.txt</span><span class="file-row-perm">-r--r--r--</span><span class="file-row-size">0.4 KB</span></div>
+        <div class="file-row" onclick="viewFile('info.txt')"><span class="file-row-icon">📄</span><span class="file-row-name">info.txt</span><span class="file-row-perm">-r--r--r--</span><span class="file-row-size">0.2 KB</span></div>
+      </div>
+      <div class="sh">Permessi attivi</div>
+      <div class="perm-row"><span class="perm-chip r">r read</span><span class="perm-chip no">w write</span><span class="perm-chip no">x execute</span></div>
+      <div class="task-panel">
+        <div class="task-title">📋 Task 1 — Leggi il readme</div>
+        <div class="task-desc">Clicca su <code>readme.txt</code> per leggerlo, oppure nel terminale: <code>cat readme.txt</code></div>
+        ${done
+          ?`<button class="task-btn done" disabled>✓ Completato — credenziali generate!</button>
+            <div class="cred-card" style="margin-top:12px;">
+              <div class="cred-row"><span class="cred-label">Username</span><span class="cred-value">${state.username}</span></div>
+              <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">${state.password}</span></div>
+              <div class="cred-row"><span class="cred-label">Livello</span><span class="cred-value">user</span></div>
+            </div>`
+          :`<button class="task-btn" onclick="completeGuestTask()">📖 Leggo il file → Ottieni credenziali</button>`}
+      </div>
+    </div>`);
+}
+
+function completeGuestTask() {
+  state.tasksCompleted.guest=true;
+  if(state.level<1){state.level=1;state.username=generateUsername();state.password=generatePassword();}
+  saveState();updateUI();closeModal();
+  notify('🎉 Credenziali generate! Cartella Utente sbloccata.');
+  setTimeout(showGuestFolder,400);
+}
+
+function showUserFolder() {
+  const done=state.tasksCompleted.user;
+  showModal(`
+    ${winTitlebar('📁 Home Utente — /home/'+state.username)}
+    <div class="win-body">
+      <div class="sh">Utente autenticato</div>
+      <div class="desc-block">Ora sei <code>${state.username}</code>. Come utente hai permessi <strong>read + write</strong> sui tuoi file. Il permesso <em>write (w)</em> ti permette di modificare file che possiedi.</div>
+      <div class="sh">File disponibili</div>
+      <div class="file-list">
+        <div class="file-row" onclick="viewFile('readme.txt')"><span class="file-row-icon">📄</span><span class="file-row-name">readme.txt</span><span class="file-row-perm">-r--r--r--</span><span class="file-row-size">0.4 KB</span></div>
+        <div class="file-row" onclick="openGedit('note.txt',state.fileContents['note.txt'])"><span class="file-row-icon">📝</span><span class="file-row-name">note.txt</span><span class="file-row-perm">-rw-r--r--</span><span class="file-row-size">0.2 KB</span></div>
+      </div>
+      <div class="sh">Permessi attivi</div>
+      <div class="perm-row"><span class="perm-chip r">r read</span><span class="perm-chip w">w write</span><span class="perm-chip no">x execute</span></div>
+      <div class="sh">Notazione ottale</div>
+      <div class="chmod-grid">
+        <div class="chmod-cell"><div class="chmod-who">owner</div><div class="chmod-bits">rw-</div><div class="chmod-val">6</div></div>
+        <div class="chmod-cell"><div class="chmod-who">group</div><div class="chmod-bits">r--</div><div class="chmod-val">4</div></div>
+        <div class="chmod-cell"><div class="chmod-who">others</div><div class="chmod-bits">r--</div><div class="chmod-val">4</div></div>
+      </div>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:4px;"><code>chmod 644 note.txt</code> → -rw-r--r--</p>
+      <div class="task-panel">
+        <div class="task-title">📋 Task 2 — Modifica note.txt</div>
+        <div class="task-desc">Clicca su <code>note.txt</code> per aprirlo nell'editor, oppure: <code>nano note.txt</code></div>
+        ${done
+          ?`<button class="task-btn done" disabled>✓ Completato — cartella chmod sbloccata!</button>`
+          :`<button class="task-btn" onclick="closeModal();openGedit('note.txt',state.fileContents['note.txt'])">✏️ Apri note.txt nell'editor</button>`}
+      </div>
+    </div>`);
+}
+
+function completeUserTask() {
+  state.tasksCompleted.user=true;
+  if(state.level<2)state.level=2;
+  saveState();updateUI();closeModal();
+  notify('✏️ Write access dimostrato! Cartella chmod sbloccata.');
+  setTimeout(showUserFolder,400);
+}
+
+function showEditFolder() {
+  const done=state.tasksCompleted.edit;
+  const perm=done?'-rwxr-xr-x':'-rw-r--r--';
+  showModal(`
+    ${winTitlebar('📁 /var/scripts — chmod')}
+    <div class="win-body">
+      <div class="sh">Permesso execute (x)</div>
+      <div class="desc-block">Il permesso <strong>execute (x)</strong> permette di <em>eseguire</em> uno script. Senza di esso, anche se leggi il file, non puoi avviarlo. Con <code>chmod +x</code> lo abiliti.</div>
+      <div class="sh">File disponibili</div>
+      <div class="file-list">
+        <div class="file-row" onclick="viewFile('script.sh')"><span class="file-row-icon">📜</span><span class="file-row-name">script.sh</span><span class="file-row-perm" id="script-perm-label">${perm}</span><span class="file-row-size">0.2 KB</span></div>
+        <div class="file-row" onclick="viewFile('note.txt')"><span class="file-row-icon">📝</span><span class="file-row-name">note.txt</span><span class="file-row-perm">-rw-r--r--</span><span class="file-row-size">0.2 KB</span></div>
+      </div>
+      <div class="sh">Permessi su script.sh</div>
+      <div class="perm-row" id="edit-perm-row"><span class="perm-chip r">r read</span><span class="perm-chip w">w write</span><span class="perm-chip ${done?'x':'no'}">x execute</span></div>
+      <div class="task-panel">
+        <div class="task-title">📋 Task 3 — Rendi script.sh eseguibile</div>
+        <div class="task-desc">Abilita il permesso execute: <code>chmod +x script.sh</code></div>
+        ${done
+          ?`<button class="task-btn done" disabled>✓ chmod +x eseguito!</button>`
+          :`<button class="task-btn" onclick="completeEditTask()">⚡ Esegui chmod +x</button>`}
+      </div>
+      <div class="sh" style="margin-top:20px;">Tabella chmod</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:2.2;">
+        <span style="color:var(--ub-orange-light)">r=4 w=2 x=1</span> &nbsp;|&nbsp; rwx=7 &nbsp;rw-=6 &nbsp;r-x=5 &nbsp;r--=4<br>
+        <code>chmod 755</code> → rwxr-xr-x &nbsp;|&nbsp; <code>chmod 644</code> → rw-r--r-- &nbsp;|&nbsp; <code>chmod 600</code> → rw-------
+      </div>
+    </div>`);
+}
+
+function completeEditTask() {
+  state.tasksCompleted.edit=true;
+  if(state.level<3)state.level=3;
+  saveState();updateUI();closeModal();
+  notify('🔓 chmod +x eseguito! Root sbloccato!');
+  setTimeout(showEditFolder,400);
+}
+
+function showAdminFolder() {
+  showModal(`
+    ${winTitlebar('🔑 /root — Amministratore')}
+    <div class="win-body">
+      <div class="final-screen">
+        <div class="final-emoji">🎓</div>
+        <div class="final-title">Percorso Completato!</div>
+        <div class="final-sub">Da <strong>Ospite</strong> (sola lettura) a <strong>Root</strong> (accesso totale).<br>Hai imparato i permessi fondamentali di Linux.</div>
+        <div class="cred-card" style="max-width:320px;margin:0 auto 20px;text-align:left;">
+          <div class="cred-row"><span class="cred-label">Username</span><span class="cred-value">${state.username}</span></div>
+          <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">${state.password}</span></div>
+          <div class="cred-row"><span class="cred-label">Livello</span><span class="cred-value">ADMIN / ROOT</span></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text-muted);margin:0 auto 20px;max-width:400px;text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px;">
+          <div style="color:var(--yellow);margin-bottom:8px;">📚 Concetti appresi:</div>
+          ✓ read (r) — leggere file e listare directory<br>
+          ✓ write (w) — creare, modificare, eliminare file<br>
+          ✓ execute (x) — eseguire script e navigare directory<br>
+          ✓ chmod — cambiare i permessi di un file<br>
+          ✓ owner / group / others — i tre livelli utente<br>
+          ✓ notazione ottale (755, 644, 600...)
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="task-btn" onclick="viewFile('secret.txt')">🔓 Leggi secret.txt</button>
+          <button class="task-btn" style="border-color:var(--red);color:var(--red);" onclick="closeModal();setTimeout(resetSession,200)">↺ Ricomincia</button>
+        </div>
+      </div>
+    </div>`, true);
+}
+
+function resetSession() { localStorage.clear(); location.reload(); }
+
+function viewFile(name) {
+  const content=state.fileContents[name]||'File non trovato.';
+  showModal(`
+    ${winTitlebar('📄 '+name+' — Visualizzatore')}
+    <div class="win-body">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:10px;">cat /home/${state.username}/${name}</div>
+      <pre style="background:#0D0D0D;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;color:#F8F8F8;white-space:pre-wrap;line-height:1.8;max-height:380px;overflow-y:auto;">${escHtml(content)}</pre>
+      <div style="margin-top:14px;display:flex;gap:8px;">
+        <button class="task-btn" onclick="closeModal()">Chiudi</button>
+        ${state.fileContents[name]!==undefined&&name!=='readme.txt'&&name!=='info.txt'?`<button class="task-btn" onclick="closeModal();openGedit('${name}',state.fileContents['${name}'])">✏️ Modifica</button>`:''}
+      </div>
+    </div>`);
+  if(!state.tasksCompleted.guest&&name==='readme.txt'){ setTimeout(completeGuestTask,200); }
+}
+
+// ══════════════════════════════════════
+//  TERMINAL
+// ══════════════════════════════════════
+let termLines=[];
+let termFS={'~':{'readme.txt':{perm:'-r--r--r--'},'info.txt':{perm:'-r--r--r--'},'note.txt':{perm:'-rw-r--r--'},'script.sh':{perm:state.tasksCompleted.edit?'-rwxr-xr-x':'-rw-r--r--'},'config.cfg':{perm:'-rw-------'}}};
+let scriptPerm=state.tasksCompleted.edit?'-rwxr-xr-x':'-rw-r--r--';
+
+function openTerminal() {
+  const isAdmin=state.level>=3;
+  const who=isAdmin?'root':state.username;
+  const sym=isAdmin?'#':'$';
+  const ps1col=isAdmin?'#F87171':'#4ADE80';
+  const c=document.getElementById('modal-container');
+  c.innerHTML=`
+    <div class="overlay">
+      <div class="window term-window${isAdmin?' wide':''}">
+        <div class="win-titlebar term-titlebar">
+          <div class="win-btns"><div class="win-btn close" onclick="closeModal()"></div><div class="win-btn min"></div><div class="win-btn max"></div></div>
+          <div class="win-title" style="color:#9CA3AF;font-family:var(--mono);font-size:12px;">${who}@permissionos: ${state.termCwd}</div>
+        </div>
+        <div class="term-toolbar">
+          <div class="term-tab"><div class="term-tab-dot" style="background:${isAdmin?'var(--red)':'var(--green)'}"></div>${who}@permissionos</div>
+          <div style="flex:1"></div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">Ubuntu 24.04 LTS</div>
+        </div>
+        <div class="term-body" id="term-out">
+          <div class="t-line"><span class="t-info">Ubuntu 24.04.1 LTS — GNU bash 5.2.21</span></div>
+          <div class="t-line"><span style="color:${ps1col};">${who}</span><span class="t-ps1-host">@permissionos</span>:<span class="t-ps1-path">~</span>${sym} <span class="t-info">uname -a</span></div>
+          <div class="t-line t-out">Linux permissionos 6.8.0-36-generic #36-Ubuntu SMP x86_64 GNU/Linux</div>
+          ${isAdmin?`<div class="t-line" style="color:var(--red);opacity:.8;">⚠  Sei root. Tutti i comandi vengono eseguiti con privilegi massimi.</div>`:''}
+          <div class="t-line t-out">Scrivi <span style="color:#C084FC">help</span> per i comandi disponibili.</div>
+          <div class="t-line"> </div>
+        </div>
+        <div class="term-input-row">
+          <span class="term-ps1-label">
+            <span style="color:${ps1col};">${who}</span><span style="color:#60A5FA;">@permissionos</span>:<span style="color:#C084FC;">~</span>${sym}&nbsp;
+          </span>
+          <input type="text" id="term-input" placeholder="digita un comando…" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>`;
+  c.querySelector('.overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+  const inp=document.getElementById('term-input');
+  inp.focus();
+  inp.addEventListener('keydown',handleTermKey);
+}
+
+const cmdHist=[]; let histIdx=-1;
+function handleTermKey(e) {
+  if(e.key==='Enter'){const v=e.target.value.trim();if(v){cmdHist.unshift(v);histIdx=-1;}runCmd(v);e.target.value='';}
+  else if(e.key==='ArrowUp'){histIdx=Math.min(histIdx+1,cmdHist.length-1);e.target.value=cmdHist[histIdx]||'';e.preventDefault();}
+  else if(e.key==='ArrowDown'){histIdx=Math.max(histIdx-1,-1);e.target.value=histIdx>=0?cmdHist[histIdx]:'';e.preventDefault();}
+}
+function tPrint(html){ const o=document.getElementById('term-out');if(o){o.innerHTML+=`<div class="t-line">${html}</div>`;o.scrollTop=o.scrollHeight;} }
+function tPrompt(cmd){
+  const isAdmin=state.level>=3;const who=isAdmin?'root':state.username;const sym=isAdmin?'#':'$';
+  const col=isAdmin?'#F87171':'#4ADE80';
+  tPrint(`<span style="color:${col};">${who}</span><span class="t-ps1-host">@permissionos</span>:<span class="t-ps1-path">${state.termCwd}</span>${sym} <span class="t-cmd">${escHtml(cmd)}</span>`);
+}
+
+function runCmd(raw) {
+  tPrompt(raw);
+  const parts=raw.trim().split(/\s+/);
+  const cmd=parts[0]; const arg=parts.slice(1).join(' ');
+  switch(cmd){
+    case '': break;
+    case 'help':
+      tPrint('<span class="t-info">═══ Comandi disponibili (PermissionOS) ═══</span>');
+      tPrint('<span class="t-out" style="color:#E3B341;">── File & Directory ──</span>');
+      [['ls [-la]','lista file e permessi'],['cat <file>','mostra contenuto file'],['less <file>','visualizza file con scorrimento'],['head <file>','prime 10 righe del file'],['tail <file>','ultime 10 righe del file'],['nano <file>','modifica file (editor)'],['touch <file>','crea file vuoto'],['mkdir <dir>','crea directory'],['rmdir <dir>','rimuove directory vuota'],['rm <file>','elimina file'],['cp <src> <dst>','copia file'],['mv <src> <dst>','sposta/rinomina file'],['find . -name','cerca file per nome'],['du -sh','spazio usato da directory'],['file <file>','tipo di file'],['wc <file>','conta righe/parole/caratteri'],['stat <file>','info dettagliate file'],['ln -s <src> <dst>','crea link simbolico']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Permessi ──</span>');
+      [['chmod +x <file>','abilita execute'],['chmod <octal> <file>','imposta permessi (es. 755)'],['chown user:group <file>','cambia proprietario'],['chgrp <group> <file>','cambia gruppo'],['umask','maschera permessi default']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Sistema & Info ──</span>');
+      [['whoami','utente corrente'],['id','uid gid gruppi'],['pwd','directory corrente'],['uname -a','info sistema/kernel'],['hostname','nome host'],['uptime','tempo di attività'],['date','data e ora corrente'],['cal','calendario del mese'],['env','variabili d\'ambiente'],['printenv','stampa env'],['lsb_release -a','info distro Ubuntu'],['arch','architettura CPU'],['nproc','numero CPU core'],['lscpu','info dettagliate CPU'],['lsmem','info memoria'],['lsblk','lista dispositivi a blocchi'],['lsusb','dispositivi USB'],['lspci','dispositivi PCI'],['dmesg','messaggi kernel'],['journalctl','log di sistema']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Processi & Risorse ──</span>');
+      [['ps aux','lista processi'],['top','monitor processi in tempo reale'],['htop','monitor interattivo (colorato)'],['kill <pid>','termina processo per PID'],['killall <nome>','termina processi per nome'],['bg','metti processo in background'],['fg','riporta processo in foreground'],['jobs','processi in background'],['nice -n <val> <cmd>','avvia con priorità'],['df -h','spazio disco (human-readable)'],['free -h','uso RAM e swap'],['vmstat','statistiche memoria virtuale'],['iostat','statistiche I/O disco'],['sar','statistiche di sistema']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Rete ──</span>');
+      [['ip a','indirizzi IP interfacce'],['ip route','tabella di routing'],['ping <host>','test connettività'],['curl <url>','richiesta HTTP'],['wget <url>','scarica file da URL'],['ss -tuln','porte in ascolto'],['netstat -tuln','connessioni di rete'],['nmap <host>','scansione porte'],['traceroute <host>','percorso pacchetti'],['dig <host>','query DNS'],['nslookup <host>','risoluzione DNS'],['host <nome>','info DNS host'],['whois <dominio>','info dominio'],['ifconfig','config interfacce (deprecato)'],['iptables -L','regole firewall'],['ufw status','stato firewall UFW']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Pacchetti (APT) ──</span>');
+      [['apt list','pacchetti installati'],['apt search <pkg>','cerca pacchetto'],['apt show <pkg>','info su pacchetto'],['apt install <pkg>','installa pacchetto (root)'],['apt remove <pkg>','rimuove pacchetto'],['apt update','aggiorna lista pacchetti'],['apt upgrade','aggiorna pacchetti'],['apt autoremove','rimuove dipendenze inutili'],['dpkg -l','lista pacchetti dpkg'],['dpkg -i <.deb>','installa pacchetto .deb'],['snap list','pacchetti Snap installati'],['snap find <pkg>','cerca pacchetto Snap']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Servizi (systemd) ──</span>');
+      [['systemctl status','stato servizi'],['systemctl start <svc>','avvia servizio'],['systemctl stop <svc>','ferma servizio'],['systemctl restart <svc>','riavvia servizio'],['systemctl enable <svc>','abilita all\'avvio'],['systemctl disable <svc>','disabilita all\'avvio'],['systemctl list-units','lista unità attive'],['service --status-all','tutti i servizi']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Utenti & Gruppi ──</span>');
+      [['who','utenti connessi'],['w','utenti connessi (dettagliato)'],['last','ultimi login'],['users','lista utenti attivi'],['groups','gruppi utente corrente'],['passwd','cambia password'],['useradd <user>','crea utente (root)'],['usermod -aG <grp> <usr>','aggiunge a gruppo'],['userdel <user>','elimina utente (root)'],['groupadd <grp>','crea gruppo (root)'],['su - <user>','cambia utente'],['sudo <cmd>','esegui come root']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Testo & Ricerca ──</span>');
+      [['grep <pat> <file>','cerca pattern in file'],['grep -r <pat> .','cerca ricorsivo'],['sed \'s/a/b/\' <file>','sostituisce testo'],['awk \'{print $1}\' <file>','elabora colonne'],['sort <file>','ordina righe'],['uniq','rimuove righe duplicate'],['cut -d: -f1 <file>','estrae colonna'],['tr \'a\' \'b\'','sostituisce caratteri'],['diff <f1> <f2>','differenze tra file'],['patch <file>','applica patch']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Archivi & Compressione ──</span>');
+      [['tar -czf out.tar.gz dir/','comprimi con gzip'],['tar -xzf file.tar.gz','estrai tar.gz'],['tar -cjf out.tar.bz2 dir/','comprimi con bzip2'],['zip -r out.zip dir/','comprimi in zip'],['unzip file.zip','estrai zip'],['gzip <file>','comprimi con gzip'],['gunzip <file.gz>','decomprimi gzip'],['bzip2 <file>','comprimi con bzip2']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Shell & Varie ──</span>');
+      [['echo <testo>','stampa testo'],['history','cronologia comandi'],['clear','pulisci terminale'],['alias ll=\'ls -la\'','crea alias'],['export VAR=val','imposta variabile ambiente'],['source <file>','esegui script nel shell corrente'],['which <cmd>','percorso del comando'],['whereis <cmd>','posizioni binario/manuale'],['man <cmd>','manuale del comando'],['info <cmd>','info comando'],['type <cmd>','tipo di comando'],['time <cmd>','misura tempo esecuzione'],['watch -n1 <cmd>','ripeti comando ogni sec'],['xargs','costruisce comandi da input'],['tee <file>','duplica output su file'],['pipe |','collega comandi'],['> file','redireziona output'],['>> file','append output'],['2> file','redireziona errori'],['crontab -e','pianifica task periodici'],['at <ora>','pianifica task una tantum'],['reboot','riavvia sistema (root)'],['shutdown -h now','spegni sistema (root)'],['exit','chiudi sessione']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      tPrint('<span class="t-out" style="color:#E3B341;">── Git ──</span>');
+      [['git status','stato repository'],['git log --oneline','log commit'],['git add <file>','aggiungi file al commit'],['git commit -m \'msg\'','crea commit'],['git diff','differenze non staged'],['git branch','lista branch'],['git checkout -b <br>','crea e cambia branch'],['git merge <branch>','unisce branch'],['git pull','scarica aggiornamenti'],['git push','invia commit al remote'],['git clone <url>','clona repository'],['git stash','salva modifiche temporaneamente']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      break;
+    case 'whoami': tPrint(`<span class="t-ok">${state.level>=3?'root':state.username}</span>`); break;
+    case 'id':
+      const uid=state.level>=3?0:1000+state.level;
+      const grps=state.level>=3?'0(root),4(adm),27(sudo)':`${uid}(${state.username}),1000(users)`;
+      tPrint(`<span class="t-out">uid=${uid}(${state.level>=3?'root':state.username}) gid=${uid} groups=${grps}</span>`); break;
+    case 'pwd': tPrint(`<span class="t-out">/home/${state.username}</span>`); break;
+    case 'uname':
+      tPrint('<span class="t-out">Linux permissionos 6.8.0-36-generic #36-Ubuntu SMP PREEMPT_DYNAMIC Thu Jun 20 14:19:20 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux</span>'); break;
+    case 'clear': document.getElementById('term-out').innerHTML=''; break;
+    case 'history':
+      cmdHist.slice().reverse().forEach((c,i)=>tPrint(`<span class="t-out">  ${String(i+1).padStart(3)} ${escHtml(c)}</span>`)); break;
+    case 'apt':
+      if(arg==='list'||arg==='list --installed'){
+        tPrint('<span class="t-info">Listing… Done</span>');
+        ['bash/noble,now 5.2.21-2ubuntu4 amd64 [installed]','coreutils/noble,now 9.4-3ubuntu6 amd64 [installed]','nano/noble,now 7.2-2 amd64 [installed]','git/noble,now 1:2.43.0-1ubuntu7.1 amd64 [installed]','python3/noble,now 3.12.3-0ubuntu2 amd64 [installed]','openssh-client/noble,now 1:9.6p1-3ubuntu13.3 amd64 [installed]'].forEach(p=>tPrint(`<span class="t-file">${escHtml(p)}</span>`));
+      } else if(arg.startsWith('install')){
+        tPrint(`<span class="t-err">E: Non è possibile installare in modalità simulata</span>`);
+      } else { tPrint('<span class="t-out">Usage: apt {list|install|show} [...]</span>'); } break;
+    case 'systemctl':
+      if(arg==='status'||arg==='status --all'){
+        tPrint('<span class="t-ok">● permissionos.service — PermissionOS Active</span>');
+        tPrint('<span class="t-out">   Loaded: loaded (/etc/systemd/system/permissionos.service)</span>');
+        tPrint('<span class="t-ok">   Active: active (running) since today</span>');
+        tPrint('<span class="t-out">  Process: 1 ExecStart=/usr/bin/permissionos --mode=learn</span>');
+      } else { tPrint(`<span class="t-out">systemctl: ${escHtml(arg)} — operazione simulata</span>`); } break;
+    case 'ps':
+      tPrint('<span class="t-out">  PID TTY          TIME CMD</span>');
+      [['1','?','00:00:01','systemd'],['423','?','00:00:00','sshd'],['512','pts/0','00:00:00','bash'],['600','pts/0','00:00:00','ps']].forEach(([p,t,ti,c])=>tPrint(`<span class="t-out">${p.padStart(5)} ${t.padEnd(12)} ${ti} ${c}</span>`)); break;
+    case 'df':
+      tPrint('<span class="t-out">Filesystem      Size  Used Avail Use% Mounted on</span>');
+      ['/dev/sda1       234G   42G  180G  19% /','tmpfs            3.8G  1.2M  3.8G   1% /run','tmpfs            3.8G     0  3.8G   0% /dev/shm'].forEach(l=>tPrint(`<span class="t-out">${l}</span>`)); break;
+    case 'free':
+      tPrint('<span class="t-out">               total        used        free      shared  buff/cache   available</span>');
+      tPrint('<span class="t-out">Mem:           7.6Gi       2.1Gi       4.2Gi        52Mi       1.3Gi       5.2Gi</span>');
+      tPrint('<span class="t-out">Swap:          2.0Gi          0B       2.0Gi</span>'); break;
+    case 'ls': {
+      const flag=arg==='-la'||arg==='-l'||arg==='-a';
+      const files=termFS['~'];
+      if(flag){
+        tPrint(`<span class="t-out">totale 36</span>`);
+        tPrint(`<span class="t-out">drwxr-xr-x 2 ${state.username} ${state.username} 4096 May 15 12:00 <span class="t-dir">.</span></span>`);
+        tPrint(`<span class="t-out">drwxr-xr-x 5 root root 4096 May 15 12:00 <span class="t-dir">..</span></span>`);
+        Object.entries(files).forEach(([nm,f])=>{
+          const p=nm==='script.sh'?scriptPerm:f.perm;
+          tPrint(`<span class="t-out">${p} 1 ${state.username} ${state.username} 1024 May 15 12:00 <span class="t-file">${nm}</span></span>`);
+        });
+      } else {
+        const names=Object.keys(files).map(n=>`<span class="t-file">${n}</span>`).join('  ');
+        tPrint(names);
+      }
+      if(!state.tasksCompleted.guest_ls){state.tasksCompleted.guest_ls=true;saveState();}
+      break;
+    }
+    case 'cat': {
+      if(!arg){tPrint('<span class="t-err">cat: specificare un file</span>');break;}
+      const con=state.fileContents[arg];
+      if(!con){tPrint(`<span class="t-err">cat: ${escHtml(arg)}: No such file or directory</span>`);break;}
+      if((arg==='config.cfg'||arg==='secret.txt')&&state.level<3){tPrint(`<span class="t-err">cat: ${arg}: Permission denied</span>`);break;}
+      tPrint(`<span class="t-out" style="white-space:pre-wrap;">${escHtml(con)}</span>`);
+      if(!state.tasksCompleted.guest&&arg==='readme.txt')setTimeout(completeGuestTask,200);
+      break;
+    }
+    case 'nano': {
+      if(!arg){tPrint('<span class="t-err">nano: specificare un file</span>');break;}
+      if((arg==='readme.txt'||arg==='info.txt')){tPrint(`<span class="t-err">nano: ${arg}: Permission denied (read-only)</span>`);break;}
+      if(arg==='config.cfg'&&state.level<3){tPrint(`<span class="t-err">nano: config.cfg: Permission denied</span>`);break;}
+      if(!state.fileContents[arg]){tPrint(`<span class="t-err">nano: ${arg}: No such file or directory</span>`);break;}
+      tPrint(`<span class="t-info">[ Apertura ${arg} in nano… ]</span>`);
+      setTimeout(()=>openNanoEditor(arg),200); break;
+    }
+    case 'chmod': {
+      if(!arg){tPrint('<span class="t-err">chmod: specificare permessi e file</span>');break;}
+      if(state.level<2){tPrint('<span class="t-err">chmod: permission denied</span>');break;}
+      const isExec=arg.includes('+x');
+      const octalMatch=arg.match(/^(\d{3})\s+(\S+)/);
+      const fileTarget=parts[parts.length-1];
+      if(isExec&&fileTarget==='script.sh'){
+        scriptPerm='-rwxr-xr-x';termFS['~']['script.sh'].perm=scriptPerm;
+        tPrint(`<span class="t-ok">chmod +x script.sh</span>`);
+        tPrint(`<span class="t-out">Nuovi permessi: <span class="t-perm-x">${scriptPerm}</span></span>`);
+        if(!state.tasksCompleted.edit)setTimeout(completeEditTask,400);
+      } else if(octalMatch){
+        const oct=octalMatch[1],fn=octalMatch[2];
+        const map={'7':'rwx','6':'rw-','5':'r-x','4':'r--','3':'-wx','2':'-w-','1':'--x','0':'---'};
+        const p=[...oct].map(d=>map[d]||'???').join('');
+        tPrint(`<span class="t-ok">chmod ${oct} ${fn} → -${p}</span>`);
+      } else {
+        tPrint(`<span class="t-ok">chmod ${escHtml(arg)}</span>`);
+      } break;
+    }
+    case 'sudo': case 'su':
+      tPrint(`<span class="t-err">[sudo] password for ${state.username}: </span>`);
+      setTimeout(()=>tPrint('<span class="t-err">sudo: accesso negato in modalità simulata — usa le cartelle per avanzare</span>'),400); break;
+    case 'git':
+      tPrint('<span class="t-out">On branch main</span>');
+      tPrint('<span class="t-out">nothing to commit, working tree clean</span>'); break;
+    case 'python3': case 'python':
+      tPrint('<span class="t-info">Python 3.12.3 (Ubuntu 24.04) — simulato</span>');
+      tPrint('<span class="t-out">Type "exit()" to quit</span>'); break;
+    case 'exit':
+      tPrint('<span class="t-out">logout</span>');
+      setTimeout(closeModal,500); break;
+    case 'echo':
+      tPrint(`<span class="t-out">${escHtml(arg.replace(/\$USER/g,state.username).replace(/\$HOME/g,'/home/'+state.username))}</span>`); break;
+    case 'env': case 'printenv':
+      [`USER=${state.username}`,`HOME=/home/${state.username}`,'SHELL=/bin/bash','PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin','LANG=it_IT.UTF-8','TERM=xterm-256color'].forEach(l=>tPrint(`<span class="t-out">${l}</span>`)); break;
+    // ─── File & Directory extra ───
+    case 'touch':
+      if(!arg){tPrint('<span class="t-err">touch: specificare un file</span>');break;}
+      if(termFS['~'][arg]){tPrint(`<span class="t-out">touch: aggiornato timestamp di '${escHtml(arg)}'</span>`);}
+      else{termFS['~'][arg]={perm:'-rw-r--r--'};state.fileContents[arg]='';tPrint(`<span class="t-ok">touch: creato '${escHtml(arg)}'</span>`);}
+      break;
+    case 'mkdir':
+      if(!arg){tPrint('<span class="t-err">mkdir: specificare un nome</span>');break;}
+      tPrint(`<span class="t-ok">mkdir: directory '${escHtml(arg)}' creata</span>`); break;
+    case 'rmdir':
+      if(!arg){tPrint('<span class="t-err">rmdir: specificare un nome</span>');break;}
+      tPrint(`<span class="t-ok">rmdir: directory '${escHtml(arg)}' rimossa</span>`); break;
+    case 'rm':
+      if(!arg){tPrint('<span class="t-err">rm: specificare un file</span>');break;}
+      if(state.level<1){tPrint('<span class="t-err">rm: permission denied</span>');break;}
+      if(termFS['~'][arg]){delete termFS['~'][arg];delete state.fileContents[arg];tPrint(`<span class="t-ok">rm: '${escHtml(arg)}' eliminato</span>`);}
+      else{tPrint(`<span class="t-err">rm: impossibile rimuovere '${escHtml(arg)}': No such file or directory</span>`);}
+      break;
+    case 'cp':
+      if(!arg){tPrint('<span class="t-err">cp: specificare sorgente e destinazione</span>');break;}
+      tPrint(`<span class="t-ok">cp: file copiato → ${escHtml(arg)}</span>`); break;
+    case 'mv':
+      if(!arg){tPrint('<span class="t-err">mv: specificare sorgente e destinazione</span>');break;}
+      tPrint(`<span class="t-ok">mv: spostato → ${escHtml(arg)}</span>`); break;
+    case 'less': case 'more':
+      if(!arg){tPrint(`<span class="t-err">${cmd}: specificare un file</span>`);break;}
+      {const con=state.fileContents[arg];
+      if(!con){tPrint(`<span class="t-err">${cmd}: ${escHtml(arg)}: No such file or directory</span>`);break;}
+      tPrint(`<span class="t-out" style="white-space:pre-wrap;">${escHtml(con)}</span>`);
+      tPrint('<span class="t-info">-- (END) --</span>');} break;
+    case 'head':
+      if(!arg){tPrint('<span class="t-err">head: specificare un file</span>');break;}
+      {const con=(state.fileContents[arg]||'');const lines=con.split('\n').slice(0,10);lines.forEach(l=>tPrint(`<span class="t-out">${escHtml(l)}</span>`));} break;
+    case 'tail':
+      if(!arg){tPrint('<span class="t-err">tail: specificare un file</span>');break;}
+      {const con=(state.fileContents[arg]||'');const lines=con.split('\n');lines.slice(-10).forEach(l=>tPrint(`<span class="t-out">${escHtml(l)}</span>`));} break;
+    case 'wc':
+      if(!arg){tPrint('<span class="t-err">wc: specificare un file</span>');break;}
+      {const con=state.fileContents[arg]||'';const lns=con.split('\n').length;const wds=con.trim().split(/\s+/).filter(Boolean).length;const chs=con.length;
+      tPrint(`<span class="t-out">  ${lns}  ${wds}  ${chs} ${escHtml(arg)}</span>`);} break;
+    case 'stat':
+      if(!arg){tPrint('<span class="t-err">stat: specificare un file</span>');break;}
+      {const f=termFS['~'][arg];if(!f){tPrint(`<span class="t-err">stat: '${escHtml(arg)}': No such file or directory</span>`);break;}
+      tPrint(`<span class="t-out">  File: ${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-out">  Size: ${(state.fileContents[arg]||'').length}\tBlocks: 8\tIO Block: 4096 regular file</span>`);
+      tPrint(`<span class="t-out">Device: sda1  Inode: ${Math.floor(Math.random()*999999+100000)}</span>`);
+      tPrint(`<span class="t-out">Access: ${f.perm} Uid: (${1000+state.level}/${state.level>=3?'root':state.username})</span>`);
+      tPrint(`<span class="t-out">Modify: 2025-05-15 12:00:00.000000000 +0200</span>`);} break;
+    case 'file':
+      if(!arg){tPrint('<span class="t-err">file: specificare un file</span>');break;}
+      {const ext=arg.split('.').pop();
+      const types={sh:'Bourne-Again shell script, ASCII text executable',txt:'ASCII text',cfg:'ASCII text',md:'ASCII text'};
+      tPrint(`<span class="t-out">${escHtml(arg)}: ${types[ext]||'ASCII text'}</span>`);} break;
+    case 'du':
+      tPrint('<span class="t-out">4.0K\t./note.txt</span>');
+      tPrint('<span class="t-out">4.0K\t./readme.txt</span>');
+      tPrint('<span class="t-out">4.0K\t./script.sh</span>');
+      tPrint('<span class="t-out">20K\t.</span>'); break;
+    case 'find':
+      tPrint(`<span class="t-out">./readme.txt</span>`);
+      tPrint(`<span class="t-out">./note.txt</span>`);
+      tPrint(`<span class="t-out">./info.txt</span>`);
+      tPrint(`<span class="t-out">./script.sh</span>`);
+      tPrint(`<span class="t-out">./config.cfg</span>`); break;
+    case 'ln':
+      if(!arg){tPrint('<span class="t-err">ln: specificare sorgente e destinazione</span>');break;}
+      tPrint(`<span class="t-ok">ln: link simbolico creato → ${escHtml(arg)}</span>`); break;
+    // ─── Permessi extra ───
+    case 'chown':
+      if(state.level<3){tPrint('<span class="t-err">chown: operation not permitted</span>');}
+      else{tPrint(`<span class="t-ok">chown: proprietà modificata → ${escHtml(arg)}</span>`);}
+      break;
+    case 'chgrp':
+      if(state.level<3){tPrint('<span class="t-err">chgrp: operation not permitted</span>');}
+      else{tPrint(`<span class="t-ok">chgrp: gruppo modificato → ${escHtml(arg)}</span>`);}
+      break;
+    case 'umask':
+      tPrint('<span class="t-out">0022</span>');
+      tPrint('<span class="t-out">u=rwx,g=rx,o=rx</span>'); break;
+    // ─── Sistema & Info extra ───
+    case 'hostname':
+      tPrint('<span class="t-out">permissionos</span>'); break;
+    case 'uptime':
+      tPrint('<span class="t-out"> 12:00:00 up 0:03,  1 user,  load average: 0.12, 0.08, 0.04</span>'); break;
+    case 'date':
+      tPrint(`<span class="t-out">${new Date().toString()}</span>`); break;
+    case 'cal':
+      {const now=new Date();const m=now.getMonth();const y=now.getFullYear();
+      const mNames=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+      tPrint(`<span class="t-out">      ${mNames[m]} ${y}</span>`);
+      tPrint('<span class="t-out">Lu Ma Me Gi Ve Sa Do</span>');
+      const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
+      let row='';let pos=(first+6)%7;
+      for(let i=0;i<pos;i++)row+='   ';
+      for(let d=1;d<=days;d++){row+=String(d).padStart(2)+' ';if((pos+1)%7===0){tPrint(`<span class="t-out">${row}</span>`);row='';}pos++;}
+      if(row.trim())tPrint(`<span class="t-out">${row}</span>`);} break;
+    case 'lsb_release':
+      tPrint('<span class="t-out">No LSB modules are available.</span>');
+      tPrint('<span class="t-out">Distributor ID:\tUbuntu</span>');
+      tPrint('<span class="t-out">Description:\tUbuntu 24.04.1 LTS</span>');
+      tPrint('<span class="t-out">Release:\t24.04</span>');
+      tPrint('<span class="t-out">Codename:\tnoble</span>'); break;
+    case 'arch':
+      tPrint('<span class="t-out">x86_64</span>'); break;
+    case 'nproc':
+      tPrint('<span class="t-out">4</span>'); break;
+    case 'lscpu':
+      tPrint('<span class="t-out">Architecture:            x86_64</span>');
+      tPrint('<span class="t-out">CPU(s):                  4</span>');
+      tPrint('<span class="t-out">Thread(s) per core:      2</span>');
+      tPrint('<span class="t-out">Core(s) per socket:      2</span>');
+      tPrint('<span class="t-out">Model name:              Intel(R) Core(TM) i5-1235U @ 1.30GHz</span>');
+      tPrint('<span class="t-out">CPU MHz:                 1300.000</span>');
+      tPrint('<span class="t-out">L1d cache:               48 KiB</span>');
+      tPrint('<span class="t-out">L2 cache:                512 KiB</span>');
+      tPrint('<span class="t-out">L3 cache:                12 MiB</span>'); break;
+    case 'lsmem':
+      tPrint('<span class="t-out">RANGE                                 SIZE  STATE REMOVABLE BLOCK</span>');
+      tPrint('<span class="t-out">0x0000000000000000-0x000000007fffffff   2G online       yes   0-15</span>');
+      tPrint('<span class="t-out">0x0000000100000000-0x000000027fffffff   6G online       yes  32-79</span>');
+      tPrint('<span class="t-out">Memory block size:       128M</span>');
+      tPrint('<span class="t-out">Total online memory:       8G</span>'); break;
+    case 'lsblk':
+      tPrint('<span class="t-out">NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS</span>');
+      tPrint('<span class="t-out">sda      8:0    0   256G  0 disk</span>');
+      tPrint('<span class="t-out">├─sda1   8:1    0   512M  0 part /boot/efi</span>');
+      tPrint('<span class="t-out">├─sda2   8:2    0     1G  0 part /boot</span>');
+      tPrint('<span class="t-out">└─sda3   8:3    0 254.5G  0 part /</span>');
+      tPrint('<span class="t-out">sr0     11:0    1  1024M  0 rom</span>'); break;
+    case 'lsusb':
+      tPrint('<span class="t-out">Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub</span>');
+      tPrint('<span class="t-out">Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub</span>');
+      tPrint('<span class="t-out">Bus 003 Device 003: ID 046d:c52b Logitech, Inc. Unifying Receiver</span>'); break;
+    case 'lspci':
+      tPrint('<span class="t-out">00:00.0 Host bridge: Intel Corporation 12th Gen Core Processor Host Bridge</span>');
+      tPrint('<span class="t-out">00:02.0 VGA compatible controller: Intel Corporation Iris Xe Graphics</span>');
+      tPrint('<span class="t-out">00:1f.2 Memory controller: Intel Corporation Alder Lake PCH Shared SRAM</span>');
+      tPrint('<span class="t-out">01:00.0 Non-Volatile memory controller: Samsung Electronics NVMe SSD</span>'); break;
+    case 'dmesg':
+      tPrint('<span class="t-out">[    0.000000] Linux version 6.8.0-36-generic (Ubuntu 24.04)</span>');
+      tPrint('<span class="t-out">[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=/dev/sda3 ro quiet</span>');
+      tPrint('<span class="t-out">[    1.234567] systemd[1]: Detected virtualization none.</span>');
+      tPrint('<span class="t-out">[    2.345678] NET: Registered PF_INET protocol family</span>');
+      tPrint('<span class="t-out">[    3.456789] EXT4-fs (sda3): mounted filesystem with ordered data mode</span>'); break;
+    case 'journalctl':
+      tPrint('<span class="t-out">May 15 12:00:01 permissionos systemd[1]: Started Session 1 of User ospite.</span>');
+      tPrint('<span class="t-out">May 15 12:00:02 permissionos sshd[423]: Server listening on 0.0.0.0 port 22.</span>');
+      tPrint('<span class="t-out">May 15 12:00:03 permissionos kernel: permissionos boot complete.</span>');
+      tPrint('<span class="t-info">-- No further journal entries --</span>'); break;
+    // ─── Processi & Risorse extra ───
+    case 'top': case 'htop':
+      tPrint(`<span class="t-info">${cmd} — simulato (premi q per uscire in un sistema reale)</span>`);
+      tPrint('<span class="t-out">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM COMMAND</span>');
+      [['1','root','20','0','168M','11M','8M','S','0.0','0.1','systemd'],['423','root','20','0','12M','6M','4M','S','0.0','0.1','sshd'],['512',state.username,'20','0','20M','4M','3M','S','0.1','0.1','bash'],['888',state.username,'20','0','8M','3M','2M','R','0.3','0.0',cmd]].forEach(([p,u,pr,ni,v,r,sh,s,c,m,cm])=>tPrint(`<span class="t-out">${p.padStart(5)} ${u.padEnd(9)} ${pr.padStart(2)} ${ni.padStart(3)} ${v.padStart(7)} ${r.padStart(6)} ${sh.padStart(6)} ${s} ${c.padStart(5)} ${m.padStart(5)} ${cm}</span>`));
+      break;
+    case 'kill':
+      if(!arg){tPrint('<span class="t-err">kill: specificare PID</span>');break;}
+      if(state.level<1){tPrint('<span class="t-err">kill: operation not permitted</span>');}
+      else{tPrint(`<span class="t-ok">kill: segnale inviato al processo ${escHtml(arg)}</span>`);}
+      break;
+    case 'killall':
+      if(!arg){tPrint('<span class="t-err">killall: specificare nome processo</span>');break;}
+      if(state.level<1){tPrint('<span class="t-err">killall: no process found</span>');}
+      else{tPrint(`<span class="t-ok">killall: processi '${escHtml(arg)}' terminati</span>`);}
+      break;
+    case 'bg': tPrint('<span class="t-out">[1]+ <processo> &</span>'); break;
+    case 'fg': tPrint('<span class="t-out">[1]+ <processo> eseguito in foreground</span>'); break;
+    case 'jobs': tPrint('<span class="t-out">[1]+  Running                 <nessun processo in background></span>'); break;
+    case 'nice':
+      tPrint(`<span class="t-ok">nice: avvio con priorità → ${escHtml(arg)}</span>`); break;
+    case 'vmstat':
+      tPrint('<span class="t-out">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</span>');
+      tPrint('<span class="t-out"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</span>');
+      tPrint('<span class="t-out"> 1  0      0 4294967 102400 1310720    0    0    12     8  234  456  2  1 97  0  0</span>'); break;
+    case 'iostat':
+      tPrint('<span class="t-out">Linux 6.8.0-36-generic (permissionos)  avg-cpu:  %user  %system %idle</span>');
+      tPrint('<span class="t-out">                                                   2.10     0.80  97.00</span>');
+      tPrint('<span class="t-out">Device       tps    kB_read/s   kB_wrtn/s  kB_dscd/s  kB_read  kB_wrtn</span>');
+      tPrint('<span class="t-out">sda         3.14       45.20       12.30       0.00   980234   267832</span>'); break;
+    case 'sar':
+      tPrint('<span class="t-out">Linux 6.8.0-36-generic — %user  %system  %iowait  %idle</span>');
+      tPrint('<span class="t-out">12:00:00 AM    all     2.10     0.80      0.10   97.00</span>'); break;
+    // ─── Rete ───
+    case 'ip':
+      if(arg.startsWith('a')||arg==='addr show'){
+        tPrint('<span class="t-out">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536</span>');
+        tPrint('<span class="t-out">    inet 127.0.0.1/8 scope host lo</span>');
+        tPrint('<span class="t-out">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500</span>');
+        tPrint('<span class="t-out">    inet 192.168.1.100/24 brd 192.168.1.255 scope global eth0</span>');
+        tPrint('<span class="t-out">    inet6 fe80::1/64 scope link</span>');
+      } else if(arg.startsWith('r')||arg==='route'){
+        tPrint('<span class="t-out">default via 192.168.1.1 dev eth0 proto dhcp metric 100</span>');
+        tPrint('<span class="t-out">192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100</span>');
+      } else { tPrint('<span class="t-out">Usage: ip {addr|route|link} [...]</span>'); } break;
+    case 'ifconfig':
+      tPrint('<span class="t-out">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span>');
+      tPrint('<span class="t-out">        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255</span>');
+      tPrint('<span class="t-out">        ether 02:42:ac:11:00:02  txqueuelen 1000  (Ethernet)</span>');
+      tPrint('<span class="t-out">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span>');
+      tPrint('<span class="t-out">        inet 127.0.0.1  netmask 255.0.0.0</span>'); break;
+    case 'ping':
+      if(!arg){tPrint('<span class="t-err">ping: specificare un host</span>');break;}
+      tPrint(`<span class="t-out">PING ${escHtml(arg)} (93.184.216.34): 56 data bytes</span>`);
+      tPrint(`<span class="t-out">64 bytes from 93.184.216.34: icmp_seq=1 ttl=57 time=12.3 ms</span>`);
+      tPrint(`<span class="t-out">64 bytes from 93.184.216.34: icmp_seq=2 ttl=57 time=11.9 ms</span>`);
+      tPrint(`<span class="t-out">--- ${escHtml(arg)} ping statistics ---</span>`);
+      tPrint(`<span class="t-out">2 packets transmitted, 2 received, 0% packet loss</span>`);
+      tPrint(`<span class="t-ok">rtt min/avg/max = 11.9/12.1/12.3 ms</span>`); break;
+    case 'curl':
+      if(!arg){tPrint('<span class="t-err">curl: specificare un URL</span>');break;}
+      tPrint(`<span class="t-info">% Total  % Received Xferd  Average Speed</span>`);
+      tPrint(`<span class="t-out">  100   1234  100   1234    0     0   5678    0 --:--:-- --:--:--</span>`);
+      tPrint(`<span class="t-ok">HTTP/1.1 200 OK — risposta simulata per ${escHtml(arg)}</span>`); break;
+    case 'wget':
+      if(!arg){tPrint('<span class="t-err">wget: specificare un URL</span>');break;}
+      tPrint(`<span class="t-out">--2025-05-15 12:00:00--  ${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-out">Connessione a ${escHtml(arg)}... connesso.</span>`);
+      tPrint(`<span class="t-ok">File salvato: 'index.html' (simulato)</span>`); break;
+    case 'ss':
+      tPrint('<span class="t-out">Netid  State   Recv-Q Send-Q Local Address:Port    Peer Address:Port</span>');
+      tPrint('<span class="t-out">tcp    LISTEN  0      128    0.0.0.0:22           0.0.0.0:*</span>');
+      tPrint('<span class="t-out">tcp    LISTEN  0      128    127.0.0.1:631        0.0.0.0:*</span>');
+      tPrint('<span class="t-out">tcp    ESTAB   0      0      192.168.1.100:34562  93.184.216.34:443</span>'); break;
+    case 'netstat':
+      tPrint('<span class="t-out">Active Internet connections (servers and established)</span>');
+      tPrint('<span class="t-out">Proto Recv-Q Send-Q Local Address    Foreign Address  State</span>');
+      tPrint('<span class="t-out">tcp        0      0 0.0.0.0:22       0.0.0.0:*        LISTEN</span>');
+      tPrint('<span class="t-out">tcp        0      0 127.0.0.1:631    0.0.0.0:*        LISTEN</span>'); break;
+    case 'nmap':
+      if(!arg){tPrint('<span class="t-err">nmap: specificare un host</span>');break;}
+      tPrint(`<span class="t-out">Starting Nmap 7.94 — https://nmap.org</span>`);
+      tPrint(`<span class="t-out">Nmap scan report for ${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-out">Host is up (0.012s latency).</span>`);
+      tPrint(`<span class="t-out">PORT    STATE SERVICE</span>`);
+      tPrint(`<span class="t-out">22/tcp  open  ssh</span>`);
+      tPrint(`<span class="t-out">80/tcp  open  http</span>`);
+      tPrint(`<span class="t-out">443/tcp open  https</span>`); break;
+    case 'traceroute':
+      if(!arg){tPrint('<span class="t-err">traceroute: specificare un host</span>');break;}
+      tPrint(`<span class="t-out">traceroute to ${escHtml(arg)}, 30 hops max</span>`);
+      ['1  192.168.1.1 (router.local)  1.234 ms','2  10.0.0.1 (isp-gateway)  5.432 ms','3  93.184.216.34 (host finale)  12.345 ms'].forEach(l=>tPrint(`<span class="t-out">${l}</span>`));
+      break;
+    case 'dig':
+      if(!arg){tPrint('<span class="t-err">dig: specificare un host</span>');break;}
+      tPrint(`<span class="t-out">; <<>> DiG 9.18.12 <<>> ${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-out">;; ANSWER SECTION:</span>`);
+      tPrint(`<span class="t-out">${escHtml(arg)}.\t300\tIN\tA\t93.184.216.34</span>`);
+      tPrint(`<span class="t-out">;; Query time: 12 msec</span>`); break;
+    case 'nslookup':
+      if(!arg){tPrint('<span class="t-err">nslookup: specificare un host</span>');break;}
+      tPrint(`<span class="t-out">Server:\t\t8.8.8.8</span>`);
+      tPrint(`<span class="t-out">Address:\t8.8.8.8#53</span>`);
+      tPrint(`<span class="t-out">Non-authoritative answer:</span>`);
+      tPrint(`<span class="t-out">Name:\t${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-out">Address: 93.184.216.34</span>`); break;
+    case 'host':
+      if(!arg){tPrint('<span class="t-err">host: specificare un nome</span>');break;}
+      tPrint(`<span class="t-out">${escHtml(arg)} has address 93.184.216.34</span>`);
+      tPrint(`<span class="t-out">${escHtml(arg)} mail is handled by 0 .</span>`); break;
+    case 'whois':
+      if(!arg){tPrint('<span class="t-err">whois: specificare un dominio</span>');break;}
+      tPrint(`<span class="t-out">Domain Name: ${escHtml(arg).toUpperCase()}</span>`);
+      tPrint(`<span class="t-out">Registrar: ICANN Accredited Registrar</span>`);
+      tPrint(`<span class="t-out">Creation Date: 2000-01-01T00:00:00Z</span>`);
+      tPrint(`<span class="t-out">Registry Expiry Date: 2030-01-01T00:00:00Z</span>`); break;
+    case 'iptables':
+      if(state.level<3){tPrint('<span class="t-err">iptables: permission denied — richiede root</span>');}
+      else{tPrint('<span class="t-out">Chain INPUT (policy ACCEPT)</span>');tPrint('<span class="t-out">Chain FORWARD (policy DROP)</span>');tPrint('<span class="t-out">Chain OUTPUT (policy ACCEPT)</span>');}
+      break;
+    case 'ufw':
+      tPrint('<span class="t-out">Status: active</span>');
+      tPrint('<span class="t-out">To                  Action  From</span>');
+      tPrint('<span class="t-out">--                  ------  ----</span>');
+      tPrint('<span class="t-out">22/tcp              ALLOW   Anywhere</span>');
+      tPrint('<span class="t-out">80/tcp              ALLOW   Anywhere</span>');
+      tPrint('<span class="t-out">443/tcp             ALLOW   Anywhere</span>'); break;
+    // ─── Pacchetti extra ───
+    case 'dpkg':
+      if(arg==='-l'||arg==='--list'){
+        tPrint('<span class="t-out">Desired=Unknown/Install/Remove/Purge/Hold</span>');
+        ['ii  bash          5.2.21-2ubuntu4  amd64  GNU Bourne Again SHell','ii  coreutils     9.4-3ubuntu6     amd64  GNU core utilities','ii  nano          7.2-2            amd64  small, friendly text editor','ii  git           1:2.43.0         amd64  fast, scalable, distributed revision control system','ii  python3       3.12.3-0ubuntu2  amd64  interactive high-level object-oriented language'].forEach(p=>tPrint(`<span class="t-file">${p}</span>`));
+      } else { tPrint(`<span class="t-out">dpkg: ${escHtml(arg)} — operazione simulata</span>`); } break;
+    case 'snap':
+      if(arg==='list'){
+        tPrint('<span class="t-out">Name        Version   Rev    Tracking       Publisher</span>');
+        ['firefox     124.0     3779   latest/stable  mozilla✓','code        1.88.1    168    latest/stable  vscode✓','spotify     1.2.31    69     latest/stable  spotify✓'].forEach(s=>tPrint(`<span class="t-file">${s}</span>`));
+      } else if(arg.startsWith('find')){
+        const q=arg.replace('find','').trim();
+        tPrint(`<span class="t-out">Name        Version   Publisher  Notes</span>`);
+        tPrint(`<span class="t-file">${escHtml(q)||'<pkg>'}  latest   publisher  -</span>`);
+      } else { tPrint(`<span class="t-out">snap: ${escHtml(arg)} — operazione simulata</span>`); } break;
+    // ─── Utenti & Gruppi extra ───
+    case 'who':
+      tPrint(`<span class="t-out">${state.level>=3?'root':state.username}   pts/0   2025-05-15 12:00 (:0)</span>`); break;
+    case 'w':
+      tPrint('<span class="t-out"> 12:00:00 up 0:03,  1 user,  load average: 0.12, 0.08, 0.04</span>');
+      tPrint('<span class="t-out">USER     TTY      FROM     LOGIN@   IDLE   JCPU   PCPU  WHAT</span>');
+      tPrint(`<span class="t-out">${(state.level>=3?'root':state.username).padEnd(9)}pts/0    :0       12:00    0.00s  0.08s  0.01s  bash</span>`); break;
+    case 'last':
+      tPrint(`<span class="t-out">${state.level>=3?'root':state.username}   pts/0        :0               Wed May 15 12:00   still logged in</span>`);
+      tPrint('<span class="t-out">reboot   system boot  6.8.0-36-generic Wed May 15 11:57 - 12:00  (00:03)</span>');
+      tPrint('<span class="t-out">wtmp begins Wed May 15 11:57:00 2025</span>'); break;
+    case 'users':
+      tPrint(`<span class="t-out">${state.level>=3?'root':state.username}</span>`); break;
+    case 'groups':
+      tPrint(`<span class="t-out">${state.level>=3?'root sudo adm':state.username+' users'}</span>`); break;
+    case 'passwd':
+      if(state.level<1){tPrint('<span class="t-err">passwd: accesso negato per ospite</span>');}
+      else{tPrint(`<span class="t-out">Changing password for ${state.level>=3?'root':state.username}.</span>`);tPrint('<span class="t-out">Current password: </span>');tPrint('<span class="t-info">(simulato) Password aggiornata con successo.</span>');}
+      break;
+    case 'useradd':
+      if(state.level<3){tPrint('<span class="t-err">useradd: permission denied — richiede root</span>');}
+      else if(!arg){tPrint('<span class="t-err">useradd: specificare un nome utente</span>');}
+      else{tPrint(`<span class="t-ok">useradd: utente '${escHtml(arg)}' creato</span>`);}
+      break;
+    case 'userdel':
+      if(state.level<3){tPrint('<span class="t-err">userdel: permission denied — richiede root</span>');}
+      else if(!arg){tPrint('<span class="t-err">userdel: specificare un nome utente</span>');}
+      else{tPrint(`<span class="t-ok">userdel: utente '${escHtml(arg)}' eliminato</span>`);}
+      break;
+    case 'usermod':
+      if(state.level<3){tPrint('<span class="t-err">usermod: permission denied — richiede root</span>');}
+      else{tPrint(`<span class="t-ok">usermod: ${escHtml(arg)}</span>`);}
+      break;
+    case 'groupadd':
+      if(state.level<3){tPrint('<span class="t-err">groupadd: permission denied — richiede root</span>');}
+      else if(!arg){tPrint('<span class="t-err">groupadd: specificare un nome</span>');}
+      else{tPrint(`<span class="t-ok">groupadd: gruppo '${escHtml(arg)}' creato</span>`);}
+      break;
+    // ─── Testo & Ricerca ───
+    case 'grep':
+      if(!arg){tPrint('<span class="t-err">grep: specificare pattern e file</span>');break;}
+      {const gparts=arg.split(/\s+/);const pat=gparts[0];const fn=gparts[1];
+      if(fn&&state.fileContents[fn]){const lines=state.fileContents[fn].split('\n').filter(l=>l.includes(pat));if(lines.length){lines.forEach(l=>tPrint(`<span class="t-out">${escHtml(l)}</span>`));}else{tPrint(`<span class="t-out">(nessuna corrispondenza per '${escHtml(pat)}')</span>`);}}
+      else{tPrint(`<span class="t-out">grep: ${escHtml(arg)} — simulato</span>`);}} break;
+    case 'sed':
+      tPrint(`<span class="t-out">sed: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'awk':
+      tPrint(`<span class="t-out">awk: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'sort':
+      if(!arg){tPrint('<span class="t-err">sort: specificare un file</span>');break;}
+      {const con=state.fileContents[arg];if(con){con.split('\n').sort().forEach(l=>tPrint(`<span class="t-out">${escHtml(l)}</span>`));}else{tPrint(`<span class="t-err">sort: ${escHtml(arg)}: No such file or directory</span>`);}} break;
+    case 'uniq':
+      tPrint('<span class="t-out">uniq: legge da stdin — in un sistema reale usa pipe: sort file | uniq</span>'); break;
+    case 'cut':
+      tPrint(`<span class="t-out">cut: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'tr':
+      tPrint(`<span class="t-out">tr: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'diff':
+      if(!arg){tPrint('<span class="t-err">diff: specificare due file</span>');break;}
+      tPrint(`<span class="t-out">diff ${escHtml(arg)}</span>`);
+      tPrint('<span class="t-out">1c1</span>');
+      tPrint('<span class="t-err">< riga nel file 1</span>');
+      tPrint('<span class="t-ok">> riga nel file 2</span>'); break;
+    case 'patch':
+      tPrint(`<span class="t-ok">patch: applicata con successo → ${escHtml(arg)}</span>`); break;
+    // ─── Archivi & Compressione ───
+    case 'tar':
+      tPrint(`<span class="t-ok">tar: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'zip':
+      if(!arg){tPrint('<span class="t-err">zip: specificare output e file</span>');break;}
+      tPrint(`<span class="t-ok">zip: creato archivio ${escHtml(arg)}</span>`); break;
+    case 'unzip':
+      if(!arg){tPrint('<span class="t-err">unzip: specificare un file .zip</span>');break;}
+      tPrint(`<span class="t-out">Archive: ${escHtml(arg)}</span>`);
+      tPrint(`<span class="t-ok">inflating: file1.txt</span>`);
+      tPrint(`<span class="t-ok">inflating: file2.txt</span>`); break;
+    case 'gzip':
+      if(!arg){tPrint('<span class="t-err">gzip: specificare un file</span>');break;}
+      tPrint(`<span class="t-ok">gzip: '${escHtml(arg)}' compresso in '${escHtml(arg)}.gz'</span>`); break;
+    case 'gunzip':
+      if(!arg){tPrint('<span class="t-err">gunzip: specificare un file .gz</span>');break;}
+      tPrint(`<span class="t-ok">gunzip: '${escHtml(arg)}' decompresso</span>`); break;
+    case 'bzip2':
+      if(!arg){tPrint('<span class="t-err">bzip2: specificare un file</span>');break;}
+      tPrint(`<span class="t-ok">bzip2: '${escHtml(arg)}' compresso in '${escHtml(arg)}.bz2'</span>`); break;
+    // ─── Shell & Utilità extra ───
+    case 'alias':
+      if(!arg){tPrint('<span class="t-out">alias ll=\'ls -la\'</span>');tPrint('<span class="t-out">alias grep=\'grep --color=auto\'</span>');tPrint('<span class="t-out">alias la=\'ls -A\'</span>');}
+      else{tPrint(`<span class="t-ok">alias: ${escHtml(arg)} impostato</span>`);}
+      break;
+    case 'export':
+      if(!arg){tPrint('<span class="t-err">export: specificare VAR=valore</span>');}
+      else{tPrint(`<span class="t-ok">export: ${escHtml(arg)}</span>`);}
+      break;
+    case 'source': case '.':
+      if(!arg){tPrint('<span class="t-err">source: specificare un file</span>');}
+      else{tPrint(`<span class="t-ok">source: eseguito ${escHtml(arg)}</span>`);}
+      break;
+    case 'which':
+      if(!arg){tPrint('<span class="t-err">which: specificare un comando</span>');break;}
+      {const paths={bash:'/usr/bin/bash',ls:'/usr/bin/ls',cat:'/usr/bin/cat',nano:'/usr/bin/nano',grep:'/usr/bin/grep',python3:'/usr/bin/python3',git:'/usr/bin/git',curl:'/usr/bin/curl',wget:'/usr/bin/wget'};
+      tPrint(paths[arg]?`<span class="t-ok">${paths[arg]}</span>`:`<span class="t-err">which: no '${escHtml(arg)}' in PATH</span>`);} break;
+    case 'whereis':
+      if(!arg){tPrint('<span class="t-err">whereis: specificare un comando</span>');break;}
+      tPrint(`<span class="t-out">${escHtml(arg)}: /usr/bin/${escHtml(arg)} /usr/share/man/man1/${escHtml(arg)}.1.gz</span>`); break;
+    case 'man': case 'info':
+      if(!arg){tPrint(`<span class="t-err">${cmd}: specificare un comando</span>`);break;}
+      tPrint(`<span class="t-info">${cmd.toUpperCase()}(1) — Manuale di ${escHtml(arg)} (simulato)</span>`);
+      tPrint(`<span class="t-out">NAME: ${escHtml(arg)} — comando Ubuntu standard</span>`);
+      tPrint(`<span class="t-out">USAGE: ${escHtml(arg)} [opzioni] [argomenti]</span>`);
+      tPrint(`<span class="t-out">Per la documentazione completa: https://manpages.ubuntu.com</span>`); break;
+    case 'type':
+      if(!arg){tPrint('<span class="t-err">type: specificare un comando</span>');break;}
+      {const builtins=['cd','echo','exit','alias','export','source','help'];
+      if(builtins.includes(arg)){tPrint(`<span class="t-out">${escHtml(arg)} è un builtin della shell</span>`);}
+      else{tPrint(`<span class="t-out">${escHtml(arg)} è /usr/bin/${escHtml(arg)}</span>`);}} break;
+    case 'time':
+      if(!arg){tPrint('<span class="t-err">time: specificare un comando</span>');break;}
+      tPrint(`<span class="t-out">real\t0m0.012s</span>`);
+      tPrint(`<span class="t-out">user\t0m0.004s</span>`);
+      tPrint(`<span class="t-out">sys\t0m0.008s</span>`); break;
+    case 'watch':
+      tPrint(`<span class="t-info">watch: ${escHtml(arg)} (simulato — Ctrl+C per uscire in un sistema reale)</span>`); break;
+    case 'xargs':
+      tPrint(`<span class="t-out">xargs: ${escHtml(arg)} — operazione simulata</span>`); break;
+    case 'tee':
+      if(!arg){tPrint('<span class="t-err">tee: specificare un file</span>');}
+      else{tPrint(`<span class="t-ok">tee: output duplicato su '${escHtml(arg)}'</span>`);}
+      break;
+    case 'crontab':
+      if(state.level<1){tPrint('<span class="t-err">crontab: permission denied</span>');}
+      else if(arg==='-e'){tPrint('<span class="t-info">crontab: apertura editor crontab (simulato)</span>');tPrint('<span class="t-out"># m h dom mon dow command</span>');tPrint('<span class="t-out">0 2 * * * /home/'+state.username+'/backup.sh</span>');}
+      else if(arg==='-l'){tPrint('<span class="t-out"># m h dom mon dow command</span>');tPrint('<span class="t-out">0 2 * * * /home/'+state.username+'/backup.sh</span>');}
+      else{tPrint('<span class="t-out">crontab: usage: crontab [-l|-e|-r]</span>');}
+      break;
+    case 'at':
+      tPrint(`<span class="t-out">warning: commands will be executed using /bin/sh</span>`);
+      tPrint(`<span class="t-out">job 1 at ${new Date().toDateString()} ${escHtml(arg)} — simulato</span>`); break;
+    case 'reboot':
+      if(state.level<3){tPrint('<span class="t-err">reboot: permission denied — richiede root</span>');}
+      else{tPrint('<span class="t-info">Broadcast message from root: The system is going down for reboot NOW!</span>');setTimeout(closeModal,1500);}
+      break;
+    case 'shutdown':
+      if(state.level<3){tPrint('<span class="t-err">shutdown: permission denied — richiede root</span>');}
+      else{tPrint('<span class="t-info">Broadcast message from root: The system is going down for power off NOW!</span>');setTimeout(closeModal,1500);}
+      break;
+    case 'cd':
+      if(!arg||arg==='~'||arg===''){state.termCwd='~';}
+      else if(arg==='..'){state.termCwd='~';}
+      else{state.termCwd='~/'+arg;}
+      tPrint(`<span class="t-out">→ ${state.termCwd}</span>`); break;
+    case 'ssh':
+      tPrint(`<span class="t-out">ssh: Tentativo di connessione a ${escHtml(arg)}...</span>`);
+      setTimeout(()=>tPrint('<span class="t-err">ssh: connect to host failed (simulato)</span>'),600); break;
+    case 'scp':
+      tPrint(`<span class="t-ok">scp: trasferimento simulato — ${escHtml(arg)}</span>`); break;
+    case 'rsync':
+      tPrint(`<span class="t-out">sending incremental file list</span>`);
+      tPrint(`<span class="t-ok">rsync: sincronizzazione simulata — ${escHtml(arg)}</span>`); break;
+    case 'vim': case 'vi':
+      tPrint(`<span class="t-info">VIM — Vi IMproved 9.0 (simulato). Usa nano in questo ambiente!</span>`);
+      tPrint('<span class="t-out">Scrivi :q! per uscire in vim reale. Qui usa nano invece.</span>'); break;
+    case 'make':
+      tPrint('<span class="t-out">make: verifico i Makefile...</span>');
+      tPrint('<span class="t-err">make: *** No rule to make target. Stop.</span>'); break;
+    case 'gcc': case 'cc':
+      if(!arg){tPrint(`<span class="t-err">${cmd}: specificare un file sorgente</span>`);break;}
+      tPrint(`<span class="t-ok">${cmd}: compilazione simulata di '${escHtml(arg)}' → a.out</span>`); break;
+    case 'node': case 'nodejs':
+      tPrint('<span class="t-info">Node.js v20.12.2 (simulato)</span>');
+      tPrint('<span class="t-out">Welcome to Node.js. Type .exit to quit.</span>'); break;
+    case 'npm':
+      tPrint(`<span class="t-out">npm ${escHtml(arg)} — simulato</span>`);
+      tPrint('<span class="t-out">npm WARN: operazione non disponibile in modalità simulata</span>'); break;
+    case 'java':
+      tPrint('<span class="t-out">openjdk version "21.0.3" 2024-04-16</span>');
+      tPrint('<span class="t-out">OpenJDK Runtime Environment (build 21.0.3+9-Ubuntu-1ubuntu1)</span>'); break;
+    case 'mysql': case 'mariadb':
+      tPrint(`<span class="t-info">${cmd} monitor (simulato) — Type 'help;' or '\\h' for help.</span>`);
+      tPrint('<span class="t-out">mysql> (simulato — usa exit per uscire)</span>'); break;
+    case 'psql':
+      tPrint('<span class="t-info">psql (PostgreSQL) 16.3 — simulato</span>');
+      tPrint('<span class="t-out">Type "help" for help. psql> (simulato)</span>'); break;
+    case 'docker':
+      tPrint(`<span class="t-out">Usage: docker [OPTIONS] COMMAND</span>`);
+      tPrint(`<span class="t-out">docker ${escHtml(arg)} — simulato (Docker non è disponibile in questo ambiente)</span>`); break;
+    case 'service':
+      tPrint('<span class="t-out">Usage: service <service> {start|stop|restart|status}</span>');
+      if(arg){tPrint(`<span class="t-ok">service: ${escHtml(arg)} — operazione simulata</span>`);} break;
+
+    default:
+      tPrint(`<span class="t-err">bash: ${escHtml(cmd)}: comando non trovato</span>`);
+      tPrint(`<span class="t-out">Scrivi <span style="color:#C084FC">help</span> per i comandi disponibili.</span>`);
+  }
+  tPrint('');
+}
+
+// ══════════════════════════════════════
+//  NANO EDITOR
+// ══════════════════════════════════════
+function openNanoEditor(filename) {
+  const currentContent=state.fileContents[filename]||'';
+  let modified=false;
+  const overlay=document.createElement('div');
+  overlay.id='nano-overlay';
+  overlay.innerHTML=`
+    <div id="nano-topbar">
+      <span style="color:var(--text-dim);">GNU nano 7.2</span>
+      <span id="nano-filename">${escHtml(filename)}</span>
+      <span id="nano-saved-msg">[ File scritto ]</span>
+    </div>
+    <textarea id="nano-editor" spellcheck="false"></textarea>
+    <div id="nano-statusbar">
+      <span id="nano-status">^S Salva  ^X Esci  ^K Taglia</span>
+      <span style="color:#C084FC;">/home/${state.username}/${filename}</span>
+    </div>
+    <div id="nano-bottombar">
+      <span class="nano-sc"><span class="nano-key">^S</span>&nbsp;Salva</span>
+      <span class="nano-sc"><span class="nano-key">^X</span>&nbsp;Esci</span>
+      <span class="nano-sc"><span class="nano-key">^K</span>&nbsp;Taglia riga</span>
+      <span class="nano-sc"><span class="nano-key">^W</span>&nbsp;Cerca</span>
+      <span class="nano-sc"><span class="nano-key">^G</span>&nbsp;Aiuto</span>
+    </div>`;
+  document.body.appendChild(overlay);
+  const editor=document.getElementById('nano-editor');
+  editor.value=currentContent; editor.focus();
+  editor.setSelectionRange(editor.value.length,editor.value.length);
+  editor.addEventListener('input',()=>{
+    modified=true;
+    document.getElementById('nano-filename').textContent=filename+' *';
+    document.getElementById('nano-status').textContent='Modificato — ^S per salvare';
+  });
+  function save(){
+    state.fileContents[filename]=editor.value; modified=false;
+    document.getElementById('nano-filename').textContent=filename;
+    document.getElementById('nano-status').textContent=`File "${filename}" scritto.`;
+    const m=document.getElementById('nano-saved-msg'); m.classList.add('show');
+    setTimeout(()=>m.classList.remove('show'),2000);
+    tPrint(`<span class="t-ok">[ File salvato: ${filename} ]</span>`);
+    if(!state.tasksCompleted.user&&filename==='note.txt')setTimeout(completeUserTask,300);
+  }
+  editor.addEventListener('keydown',e=>{
+    if(e.ctrlKey&&e.key==='s'){e.preventDefault();save();}
+    else if(e.ctrlKey&&e.key==='x'){
+      e.preventDefault();
+      if(modified){if(confirm(`"${filename}" modificato. Salvare?`))save();}
+      overlay.remove();
+      tPrint(`<span class="t-info">[ Uscita da nano ]</span>`);tPrint('');
+      setTimeout(()=>document.getElementById('term-input')?.focus(),50);
+    }
+  });
+}
+
+// ══════════════════════════════════════
+//  USER PROFILE
+// ══════════════════════════════════════
+function openUserProfile() {
+  const lvl=state.level;
+  const lvlColors=['var(--text-dim)','#60A5FA','#4ADE80','var(--red)'];
+  const lvlIcons=['👤','🧑‍💻','✏️','🔑'];
+  const permRows=[
+    {p:'read (r)',has:true,d:'Leggere file e listare directory'},
+    {p:'write (w)',has:lvl>=1,d:'Creare e modificare file propri'},
+    {p:'execute (x)',has:lvl>=2,d:'Eseguire script e programmi'},
+    {p:'sudo / root',has:lvl>=3,d:'Accesso amministratore totale'},
+  ];
+  const folderList=(state.userFolders||[]).length
+    ?state.userFolders.map(f=>{const nm=typeof f==='object'?f.name:f;return`<span style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.07);padding:2px 8px;border-radius:4px;color:var(--text-muted);">📁 ${escHtml(nm)}</span>`;}).join(' ')
+    :`<span style="color:var(--text-dim);font-size:11px;">Nessuna cartella creata</span>`;
+  showModal(`
+    ${winTitlebar('🪪 Profilo — '+state.username)}
+    <div class="win-body">
+      <div class="profile-card">
+        <div class="profile-avatar-big">${lvlIcons[lvl]}</div>
+        <div>
+          <div class="profile-name">${escHtml(state.username)}<span class="profile-badge">${LEVEL_LABELS[lvl]}</span></div>
+          <div class="profile-detail">
+            Livello: <span style="color:${lvlColors[lvl]};font-weight:700;">${lvl+1}/4</span><br>
+            Home: <span style="color:#C084FC;">/home/${escHtml(state.username)}</span><br>
+            Shell: /bin/bash &nbsp;|&nbsp; Ubuntu 24.04 LTS
+          </div>
+        </div>
+      </div>
+      <div class="sh">Credenziali</div>
+      <div class="cred-card">
+        <div class="cred-row"><span class="cred-label">Username</span><span class="cred-value">${escHtml(state.username||'ospite')}</span></div>
+        <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">${escHtml(state.password||'(nessuna)')}</span></div>
+        <div class="cred-row"><span class="cred-label">UID</span><span class="cred-value">${1000+lvl}</span></div>
+        <div class="cred-row"><span class="cred-label">GID</span><span class="cred-value">${1000+lvl}</span></div>
+        <div class="cred-row"><span class="cred-label">Gruppi</span><span class="cred-value">${lvl>=3?'root,sudo,adm':lvl>=1?escHtml(state.username)+',users':'guest'}</span></div>
+      </div>
+      <div class="sh">Permessi attivi</div>
+      ${permRows.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:14px;">${r.has?'✅':'❌'}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:${r.has?'var(--text)':'var(--text-dim)'};flex:0 0 100px;">${r.p}</span>
+        <span style="font-size:12px;color:var(--text-muted);">${r.d}</span>
+      </div>`).join('')}
+      <div class="sh" style="margin-top:14px;">Cartelle create</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${folderList}</div>
+      <div style="margin-top:18px;display:flex;gap:8px;">
+        <button class="task-btn" onclick="closeModal()">Chiudi</button>
+        ${lvl>=3?`<button class="task-btn" style="border-color:var(--red);color:var(--red);" onclick="closeModal();setTimeout(resetSession,200)">↺ Reset</button>`:''}
+      </div>
+    </div>`);
+}
+
+// ══════════════════════════════════════
+//  DESKTOP FOLDER ICONS
+// ══════════════════════════════════════
+let userFolderCount=0; let ctxTargetId=null;
+
+function desktopIconClick(e,id){
+  e.stopPropagation();
+  if(multiselectMode&&id!=='home'){msToggleItem(id);return;}
+  document.querySelectorAll('.desk-icon').forEach(el=>el.classList.remove('selected'));
+  document.getElementById(id==='home'?'desk-home':'desk-'+id)?.classList.add('selected');
+}
+
+function createNewFolder(){
+  userFolderCount++;
+  const id='uf-'+Date.now();
+  const nm='Cartella '+userFolderCount;
+  const div=buildDeskIcon(id,nm);
+  document.getElementById('desktop-icons').appendChild(div);
+  if(!state.userFolders)state.userFolders=[];
+  state.userFolders.push({id,name:nm});saveState();
+  setTimeout(()=>startRename(id),50);
+  notify('📁 Nuova cartella creata!');
+}
+
+function buildDeskIcon(id,nm){
+  const div=document.createElement('div');
+  div.className='desk-icon';div.id='desk-'+id;
+  div.draggable=true;
+  div.innerHTML=`<div class="desk-icon-img" style="background:linear-gradient(135deg,#134E4A,#0D9488);">📁</div><div class="desk-icon-label" id="lbl-${id}">${escHtml(nm)}</div>`;
+  div.addEventListener('click',e=>{e.stopPropagation();desktopIconClick(e,id);});
+  div.addEventListener('dblclick',e=>{e.stopPropagation();ctxOpenFolder(id);});
+  div.addEventListener('contextmenu',e=>{e.preventDefault();showCtxMenu(e,id);});
+  div.addEventListener('dragstart',e=>{e.dataTransfer.setData('folderId',id);div.style.opacity='.4';});
+  div.addEventListener('dragend',()=>div.style.opacity='1');
+  // Long press
+  let lpt=null;
+  div.addEventListener('pointerdown',e=>{if(e.button!==0)return;lpt=setTimeout(()=>{lpt=null;if(!multiselectMode)enterMultiselect(id);},500);});
+  ['pointerup','pointermove','pointercancel'].forEach(ev=>div.addEventListener(ev,()=>clearTimeout(lpt)));
+  return div;
+}
+
+function startRename(id){
+  const lbl=document.getElementById('lbl-'+id); if(!lbl)return;
+  const cur=lbl.textContent;
+  const inp=document.createElement('input');
+  inp.className='desk-rename-input'; inp.value=cur;
+  lbl.replaceWith(inp); inp.focus(); inp.select();
+  function done(){
+    const nw=inp.value.trim()||cur;
+    const span=document.createElement('div');
+    span.className='desk-icon-label'; span.id='lbl-'+id; span.textContent=nw;
+    inp.replaceWith(span);
+    const e=state.userFolders?.find(f=>typeof f==='object'&&f.id===id);
+    if(e)e.name=nw; saveState();
+  }
+  inp.addEventListener('blur',done);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}if(e.key==='Escape'){inp.value=cur;inp.blur();}});
+}
+
+// Context menu (desktop)
+function showCtxMenu(e,id){
+  ctxTargetId=id;
+  const m=document.getElementById('ctx-menu');
+  m.style.display='block';
+  m.style.left=Math.min(e.clientX,window.innerWidth-190)+'px';
+  m.style.top=Math.min(e.clientY,window.innerHeight-140)+'px';
+  document.querySelectorAll('.desk-icon').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('desk-'+id)?.classList.add('selected');
+}
+function hideCtxMenu(){ document.getElementById('ctx-menu').style.display='none'; ctxTargetId=null; }
+function ctxOpen(){ hideCtxMenu(); ctxOpenFolder(ctxTargetId); }
+function ctxOpenFolder(id){
+  const nm=document.getElementById('lbl-'+id)?.textContent||'Cartella';
+  showModal(`${winTitlebar('📁 '+escHtml(nm))}<div class="win-body"><div class="desc-block">Cartella personale: <code>${escHtml(nm)}</code></div><div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);padding:32px;text-align:center;">📭 La cartella è vuota.</div><button class="task-btn" onclick="closeModal()">Chiudi</button></div>`);
+}
+function ctxRename(){ hideCtxMenu(); if(ctxTargetId)startRename(ctxTargetId); }
+function ctxDelete(){
+  const id=ctxTargetId; hideCtxMenu();
+  if(!id)return;
+  const nm=document.getElementById('lbl-'+id)?.textContent||'Cartella';
+  moveToTrash(id,nm);
+}
+document.getElementById('desktop').addEventListener('click',e=>{
+  if(!e.target.closest('.desk-icon'))document.querySelectorAll('.desk-icon').forEach(el=>el.classList.remove('selected'));
+  if(multiselectMode&&!e.target.closest('.desk-icon')&&!e.target.closest('#ms-bar'))exitMultiselect();
+});
+
+// Trash (drag&drop)
+const trashItems=[];
+function trashDragOver(e){e.preventDefault();document.getElementById('dock-trash').classList.add('running');}
+function trashDragLeave(){document.getElementById('dock-trash').classList.remove('running');}
+function trashDrop(e){
+  e.preventDefault();document.getElementById('dock-trash').classList.remove('running');
+  const id=e.dataTransfer.getData('folderId');
+  if(id){const nm=document.getElementById('lbl-'+id)?.textContent||'Cartella';moveToTrash(id,nm);}
+}
+function moveToTrash(id,nm){
+  const el=document.getElementById('desk-'+id); if(!el)return;
+  trashItems.push({id,name:nm,date:new Date().toLocaleString('it-IT')});
+  el.remove();
+  state.userFolders=state.userFolders?.filter(f=>typeof f==='object'?f.id!==id:f!==nm)||[];
+  saveState();updateTrashIcon();notify('🗑️ "'+nm+'" spostato nel cestino.');
+}
+function updateTrashIcon(){
+  const ic=document.getElementById('trash-icon');
+  ic.textContent=trashItems.length?'🗑️':'🗑️';
+  document.getElementById('dock-trash').classList.toggle('running',trashItems.length>0);
+}
+function openTrash(){
+  const html=trashItems.length===0
+    ?`<div style="padding:48px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text-dim);">🌟 Il Cestino è vuoto</div>`
+    :trashItems.map((it,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted);border-bottom:1px solid rgba(255,255,255,.05);">
+      <span style="font-size:16px;">📁</span><span style="flex:1;color:var(--text);">${escHtml(it.name)}</span>
+      <span style="font-size:10px;color:var(--text-dim);">${it.date}</span>
+      <button class="task-btn" style="font-size:10px;padding:3px 8px;" onclick="restoreTrashItem(${i})">↩</button>
+    </div>`).join('');
+  showModal(`${winTitlebar('🗑️ Cestino')}<div class="win-body"><div class="sh">Elementi</div><div style="background:#0D0D0D;border:1px solid rgba(255,255,255,.07);border-radius:8px;overflow:hidden;">${html}</div><div style="display:flex;gap:8px;margin-top:14px;"><button class="task-btn" onclick="closeModal()">Chiudi</button>${trashItems.length?`<button class="task-btn" style="border-color:var(--red);color:var(--red);" onclick="emptyTrash()">🗑️ Svuota</button>`:''}</div></div>`);
+}
+function restoreTrashItem(i){
+  const it=trashItems[i]; if(!it)return;
+  trashItems.splice(i,1);
+  document.getElementById('desktop-icons').appendChild(buildDeskIcon(it.id,it.name));
+  if(!state.userFolders)state.userFolders=[];
+  state.userFolders.push({id:it.id,name:it.name});saveState();updateTrashIcon();closeModal();
+  notify('↩ "'+it.name+'" ripristinato!');
+}
+function emptyTrash(){trashItems.length=0;updateTrashIcon();closeModal();notify('✨ Cestino svuotato!');}
+
+// Multi-select
+let multiselectMode=false; const msSelected=new Set();
+function enterMultiselect(id){
+  multiselectMode=true; document.getElementById('ms-bar').classList.add('visible');
+  msSelected.clear(); if(id){msSelected.add(id);document.getElementById('desk-'+id)?.classList.add('multi-selected');}
+  updateMsCount(); notify('📋 Selezione multipla — clicca per selezionare');
+}
+function exitMultiselect(){
+  multiselectMode=false; document.getElementById('ms-bar').classList.remove('visible');
+  msSelected.forEach(id=>document.getElementById('desk-'+id)?.classList.remove('multi-selected'));
+  msSelected.clear();
+}
+function msToggleItem(id){
+  const el=document.getElementById('desk-'+id); if(!el)return;
+  if(msSelected.has(id)){msSelected.delete(id);el.classList.remove('multi-selected');}
+  else{msSelected.add(id);el.classList.add('multi-selected');}
+  updateMsCount();
+}
+function msSelectAll(){document.querySelectorAll('#desktop-icons .desk-icon:not(.home-icon)').forEach(el=>{msSelected.add(el.id.replace('desk-',''));el.classList.add('multi-selected');});updateMsCount();}
+function msDeleteSelected(){[...msSelected].forEach(id=>{const nm=document.getElementById('lbl-'+id)?.textContent||'Cartella';moveToTrash(id,nm);});exitMultiselect();}
+function updateMsCount(){document.getElementById('ms-count').textContent=msSelected.size;}
+
+// ══════════════════════════════════════
+//  FILE MANAGER (Nautilus)
+// ══════════════════════════════════════
+const fmExtraContent = {
+  'permessi_linux.txt':`# Guida ai Permessi Linux\n\nr = read    (4)\nw = write   (2)\nx = execute (1)\n\nEsempi:\n  rwxr-xr-x → 755\n  rw-r--r-- → 644\n  rw------- → 600\n\nComandi:\n  chmod 755 file.sh\n  chmod +x  file.sh\n  ls -la   (mostra permessi)`,
+  'esercizi.txt':`# Esercizi sui Permessi\n\n1. rwxr--r-- in ottale? → 744\n2. chmod 600: chi legge? → solo owner\n3. -rwxr-xr-x in ottale? → 755\n4. Come rendere eseguibile? → chmod +x`,
+  'syslog':`May 15 12:00:01 permissionos kernel: Linux 6.8.0-36-generic\nMay 15 12:00:02 permissionos systemd[1]: Started System Logging Service\nMay 15 12:00:03 permissionos sshd[423]: Server listening on 0.0.0.0 port 22\nMay 15 12:01:00 permissionos sudo[512]: ospite : TTY=pts/0 ; USER=root`,
+  'auth.log':`May 15 12:00:05 permissionos login[400]: pam_unix: session opened for user ospite\nMay 15 12:01:00 permissionos sudo[512]: pam_unix(sudo:auth): authentication failure\nMay 15 12:01:05 permissionos sshd[423]: Accepted password for user from 127.0.0.1`,
+  'kern.log':`May 15 12:00:00 permissionos kernel: Initializing cgroup subsys cpuset\nMay 15 12:00:01 permissionos kernel: ACPI: RSDP 0x00000000000F0490 000024\nMay 15 12:00:02 permissionos kernel: PCI: Using configuration type 1`,
+  'passwd':`root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\n${state.username||'user'}:x:1001:1001::/home/${state.username||'user'}:/bin/bash`,
+  'hostname':'permissionos',
+  'fstab':`# /etc/fstab\n/dev/sda1  /      ext4  errors=remount-ro 0 1\n/dev/sda2  /home  ext4  defaults         0 2\n/dev/sda3  swap   swap  sw               0 0`,
+  'shadow':`# Permission denied\n# /etc/shadow richiede root (sudo)\n# Contiene password cifrate del sistema`,
+  'session_tmp.txt':`SESSION_ID=abc123\nUSER=${state.username||'ospite'}\nSTARTED=May 15 12:00:00\nTTY=pts/0`,
+};
+
+function fmGetFS(){
+  const u=state.username||'utente';
+  const userFolderNames=(state.userFolders||[]).map(f=>typeof f==='object'?f.name:f);
+  return {
+    '/':{type:'dir',ch:['home','etc','var','tmp','boot','dev','proc']},
+    '/home':{type:'dir',ch:[u]},
+    [`/home/${u}`]:{type:'dir',ch:['readme.txt','info.txt','note.txt','script.sh','config.cfg','Documenti','Immagini','Download','Desktop',...userFolderNames]},
+    [`/home/${u}/Documenti`]:{type:'dir',ch:['permessi_linux.txt','esercizi.txt']},
+    [`/home/${u}/Immagini`]:{type:'dir',ch:['screenshot.png','wallpaper.jpg','avatar.svg']},
+    [`/home/${u}/Download`]:{type:'dir',ch:[]},
+    [`/home/${u}/Desktop`]:{type:'dir',ch:[...userFolderNames]},
+    '/etc':{type:'dir',ch:['passwd','hostname','fstab','shadow','apt','cron.d','ssh']},
+    '/etc/apt':{type:'dir',ch:['sources.list','trusted.gpg.d']},
+    '/etc/ssh':{type:'dir',ch:['sshd_config','ssh_config']},
+    '/etc/cron.d':{type:'dir',ch:['anacron','e2scrub_all']},
+    '/var':{type:'dir',ch:['log','tmp','cache','lib']},
+    '/var/log':{type:'dir',ch:['syslog','auth.log','kern.log','apt']},
+    '/var/log/apt':{type:'dir',ch:['history.log','term.log']},
+    '/var/tmp':{type:'dir',ch:['session_tmp.txt']},
+    '/var/cache':{type:'dir',ch:[]},
+    '/var/lib':{type:'dir',ch:['apt','dpkg']},
+    '/tmp':{type:'dir',ch:['session_tmp.txt']},
+    '/boot':{type:'dir',ch:['vmlinuz-6.8.0-36-generic','initrd.img-6.8.0-36-generic','grub']},
+    '/boot/grub':{type:'dir',ch:['grub.cfg','fonts','i386-pc']},
+    '/dev':{type:'dir',ch:['sda','sda1','sda2','null','zero','random','tty','tty0']},
+    '/proc':{type:'dir',ch:['cpuinfo','meminfo','version','uptime','1','self']},
+  };
+}
+
+const FM_ICONS={dir:'📁',txt:'📄',log:'📋',cfg:'⚙️',sh:'📜',png:'🖼️',jpg:'🖼️',svg:'🎨',passwd:'🔐',fstab:'💾',shadow:'🔒',hostname:'🖥️',list:'📃',conf:'⚙️',img:'💿',vmlinuz:'🐧',initrd:'🐧',gpg:'🔑'};
+function fmIcon(name,type){if(type==='dir')return'📁';const ext=name.split('.').pop().toLowerCase();return FM_ICONS[ext]||FM_ICONS[name]||'📄';}
+function fmSize(name,type){if(type==='dir')return'—';const sizes={'readme.txt':'0.4 KB','note.txt':'0.2 KB','script.sh':'0.2 KB','config.cfg':'0.1 KB','syslog':'12 KB','auth.log':'4 KB','kern.log':'8 KB','passwd':'2 KB','fstab':'0.5 KB','shadow':'0.1 KB','vmlinuz-6.8.0-36-generic':'12 MB','initrd.img-6.8.0-36-generic':'45 MB'};return sizes[name]||'1 KB';}
+function fmPerm(name,type){if(type==='dir')return'drwxr-xr-x';const p={'readme.txt':'-r--r--r--','info.txt':'-r--r--r--','note.txt':'-rw-r--r--','script.sh':state.tasksCompleted.edit?'-rwxr-xr-x':'-rw-r--r--','config.cfg':'-rw-------','secret.txt':'-rwx------','shadow':'----------','passwd':'-rw-r--r--','fstab':'-rw-r--r--','hostname':'-rw-r--r--','syslog':'-rw-r-----','auth.log':'-rw-r-----','kern.log':'-rw-r-----','session_tmp.txt':'-rw-rw-rw-'};return p[name]||'-rw-r--r--';}
+function fmContent(path,name){
+  const base=state.fileContents[name];if(base)return base;
+  if(fmExtraContent[name])return fmExtraContent[name];
+  if(name.endsWith('.log'))return`# ${name}\n(log vuoto)`;
+  if(name.endsWith('.conf'))return`# ${name}\n# Configurazione di sistema`;
+  return null;
+}
+function fmCanEdit(path,name){
+  if(['shadow','readme.txt','info.txt'].includes(name))return false;
+  if(path.startsWith('/etc/')&&state.level<3)return false;
+  if(path.startsWith('/var/log/'))return false;
+  return state.level>=1;
+}
+
+function fmListDir(path){
+  const fs=fmGetFS(); const node=fs[path];
+  if(!node||node.type!=='dir')return[];
+  return node.ch.map(nm=>{
+    const cp=(path==='/'?'':path)+'/'+nm;
+    const cn=fs[cp];
+    return{name:nm,type:cn?cn.type:(nm.includes('.')?'file':'dir')};
+  });
+}
+
+let fmCur='',fmHist=[],fmHidx=-1,fmView='grid',fmQ='',fmSel=null;
+
+function openFileManager(startPath){
+  const u=state.username||'utente';
+  fmCur=startPath||`/home/${u}`;
+  fmHist=[fmCur];fmHidx=0;fmView='grid';fmQ='';fmSel=null;
+  _renderFM();
+}
+
+function _renderFM(){
+  const u=state.username||'utente';
+  const sb=[
+    {icon:'🏠',label:'Home',path:`/home/${u}`},
+    {icon:'📄',label:'Documenti',path:`/home/${u}/Documenti`},
+    {icon:'🖼️',label:'Immagini',path:`/home/${u}/Immagini`},
+    {icon:'📥',label:'Download',path:`/home/${u}/Download`},
+    {icon:'🗑️',label:'Cestino',path:'__trash__'},
+    {icon:'💻',label:'File System',path:'/'},
+    {icon:'⚙️',label:'/etc',path:'/etc'},
+    {icon:'📋',label:'/var/log',path:'/var/log'},
+    {icon:'🗂️',label:'/tmp',path:'/tmp'},
+    {icon:'🐧',label:'/proc',path:'/proc'},
+  ];
+  const userFolders=state.userFolders||[];
+
+  const c=document.getElementById('modal-container');
+  c.innerHTML=`
+    <div class="overlay" id="fm-overlay">
+      <div class="window fm-win wide tall">
+        <div class="win-titlebar fm-titlebar">
+          <div class="win-btns"><div class="win-btn close" onclick="closeModal()"></div><div class="win-btn min"></div><div class="win-btn max"></div></div>
+          <div class="win-title" style="font-family:var(--sans);color:rgba(255,255,255,.7);">🗂️ File Manager — ${escHtml(fmCur)}</div>
+        </div>
+        <div class="fm-header-bar">
+          <button class="fm-nav-btn" onclick="fmBack()" ${fmHidx<=0?'disabled':''} title="Indietro">‹</button>
+          <button class="fm-nav-btn" onclick="fmForward()" ${fmHidx>=fmHist.length-1?'disabled':''} title="Avanti">›</button>
+          <button class="fm-nav-btn" onclick="fmUp()" title="Su">↑</button>
+          <button class="fm-nav-btn" onclick="fmNavigate('/home/${u}')" title="Home">🏠</button>
+          <div class="fm-path-bar">${escHtml(fmCur)}</div>
+          <div class="fm-search-wrap"><span style="font-size:13px;opacity:.5;">🔍</span><input class="fm-search" id="fm-q" type="text" placeholder="Cerca…" value="${escHtml(fmQ)}" oninput="fmSearch(this.value)" autocomplete="off" spellcheck="false"></div>
+          <div class="fm-view-btns">
+            <button class="fm-vbtn${fmView==='grid'?' active':''}" onclick="fmSetView('grid')" title="Griglia">⊞</button>
+            <button class="fm-vbtn${fmView==='list'?' active':''}" onclick="fmSetView('list')" title="Lista">☰</button>
+          </div>
+        </div>
+        <div class="fm-body">
+          <div class="fm-sidebar">
+            <div class="fm-sb-section">Preferiti</div>
+            ${sb.map(it=>`<div class="fm-sb-item${fmCur===it.path?' active':''}" onclick="${it.path==='__trash__'?'closeModal();setTimeout(openTrash,150)':`fmNavigate(${JSON.stringify(it.path)})`}"><span class="fm-sb-icon">${it.icon}</span>${escHtml(it.label)}</div>`).join('')}
+            ${userFolders.length?`<div class="fm-sb-section">Tue Cartelle</div>${userFolders.map(f=>{const nm=typeof f==='object'?f.name:f;const p=`/home/${u}/${nm}`;return`<div class="fm-sb-item${fmCur===p?' active':''}" onclick="fmNavigate(${JSON.stringify(p)})"><span class="fm-sb-icon">📁</span>${escHtml(nm)}</div>`;}).join('')}`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+            <div class="fm-content${fmView==='list'?' list':''}" id="fm-area">${_fmContent()}</div>
+            <div class="fm-statusbar">
+              <span id="fm-st-l">${_fmStatus()}</span>
+              <span id="fm-st-r" style="color:#C084FC;">${fmSel?escHtml(fmSel.name):'Nessuna selezione'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="fm-ctx" style="display:none;position:fixed;background:#2a2a2a;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px;z-index:9999;min-width:160px;box-shadow:var(--shadow-win);animation:popIn .1s ease;"></div>`;
+
+  c.querySelector('#fm-overlay').addEventListener('click',e=>{if(e.target.id==='fm-overlay')closeModal();});
+  document.getElementById('fm-area').addEventListener('contextmenu',e=>{e.preventDefault();if(!e.target.closest('.fm-item'))return;});
+}
+
+function _fmContent(){
+  const items=fmListDir(fmCur);
+  const filtered=fmQ?items.filter(i=>i.name.toLowerCase().includes(fmQ.toLowerCase())):items;
+  if(!filtered.length)return`<div style="grid-column:1/-1;padding:48px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text-dim);">${fmQ?'🔍 Nessun risultato':'📭 Cartella vuota'}</div>`;
+  const sorted=[...filtered].sort((a,b)=>a.type===b.type?a.name.localeCompare(b.name):a.type==='dir'?-1:1);
+  const isList=fmView==='list';
+  return sorted.map(it=>{
+    const cp=(fmCur==='/'?'':fmCur)+'/'+it.name;
+    const sel=fmSel&&fmSel.path===cp;
+    const ic=fmIcon(it.name,it.type);
+    const perm=fmPerm(it.name,it.type);
+    const sz=fmSize(it.name,it.type);
+    return `<div class="fm-item${isList?' list':''}${sel?' fm-sel':''}"
+      data-path="${escHtml(cp)}" data-type="${it.type}" data-name="${escHtml(it.name)}"
+      onclick="fmSelect(event,'${escHtml(cp)}','${it.type}','${escHtml(it.name)}')"
+      ondblclick="fmOpen('${escHtml(cp)}','${it.type}','${escHtml(it.name)}')"
+      oncontextmenu="fmCtx(event,'${escHtml(cp)}','${it.type}','${escHtml(it.name)}')"
+      title="${escHtml(it.name)}">
+      <span class="fm-item-icon">${ic}</span>
+      <span class="fm-item-name">${escHtml(it.name)}</span>
+      ${isList?`<span class="fm-item-perm">${perm}</span><span class="fm-item-size">${sz}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function _fmStatus(){
+  const items=fmListDir(fmCur);
+  return`${items.length} elementi · ${items.filter(i=>i.type==='dir').length} cartelle, ${items.filter(i=>i.type!=='dir').length} file`;
+}
+
+function fmSelect(e,path,type,name){
+  e.stopPropagation();fmSel={path,type,name};
+  document.querySelectorAll('.fm-item').forEach(el=>el.classList.remove('fm-sel'));
+  e.currentTarget.classList.add('fm-sel');
+  const sr=document.getElementById('fm-st-r');if(sr)sr.textContent=name+(type==='dir'?' (cartella)':' (file)');
+}
+
+function fmOpen(path,type,name){
+  if(type==='dir')fmNavigate(path);else fmOpenFile(path,name);
+}
+
+function fmOpenFile(path,name){
+  const isImg=['png','jpg','jpeg','gif','svg'].includes(name.split('.').pop().toLowerCase());
+  const isProtected=name==='shadow'&&state.level<3;
+  if(isProtected){
+    showModal(`${winTitlebar('🔒 Accesso negato — /etc/shadow')}<div class="win-body" style="text-align:center;padding:40px;">
+      <div style="font-size:56px;">🔒</div>
+      <div style="font-family:var(--mono);font-size:14px;color:var(--red);margin-top:12px;">Permission denied</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:6px;">----------  root  shadow</div>
+      <div style="margin-top:20px;"><button class="task-btn" onclick="closeModal();setTimeout(openFileManager,100)">← Torna</button></div>
+    </div>`);return;
+  }
+  if(isImg){
+    showModal(`${winTitlebar('🖼️ '+name)}<div class="win-body" style="text-align:center;padding:40px;">
+      <div style="font-size:80px;">🖼️</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:10px;">Anteprima non disponibile in questo ambiente</div>
+      <button class="task-btn" style="margin-top:16px;" onclick="closeModal();setTimeout(openFileManager,100)">← Torna</button>
+    </div>`);return;
+  }
+  const content=fmContent(path,name);
+  const perm=fmPerm(name,'file');
+  const canEdit=fmCanEdit(path,name);
+  showModal(`
+    ${winTitlebar('📄 '+escHtml(name))}
+    <div class="win-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-dim);">${escHtml(path)}</span>
+        <span style="font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;color:#C084FC;">${perm}</span>
+      </div>
+      <pre style="background:#0D0D0D;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;color:#F8F8F8;white-space:pre-wrap;line-height:1.8;max-height:360px;overflow-y:auto;">${content?escHtml(content):'(vuoto)'}</pre>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="task-btn" onclick="closeModal();setTimeout(openFileManager,100)">← Torna</button>
+        ${canEdit?`<button class="task-btn" onclick="closeModal();setTimeout(()=>fmEditFile('${escHtml(path)}','${escHtml(name)}'),100)">✏️ Modifica</button>`:''}
+      </div>
+    </div>`);
+}
+
+function fmEditFile(path,name){
+  const content=fmContent(path,name)||'';
+  showModal(`
+    ${winTitlebar('✏️ '+escHtml(name)+' — Modifica')}
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="display:flex;gap:4px;padding:6px 10px;background:#2C2C2C;border-bottom:1px solid rgba(0,0,0,.3);">
+        <button onclick="fmSaveFile('${escHtml(name)}')" style="background:rgba(233,84,32,.15);border:1px solid rgba(233,84,32,.35);color:var(--ub-orange-light);font-family:var(--sans);font-size:12px;padding:5px 14px;border-radius:5px;cursor:pointer;">💾 Salva</button>
+        <button onclick="closeModal();setTimeout(openFileManager,100)" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--text-muted);font-family:var(--sans);font-size:12px;padding:5px 14px;border-radius:5px;cursor:pointer;">✕ Annulla</button>
+      </div>
+      <textarea id="fm-edit-area" spellcheck="false" style="flex:1;background:#1A1A1A;color:#F8F8F8;border:none;outline:none;padding:16px;font-family:var(--mono);font-size:13px;line-height:1.75;resize:none;min-height:380px;caret-color:#4ADE80;">${escHtml(content)}</textarea>
+    </div>`, false, true);
+}
+function fmSaveFile(name){
+  const val=document.getElementById('fm-edit-area')?.value||'';
+  if(state.fileContents[name]!==undefined)state.fileContents[name]=val;
+  else fmExtraContent[name]=val;
+  notify('💾 "'+name+'" salvato.');
+  if(!state.tasksCompleted.user&&name==='note.txt')setTimeout(completeUserTask,300);
+  closeModal();setTimeout(openFileManager,100);
+}
+
+function fmCtx(e,path,type,name){
+  e.preventDefault();e.stopPropagation();
+  const ctx=document.getElementById('fm-ctx');if(!ctx)return;
+  const items=[];
+  if(type==='dir')items.push(`<div class="ctx-item" onclick="fmNavigate('${escHtml(path)}');fmHideCtx()">📂 Apri</div>`);
+  else items.push(`<div class="ctx-item" onclick="fmOpenFile('${escHtml(path)}','${escHtml(name)}');fmHideCtx()">👁️ Visualizza</div>`);
+  if(type!=='dir'&&fmCanEdit(path,name))items.push(`<div class="ctx-item" onclick="fmEditFile('${escHtml(path)}','${escHtml(name)}');fmHideCtx()">✏️ Modifica</div>`);
+  items.push(`<div class="ctx-item" onclick="navigator.clipboard?.writeText('${escHtml(path)}').then(()=>notify('📋 Percorso copiato'));fmHideCtx()">📋 Copia percorso</div>`);
+  ctx.innerHTML=items.join('');ctx.style.display='block';
+  ctx.style.left=Math.min(e.clientX,window.innerWidth-180)+'px';
+  ctx.style.top=Math.min(e.clientY,window.innerHeight-items.length*36-8)+'px';
+}
+function fmHideCtx(){const c=document.getElementById('fm-ctx');if(c)c.style.display='none';}
+
+function fmNavigate(path){
+  fmCur=path;fmQ='';fmSel=null;
+  fmHist=fmHist.slice(0,fmHidx+1);fmHist.push(path);fmHidx=fmHist.length-1;
+  _renderFM();
+}
+function fmBack(){if(fmHidx>0){fmHidx--;fmCur=fmHist[fmHidx];fmQ='';fmSel=null;_renderFM();}}
+function fmForward(){if(fmHidx<fmHist.length-1){fmHidx++;fmCur=fmHist[fmHidx];fmQ='';fmSel=null;_renderFM();}}
+function fmUp(){
+  if(fmCur==='/')return;
+  const parts=fmCur.split('/').filter(Boolean);parts.pop();
+  fmNavigate(parts.length===0?'/':'/'+parts.join('/'));
+}
+function fmSetView(v){fmView=v;const a=document.getElementById('fm-area');if(a){a.className='fm-content'+(v==='list'?' list':'');a.innerHTML=_fmContent();}document.querySelectorAll('.fm-vbtn').forEach((b,i)=>b.classList.toggle('active',(i===0&&v==='grid')||(i===1&&v==='list')));}
+function fmSearch(q){fmQ=q;const a=document.getElementById('fm-area');if(a)a.innerHTML=_fmContent();const sl=document.getElementById('fm-st-l');if(sl)sl.textContent=_fmStatus();}
+
+document.addEventListener('click',e=>{if(!e.target.closest('#fm-ctx'))fmHideCtx();});
+
+// ══════════════════════════════════════
+//  VM MANAGER + ISO BUILDER
+// ══════════════════════════════════════
+const vmState = {
+  vms: [
+    { id:'vm1', name:'PermissionOS Dev', os:'Ubuntu 24.04 LTS', ram:2048, cpu:2, disk:25, status:'stopped', iso:null },
+    { id:'vm2', name:'Lab Permessi Linux', os:'Ubuntu 22.04 LTS', ram:1024, cpu:1, disk:15, status:'stopped', iso:null },
+  ],
+  selectedVM: null,
+  activeTab: 'vms',
+  isoBuilding: false,
+  isoReady: null,
+};
+
+function openVMManager() {
+  document.getElementById('dock-vm')?.classList.add('running');
+  _renderVMManager();
+}
+
+function _renderVMManager() {
+  const c = document.getElementById('modal-container');
+  c.innerHTML = `
+    <div class="overlay">
+      <div class="window wide tall" style="width:min(900px,96vw);max-height:90vh;display:flex;flex-direction:column;">
+        <div class="win-titlebar" style="background:#1e1e1e;">
+          <div class="win-btns">
+            <div class="win-btn close" onclick="closeModal();document.getElementById('dock-vm')?.classList.remove('running')"></div>
+            <div class="win-btn min"></div><div class="win-btn max"></div>
+          </div>
+          <div class="win-title" style="font-family:var(--mono);font-size:12px;color:#888;">🖥️ VM Manager — VirtualBox (simulato)</div>
+        </div>
+        <div style="display:flex;flex:1;overflow:hidden;">
+          <div class="vm-sidebar">
+            <div class="vm-sidebar-section">Macchine</div>
+            <div class="vm-sidebar-item${vmState.activeTab==='vms'?' active':''}" onclick="vmSetTab('vms')"><span>🖥️</span> Tutte le VM <span class="vm-si-badge">${vmState.vms.length}</span></div>
+            <div class="vm-sidebar-item${vmState.activeTab==='running'?' active':''}" onclick="vmSetTab('running')"><span>▶️</span> In esecuzione <span class="vm-si-badge">${vmState.vms.filter(v=>v.status==='running').length}</span></div>
+            <div class="vm-sidebar-section">Strumenti</div>
+            <div class="vm-sidebar-item${vmState.activeTab==='iso'?' active':''}" onclick="vmSetTab('iso')"><span>💿</span> ISO Builder ${vmState.isoReady?'<span class="vm-si-badge" style="color:var(--green);background:rgba(60,165,92,.15);">✓</span>':''}</div>
+            <div class="vm-sidebar-item${vmState.activeTab==='network'?' active':''}" onclick="vmSetTab('network')"><span>🌐</span> Rete</div>
+            <div class="vm-sidebar-item${vmState.activeTab==='snapshots'?' active':''}" onclick="vmSetTab('snapshots')"><span>📸</span> Snapshot</div>
+            <div style="flex:1"></div>
+            <div class="vm-sidebar-section">Versione</div>
+            <div style="padding:6px 14px 12px;font-family:var(--mono);font-size:10px;color:var(--text-dim);">VirtualBox 7.0.18<br>Ubuntu Host (sim)</div>
+          </div>
+          <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">${_vmTabContent()}</div>
+        </div>
+      </div>
+    </div>`;
+  c.querySelector('.overlay').addEventListener('click', e=>{
+    if(e.target===e.currentTarget){ closeModal(); document.getElementById('dock-vm')?.classList.remove('running'); }
+  });
+}
+
+function vmSetTab(tab) { vmState.activeTab=tab; _renderVMManager(); }
+
+function _vmTabContent() {
+  switch(vmState.activeTab) {
+    case 'vms': return _vmListTab();
+    case 'running': return _vmRunningTab();
+    case 'iso': return _vmISOTab();
+    case 'network': return _vmNetworkTab();
+    case 'snapshots': return _vmSnapshotsTab();
+    default: return _vmListTab();
+  }
+}
+
+function _vmListTab() {
+  const sel = vmState.selectedVM ? vmState.vms.find(v=>v.id===vmState.selectedVM) : null;
+  return `
+    <div class="vm-toolbar">
+      <button class="vm-tool-btn primary" onclick="vmNewVM()">➕ Nuova VM</button>
+      <button class="vm-tool-btn green-btn" onclick="vmStart('${sel?.id||''}')" ${sel&&sel.status==='stopped'?'':'disabled'}>▶ Avvia</button>
+      <button class="vm-tool-btn" onclick="vmStop('${sel?.id||''}')" ${sel&&sel.status==='running'?'':'disabled'}>⏹ Ferma</button>
+      <button class="vm-tool-btn" onclick="vmAttachISO('${sel?.id||''}')" ${sel?'':'disabled'}>💿 Monta ISO</button>
+      <button class="vm-tool-btn" onclick="vmDelete('${sel?.id||''}')" style="${sel?'':'opacity:.4;pointer-events:none;'}color:var(--red);">🗑️ Elimina</button>
+    </div>
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <div style="flex:1;overflow-y:auto;padding:14px;border-right:1px solid rgba(255,255,255,.06);">
+        ${vmState.vms.length===0?`<div class="vm-empty-state"><div class="vm-empty-icon">🖥️</div><div class="vm-empty-title">Nessuna macchina virtuale</div><div class="vm-empty-sub">Crea una nuova VM o un ISO da installare.</div><button class="vm-tool-btn primary" onclick="vmNewVM()">➕ Crea prima VM</button></div>`:
+          vmState.vms.map(vm=>`
+            <div class="vm-card${vmState.selectedVM===vm.id?' selected':''}" onclick="vmSelect('${vm.id}')">
+              <div class="vm-card-icon" style="background:linear-gradient(135deg,#1a2744,#1e40af);">${vm.status==='running'?'🟢':'🖥️'}</div>
+              <div style="flex:1">
+                <div class="vm-card-name">${escHtml(vm.name)}</div>
+                <div class="vm-card-sub">${escHtml(vm.os)} · ${vm.ram>=1024?vm.ram/1024+'GB':vm.ram+'MB'} RAM · ${vm.cpu} vCPU · ${vm.disk}GB HDD</div>
+                ${vm.iso?`<div style="font-size:10px;color:var(--ub-orange-light);margin-top:2px;font-family:var(--mono);">💿 ${escHtml(vm.iso)}</div>`:''}
+              </div>
+              <div class="vm-card-status ${vm.status}"><div class="vm-dot"></div>${vm.status==='running'?'In esecuzione':vm.status==='building'?'Avvio...':'Arrestata'}</div>
+            </div>`).join('')}
+      </div>
+      <div style="width:230px;flex-shrink:0;overflow-y:auto;padding:14px;background:#1f1f1f;">
+        ${sel?`
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;">⚙️ ${escHtml(sel.name)}</div>
+          <div class="vm-specs-grid">
+            <div class="vm-spec-cell"><div class="vm-spec-label">RAM</div><div class="vm-spec-val">${sel.ram>=1024?sel.ram/1024+'GB':sel.ram+'MB'}</div></div>
+            <div class="vm-spec-cell"><div class="vm-spec-label">CPU</div><div class="vm-spec-val">${sel.cpu} vCPU</div></div>
+            <div class="vm-spec-cell"><div class="vm-spec-label">Disco</div><div class="vm-spec-val">${sel.disk}GB</div></div>
+            <div class="vm-spec-cell"><div class="vm-spec-label">Stato</div><div class="vm-spec-val" style="color:${sel.status==='running'?'var(--green)':'var(--text-dim)'}">${sel.status==='running'?'ON':'OFF'}</div></div>
+          </div>
+          <div style="margin-top:10px;"><div class="vm-spec-label" style="margin-bottom:4px;">Sistema Operativo</div><div style="font-size:12px;color:var(--text);font-family:var(--mono);">${escHtml(sel.os)}</div></div>
+          <div style="margin-top:10px;"><div class="vm-spec-label" style="margin-bottom:4px;">ISO montata</div><div style="font-size:12px;color:${sel.iso?'var(--ub-orange-light)':'var(--text-dim)'};font-family:var(--mono);">${sel.iso?'💿 '+escHtml(sel.iso):'Nessuna'}</div></div>
+          ${sel.status==='running'?`<div style="margin-top:12px;"><div class="vm-spec-label" style="margin-bottom:4px;">Console</div><div class="vm-console">[    0.000] Booting ${escHtml(sel.os)}<br>[    1.204] Loaded initrd (${Math.floor(sel.ram*0.08)}KB)<br>[    2.891] systemd v255 running<br>[    3.441] <span style="color:#4ADE80;">Login: </span></div></div>`:''}
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+            ${sel.status==='stopped'?`<button class="vm-tool-btn green-btn" style="justify-content:center;" onclick="vmStart('${sel.id}')">▶ Avvia VM</button>`:''}
+            ${sel.status==='running'?`<button class="vm-tool-btn" style="justify-content:center;border-color:rgba(224,83,83,.4);color:var(--red);" onclick="vmStop('${sel.id}')">⏹ Ferma VM</button>`:''}
+            <button class="vm-tool-btn" style="justify-content:center;" onclick="vmSetTab('iso')">💿 Build ISO</button>
+          </div>`:
+          `<div style="padding:24px 8px;text-align:center;"><div style="font-size:36px;opacity:.3;margin-bottom:10px;">🖥️</div><div style="font-size:11px;color:var(--text-dim);">Seleziona una VM<br>per i dettagli</div></div>`}
+      </div>
+    </div>`;
+}
+
+function _vmRunningTab() {
+  const running=vmState.vms.filter(v=>v.status==='running');
+  return `
+    <div class="vm-toolbar"><span style="font-size:12px;color:var(--text-muted);">${running.length} VM in esecuzione</span></div>
+    <div class="vm-content-area">
+      ${running.length===0?`<div class="vm-empty-state"><div class="vm-empty-icon">⏸️</div><div class="vm-empty-title">Nessuna VM attiva</div><div class="vm-empty-sub">Avvia una VM dalla sezione Macchine.</div><button class="vm-tool-btn primary" onclick="vmSetTab('vms')">← Vai alle VM</button></div>`:
+        running.map(vm=>`<div class="vm-card"><div class="vm-card-icon" style="background:linear-gradient(135deg,#14532d,#16a34a);">🟢</div><div style="flex:1"><div class="vm-card-name">${escHtml(vm.name)}</div><div class="vm-card-sub">${escHtml(vm.os)} · ${vm.ram>=1024?vm.ram/1024+'GB':vm.ram+'MB'} RAM</div></div><button class="vm-tool-btn" onclick="vmStop('${vm.id}')">⏹ Ferma</button></div><div class="vm-console" style="margin-bottom:12px;">[running] ${escHtml(vm.name)}<br>[kernel] Linux 6.8.0-36-generic<br>[systemd] Multi-User Target reached<br><span style="color:#4ADE80;">${state.username}@vm:~$ </span></div>`).join('')}
+    </div>`;
+}
+
+function _vmISOTab() {
+  return `
+    <div class="vm-toolbar">
+      <span style="font-size:13px;font-weight:600;color:var(--text);">💿 ISO Builder</span>
+      <span style="font-size:11px;color:var(--text-dim);margin-left:6px;">Crea un'immagine ISO avviabile</span>
+    </div>
+    <div class="vm-content-area">
+      <div class="iso-panel">
+        <div class="iso-panel-title">🛠️ Configurazione ISO</div>
+        <div class="iso-form-grid">
+          <div class="iso-field">
+            <label>Sistema Operativo</label>
+            <select id="iso-os" onchange="isoUpdateName()">
+              <option value="ubuntu-24.04">Ubuntu 24.04 LTS (Noble)</option>
+              <option value="ubuntu-22.04">Ubuntu 22.04 LTS (Jammy)</option>
+              <option value="ubuntu-20.04">Ubuntu 20.04 LTS (Focal)</option>
+              <option value="debian-12">Debian 12 (Bookworm)</option>
+              <option value="fedora-40">Fedora 40 Workstation</option>
+              <option value="arch">Arch Linux (2024.05)</option>
+              <option value="linuxmint-21">Linux Mint 21.3</option>
+            </select>
+          </div>
+          <div class="iso-field">
+            <label>Variante</label>
+            <select id="iso-variant" onchange="isoUpdateName()">
+              <option value="desktop">Desktop (GNOME)</option>
+              <option value="server">Server (minimal)</option>
+              <option value="live">Live (no install)</option>
+            </select>
+          </div>
+          <div class="iso-field">
+            <label>Architettura</label>
+            <select id="iso-arch" onchange="isoUpdateName()">
+              <option value="amd64">amd64 (x86_64)</option>
+              <option value="arm64">arm64 (aarch64)</option>
+              <option value="i386">i386 (32-bit)</option>
+            </select>
+          </div>
+          <div class="iso-field">
+            <label>Nome file output</label>
+            <input type="text" id="iso-name" value="ubuntu-24.04-desktop-amd64.iso" style="font-family:var(--mono);font-size:11px;">
+          </div>
+          <div class="iso-field">
+            <label>Lingua</label>
+            <select id="iso-lang">
+              <option value="it">Italiano</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
+          <div class="iso-field">
+            <label>Kernel</label>
+            <select id="iso-kernel">
+              <option value="generic">linux-generic (default)</option>
+              <option value="hwe">linux-hwe (HWE stack)</option>
+              <option value="lowlatency">linux-lowlatency</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="vm-tool-btn primary" onclick="isoBuild()" id="iso-build-btn" ${vmState.isoBuilding?'disabled':''}>
+            ${vmState.isoBuilding?'⏳ Build in corso...':'🔨 Build ISO'}
+          </button>
+          ${vmState.isoReady?`<button class="vm-tool-btn green-btn" onclick="isoDownload()">⬇️ Download ISO</button><button class="vm-tool-btn" onclick="isoMountToVM()">💿 Monta in VM</button>`:''}
+          <span style="font-size:11px;color:var(--text-dim);" id="iso-size-label">${vmState.isoReady?`✅ ${escHtml(vmState.isoReady)} · ~1.6 GB`:'Dimensione stimata: ~1.6 GB'}</span>
+        </div>
+      </div>
+
+      ${vmState.isoBuilding||vmState.isoReady?`
+      <div class="iso-panel">
+        <div class="iso-panel-title">Stato Build</div>
+        <div class="iso-progress-bar-bg">
+          <div class="iso-progress-bar-fill" id="iso-prog-fill" style="width:${vmState.isoReady?'100%':'0%'}"></div>
+        </div>
+        <div id="iso-prog-label" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:10px;">${vmState.isoReady?'100% — Build completata!':'Inizializzazione...'}</div>
+        <div class="iso-steps" id="iso-steps-list">${_isoStepsHTML(vmState.isoReady?8:0)}</div>
+      </div>`:''}
+
+      <div class="iso-panel">
+        <div class="iso-panel-title">ℹ Come usare l'ISO in una VM</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:2.2;font-family:var(--mono);">
+          <span style="color:var(--ub-orange-light);">1.</span> Configura e clicca <strong style="color:var(--text);">Build ISO</strong><br>
+          <span style="color:var(--ub-orange-light);">2.</span> Scarica il <code>.iso</code> generato<br>
+          <span style="color:var(--ub-orange-light);">3.</span> Apri <strong style="color:var(--text);">VirtualBox</strong> → Nuova VM → Linux<br>
+          <span style="color:var(--ub-orange-light);">4.</span> Impostazioni → Storage → Aggiungi disco ottico<br>
+          <span style="color:var(--ub-orange-light);">5.</span> Seleziona ISO → Avvia → Segui installer Ubuntu<br>
+          <span style="color:var(--ub-orange-light);">Alt.</span> Usa <strong style="color:var(--text);">GNOME Boxes</strong>, <strong style="color:var(--text);">VMware</strong> o <strong style="color:var(--text);">UTM</strong> (macOS)
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${[['RAM consigliata','2–4 GB'],['Disco minimo','25 GB'],['CPU cores','2 vCPU'],['Accelerazione','KVM / VT-x']].map(([l,v])=>`<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:11px;"><div style="color:var(--text-dim);margin-bottom:3px;">${l}</div><div style="color:var(--text);font-family:var(--mono);font-weight:700;">${v}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function _isoStepsHTML(doneCount) {
+  const steps=['Inizializzazione ambiente build','Scaricamento pacchetti base','Configurazione kernel linux-generic','Installazione GNOME Desktop','Configurazione locale (it_IT.UTF-8)','Generazione initrd e bootloader GRUB','Creazione filesystem squashfs','Firma SHA256 e finalizzazione ISO'];
+  return steps.map((s,i)=>{
+    const cl=i<doneCount?'done':i===doneCount?'active':'';
+    const ic=i<doneCount?'✓':i===doneCount?'→':'·';
+    return `<div class="iso-step ${cl}"><div class="iso-step-dot"></div><span>${ic} ${s}</span></div>`;
+  }).join('');
+}
+
+function _vmNetworkTab() {
+  return `<div class="vm-toolbar"><span style="font-size:13px;font-weight:600;color:var(--text);">🌐 Impostazioni di Rete</span></div>
+    <div class="vm-content-area"><div class="iso-panel"><div class="iso-panel-title">🔌 Adattatori di rete</div>
+    <div class="vm-specs-grid">
+      <div class="vm-spec-cell"><div class="vm-spec-label">Tipo host</div><div class="vm-spec-val">NAT</div></div>
+      <div class="vm-spec-cell"><div class="vm-spec-label">Bridge</div><div class="vm-spec-val">eth0</div></div>
+      <div class="vm-spec-cell"><div class="vm-spec-label">IP host</div><div class="vm-spec-val">192.168.1.1</div></div>
+      <div class="vm-spec-cell"><div class="vm-spec-label">DHCP</div><div class="vm-spec-val" style="color:var(--green);">Attivo</div></div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-dim);font-family:var(--mono);line-height:2;">NAT: le VM accedono a internet tramite l'host.<br>Bridge: la VM appare come device distinto in LAN.<br>Host-only: rete privata solo tra host e VM.</div>
+    </div></div>`;
+}
+
+function _vmSnapshotsTab() {
+  return `<div class="vm-toolbar"><span style="font-size:13px;font-weight:600;color:var(--text);">📸 Snapshot</span><button class="vm-tool-btn primary" onclick="notify('📸 Snapshot creato!')">+ Nuovo Snapshot</button></div>
+    <div class="vm-content-area"><div class="vm-empty-state"><div class="vm-empty-icon">📸</div><div class="vm-empty-title">Nessuno snapshot</div><div class="vm-empty-sub">Gli snapshot salvano lo stato della VM per ripristinarla in seguito.</div><button class="vm-tool-btn primary" onclick="notify('📸 Snapshot creato!')">Crea primo snapshot</button></div></div>`;
+}
+
+function vmSelect(id) { vmState.selectedVM=vmState.selectedVM===id?null:id; _renderVMManager(); }
+
+function vmStart(id) {
+  const vm=vmState.vms.find(v=>v.id===id); if(!vm) return;
+  if(!vm.iso){ notify('⚠️ Monta un ISO prima di avviare la VM!'); vmSetTab('iso'); return; }
+  vm.status='building'; _renderVMManager(); notify(`▶️ Avvio "${vm.name}"...`);
+  setTimeout(()=>{ vm.status='running'; _renderVMManager(); notify(`🟢 "${vm.name}" in esecuzione!`); },2200);
+}
+
+function vmStop(id) {
+  const vm=vmState.vms.find(v=>v.id===id); if(!vm) return;
+  vm.status='stopped'; _renderVMManager(); notify(`⏹ "${vm.name}" arrestata.`);
+}
+
+function vmDelete(id) {
+  if(!id) return; const vm=vmState.vms.find(v=>v.id===id); if(!vm) return;
+  if(!confirm(`Eliminare "${vm.name}"?`)) return;
+  vmState.vms=vmState.vms.filter(v=>v.id!==id); vmState.selectedVM=null;
+  _renderVMManager(); notify('🗑️ VM eliminata.');
+}
+
+function vmAttachISO(id) {
+  if(!id) return;
+  if(!vmState.isoReady){ notify('⚠️ Crea prima un ISO dal tab ISO Builder!'); vmSetTab('iso'); return; }
+  const vm=vmState.vms.find(v=>v.id===id); if(!vm) return;
+  vm.iso=vmState.isoReady; _renderVMManager(); notify(`💿 ISO montata su "${vm.name}"!`);
+}
+
+function vmNewVM() {
+  const name=prompt('Nome della nuova VM:','Nuova VM Ubuntu'); if(!name) return;
+  const id='vm'+Date.now();
+  vmState.vms.push({id,name,os:'Ubuntu 24.04 LTS',ram:2048,cpu:2,disk:25,status:'stopped',iso:null});
+  vmState.selectedVM=id; _renderVMManager(); notify(`🖥️ VM "${name}" creata!`);
+}
+
+function isoUpdateName() {
+  const os=document.getElementById('iso-os')?.value||'ubuntu-24.04';
+  const arch=document.getElementById('iso-arch')?.value||'amd64';
+  const variant=document.getElementById('iso-variant')?.value||'desktop';
+  const map={'ubuntu-24.04':'ubuntu-24.04','ubuntu-22.04':'ubuntu-22.04','ubuntu-20.04':'ubuntu-20.04','debian-12':'debian-12.5.0','fedora-40':'Fedora-Workstation-Live-x86_64-40','arch':'archlinux-2024.05.01','linuxmint-21':'linuxmint-21.3-cinnamon-64bit'};
+  const base=map[os]||os;
+  const fn=document.getElementById('iso-name'); if(fn) fn.value=`${base}-${variant}-${arch}.iso`;
+}
+
+function isoBuild() {
+  if(vmState.isoBuilding) return;
+  const isoName=document.getElementById('iso-name')?.value||'ubuntu-24.04-desktop-amd64.iso';
+  vmState.isoBuilding=true; vmState.isoReady=null; _renderVMManager();
+  const stepDurations=[600,900,1100,1400,700,800,1200,600];
+  let step=0;
+  function nextStep(){
+    if(step>=8){ vmState.isoBuilding=false; vmState.isoReady=isoName; _renderVMManager(); notify(`✅ ISO "${isoName}" pronta! Puoi montarla in una VM.`); return; }
+    const pct=Math.round((step/8)*100);
+    const fill=document.getElementById('iso-prog-fill');
+    const label=document.getElementById('iso-prog-label');
+    const sl=document.getElementById('iso-steps-list');
+    if(fill) fill.style.width=pct+'%';
+    if(label) label.textContent=`${pct}% — Step ${step+1}/8`;
+    if(sl) sl.innerHTML=_isoStepsHTML(step);
+    step++;
+    setTimeout(nextStep,stepDurations[step-1]||800);
+  }
+  nextStep();
+}
+
+function isoDownload() { if(!vmState.isoReady) return; notify(`⬇️ Download simulato: "${vmState.isoReady}" (1.62 GB)`); }
+
+function isoMountToVM() {
+  if(!vmState.isoReady) return;
+  if(vmState.vms.length===0){ notify('⚠️ Nessuna VM disponibile. Creane una prima!'); vmSetTab('vms'); return; }
+  const vm=vmState.vms[0]; vm.iso=vmState.isoReady;
+  vmSetTab('vms'); notify(`💿 ISO montata su "${vm.name}"!`);
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+updateUI();
+
+// Restore user folders
+(function(){
+  if(!state.userFolders?.length)return;
+  state.userFolders.forEach(f=>{
+    const id=typeof f==='object'?f.id:'uf-'+Date.now()+Math.random();
+    const nm=typeof f==='object'?f.name:f;
+    userFolderCount++;
+    document.getElementById('desktop-icons').appendChild(buildDeskIcon(id,nm));
+  });
+  state.userFolders=state.userFolders.map(f=>typeof f==='object'?f:{id:'uf-legacy-'+Math.random(),name:f});
+})();
+
+if(state.level===0&&!state.tasksCompleted.welcomed){
+  setTimeout(()=>notify('👋 Benvenuto in PermissionOS! Inizia dalla Lezione 1 — Ospite.'),800);
+  state.tasksCompleted.welcomed=true; saveState();
+}
+</script>
+</body>
+</html>
