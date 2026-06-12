@@ -50,6 +50,10 @@ body {
   user-select: none;
 }
 
+.panel-btn, .panel-icon-btn, .task-btn, .sm-action-btn, .desk-icon, .app-grid-item, .dock-item {
+  transition: transform .18s ease, background .18s ease, color .15s ease, opacity .18s ease;
+}
+
 /* ══════════════════════════════════════════
    GNOME TOP PANEL
 ══════════════════════════════════════════ */
@@ -83,7 +87,7 @@ body {
   transition: background 0.15s;
   white-space: nowrap;
 }
-.panel-btn:hover { background: var(--panel-hover); }
+.panel-btn:hover { background: var(--panel-hover); transform: translateY(-1px); }
 .panel-btn.active-app { color: white; font-weight: 600; }
 
 #panel-clock {
@@ -96,9 +100,9 @@ body {
   height: 32px;
   display: flex; align-items: center;
   border-radius: 4px;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.15s;
 }
-#panel-clock:hover { background: var(--panel-hover); }
+#panel-clock:hover { background: var(--panel-hover); transform: translateY(-1px); }
 
 .panel-icon-btn {
   width: 32px; height: 32px;
@@ -109,7 +113,7 @@ body {
   opacity: 0.85;
   transition: background 0.15s, opacity 0.15s;
 }
-.panel-icon-btn:hover { background: var(--panel-hover); opacity: 1; }
+.panel-icon-btn:hover { background: var(--panel-hover); opacity: 1; transform: translateY(-1px); }
 
 /* System menu */
 #system-menu {
@@ -157,7 +161,7 @@ body {
   background: rgba(255,255,255,0.05); transition: background 0.15s;
   font-size: 10px; color: var(--text-muted);
 }
-.sm-toggle:hover { background: rgba(255,255,255,0.1); }
+.sm-toggle:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
 .sm-toggle.on { background: rgba(233,84,32,0.2); color: var(--ub-orange-light); }
 .sm-toggle-icon { font-size: 18px; }
 
@@ -168,7 +172,7 @@ body {
   font-family: var(--sans); font-size: 11px; text-align: center;
   transition: all .15s; display:flex; flex-direction:column; align-items:center; gap:4px;
 }
-.sm-action-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+.sm-action-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); transform: translateY(-1px); }
 .sm-action-btn span { font-size:16px; }
 
 /* ══════════════════════════════════════════
@@ -199,6 +203,7 @@ body {
   border-radius: 14px;
   transition: transform .18s cubic-bezier(.34,1.56,.64,1), background .15s;
   flex-shrink: 0;
+  animation: popIn .18s ease both;
 }
 .dock-item:hover { transform: scale(1.14); background: rgba(255,255,255,0.06); }
 .dock-item:active { transform: scale(0.94); }
@@ -244,6 +249,7 @@ body {
 #desktop {
   position: fixed;
   left: 64px; top: 32px; right: 0; bottom: 0;
+  animation: fadeIn .28s ease both;
   background:
     radial-gradient(ellipse 70% 80% at 15% 85%, rgba(233,84,32,0.18) 0%, transparent 55%),
     radial-gradient(ellipse 80% 60% at 85% 10%, rgba(119,33,111,0.2) 0%, transparent 55%),
@@ -277,9 +283,11 @@ body {
   display: flex; flex-direction: column; align-items: center;
   gap: 6px; padding: 8px 4px;
   border-radius: 8px; cursor: pointer;
-  transition: background .15s, transform .15s;
+  transition: background .15s, transform .18s ease, box-shadow .18s ease;
   text-align: center;
+  animation: popIn .2s ease both;
 }
+
 .desk-icon:hover { background: rgba(255,255,255,0.08); transform: translateY(-1px); }
 .desk-icon:active { transform: scale(0.96); }
 .desk-icon.selected { background: rgba(233,84,32,0.2); outline: 1px solid rgba(233,84,32,0.5); }
@@ -396,7 +404,7 @@ body {
   padding-top: 40px;
   animation: fadeIn .2s ease;
 }
-#app-overview.open { display: flex; }
+#app-overview.open { display: flex; animation: slideInRight .24s ease both; }
 
 #app-overview-search-wrap {
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
@@ -422,6 +430,7 @@ body {
   gap: 8px; padding: 16px 8px 12px;
   border-radius: 14px; cursor: pointer;
   transition: background .13s, transform .13s; text-align:center;
+  animation: popIn .16s ease both;
 }
 .app-grid-item:hover { background: rgba(255,255,255,0.1); transform: scale(1.06); }
 .app-grid-item:active { transform: scale(0.97); }
@@ -456,6 +465,127 @@ body {
   animation: fadeIn .15s ease;
 }
 
+.level-transition-overlay {
+  position:fixed; inset:0; z-index:600;
+  background: rgba(10,10,10,0.90); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center; padding:18px;
+  animation: fadeIn .18s ease;
+}
+
+.level-transition-card {
+  width: min(470px, 92vw);
+  background: rgba(20,20,20,0.98);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  box-shadow: 0 28px 90px rgba(0,0,0,0.35);
+  padding: 26px 24px;
+  text-align:center;
+  color: #fff;
+  overflow:hidden;
+}
+
+.level-transition-logo {
+  width: 78px; height: 78px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 40px;
+  background: linear-gradient(135deg, var(--ub-orange), var(--ub-purple));
+  box-shadow: 0 16px 45px rgba(231,84,32,0.22);
+}
+
+.level-transition-title {
+  margin-top: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.level-transition-subtitle {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.74);
+  line-height: 1.6;
+}
+
+.level-transition-progress {
+  margin-top: 24px;
+  height: 12px;
+  border-radius: 999px;
+  overflow:hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.level-transition-progress-fill {
+  width: 0%; height: 100%;
+  background: linear-gradient(90deg, var(--ub-orange), var(--ub-purple));
+  animation: progressLoad 1.5s ease forwards;
+}
+
+.level-transition-meta {
+  margin-top: 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color: rgba(255,255,255,0.72);
+  font-size: 13px;
+}
+
+.level-transition-meta span {
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+}
+
+.startup-card {
+  width: min(520px, 96vw);
+  background: rgba(15,15,15,0.98);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  box-shadow: 0 32px 90px rgba(0,0,0,0.45);
+  padding: 28px 28px 24px;
+  text-align: center;
+  color: #fff;
+}
+
+.startup-logo {
+  width: 92px; height: 92px; margin: 0 auto;
+  border-radius: 50%; background: linear-gradient(135deg,var(--ub-orange),var(--ub-purple));
+  display:flex; align-items:center; justify-content:center;
+  font-size:44px; box-shadow:0 18px 50px rgba(231,84,32,0.22);
+}
+
+.startup-label {
+  margin-top: 20px; font-size:16px; font-weight:700; letter-spacing:.02em;
+}
+
+.startup-subtitle {
+  margin-top: 8px; font-size:13px; color:rgba(255,255,255,.78); line-height:1.6;
+}
+
+.startup-progress {
+  margin-top: 26px; height: 14px; border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  overflow:hidden;
+}
+
+.startup-progress-fill {
+  width: 0%; height: 100%;
+  background: linear-gradient(90deg,var(--ub-orange),var(--ub-purple));
+  animation: progressLoad 1.7s ease forwards;
+}
+
+.level-row {
+  opacity: 0;
+}
+
+.level-select-btn:hover {
+  transform: translateY(-1px);
+}
+
 .window {
   background: var(--surface);
   border-radius: var(--radius);
@@ -468,6 +598,11 @@ body {
 }
 .window.wide { width: min(880px, 96vw); }
 .window.tall { max-height: 92vh; }
+
+@keyframes progressLoad {
+  from { width: 0%; }
+  to { width: 100%; }
+}
 
 @keyframes winIn { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:none; } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -540,7 +675,7 @@ body {
   font-family:var(--sans); font-size:12px; padding:7px 18px; border-radius:6px;
   cursor:pointer; transition:all .15s; font-weight:500;
 }
-.task-btn:hover { background:rgba(233,84,32,.15); }
+.task-btn:hover { background:rgba(233,84,32,.15); transform: translateY(-1px); }
 .task-btn.done { border-color:var(--green); color:var(--green); cursor:default; }
 
 /* ── Section heading ── */
@@ -640,7 +775,7 @@ code {
   scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent;
   flex:1; line-height:1.65;
 }
-.t-line { margin:0; }
+.t-line { margin:0; animation: fadeInUp .18s ease both; }
 .t-ps1 { color:#4ADE80; }
 .t-ps1-host { color:#60A5FA; }
 .t-ps1-path { color:#C084FC; }
@@ -820,9 +955,11 @@ code {
   border-radius:8px; padding:12px 16px;
   font-size:13px; color:var(--text); max-width:300px;
   box-shadow:var(--shadow-win);
-  animation:slideInRight .25s ease, fadeOut .3s ease 2.7s forwards;
+  animation:slideInRight .25s ease, fadeOut .3s ease 2.7s forwards, floatUp .4s ease both;
 }
 @keyframes fadeOut { to { opacity:0; transform:translateX(20px); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes floatUp { from { transform: translateY(0); } to { transform: translateY(-4px); } }
 
 /* ══════════════════════════════════════════
    ADMIN MODE
@@ -1010,7 +1147,7 @@ body.admin-mode #desktop::before {
     <div style="display:flex;align-items:center;gap:6px;padding:0 6px;height:32px;cursor:pointer;border-radius:4px;transition:background .15s;" onclick="toggleSystemMenu()" id="panel-systray-btn" onmouseover="this.style.background='var(--panel-hover)'" onmouseout="this.style.background=''">
       <div id="panel-user-dot" style="width:7px;height:7px;border-radius:50%;background:var(--text-dim);flex-shrink:0;"></div>
       <span style="font-size:12px;color:var(--text-muted);font-family:var(--mono);" id="panel-username">ospite</span>
-      <span id="panel-level-badge">GUEST</span>
+      <span id="panel-level-badge" onclick="showLevelsMenu()" style="cursor:pointer;">GUEST</span>
       <span style="font-size:9px;opacity:.5;">▾</span>
     </div>
   </div>
@@ -1052,6 +1189,7 @@ body.admin-mode #desktop::before {
     </div>
   </div>
   <div class="sm-actions">
+    <button class="sm-action-btn" onclick="closeSystemMenu();showLevelsMenu()"><span>🧭</span>Argomenti</button>
     <button class="sm-action-btn" onclick="closeSystemMenu();openUserProfile()"><span>👤</span>Profilo</button>
     <button class="sm-action-btn" onclick="closeSystemMenu();openSettings()"><span>⚙️</span>Impostaz.</button>
     <button class="sm-action-btn" onclick="closeSystemMenu();resetSession()" style="color:var(--red)"><span>↺</span>Reset</button>
@@ -1196,8 +1334,8 @@ body.admin-mode #desktop::before {
   <!-- Progress -->
   <div id="progress-area">
     <span id="progress-label" style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;">GUEST</span>
-    <div id="progress-track"><div id="progress-fill" style="width:25%"></div></div>
-    <span style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.25);" id="progress-steps">1/4</span>
+    <div id="progress-track"><div id="progress-fill" style="width:20%"></div></div>
+    <span style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.25);" id="progress-steps">1/5</span>
   </div>
 </div>
 
@@ -1311,36 +1449,36 @@ function generatePassword() {
 // ══════════════════════════════════════
 //  UI UPDATE
 // ══════════════════════════════════════
-const LEVEL_NAMES = ['GUEST','USER','EDITOR','ADMIN'];
-const LEVEL_LABELS = ['Ospite','Utente','Editor','Amministratore'];
+const LEVEL_NAMES = ['INTRO','FILE','UBUNTU','PERMESSI','ADMIN'];
+const LEVEL_LABELS = ['Introduzione','Gestione file','Ubuntu passo passo','Permessi e script','Amministrazione'];
 
 function updateUI() {
   const lvl = state.level;
   document.getElementById('panel-username').textContent = state.username;
   document.getElementById('panel-level-badge').textContent = LEVEL_NAMES[lvl];
-  document.getElementById('panel-level-badge').className = 'panel-level-badge'+(lvl===0?'':lvl>=3?' admin':' user');
+  document.getElementById('panel-level-badge').className = 'panel-level-badge'+(lvl===0?'':lvl===LEVEL_NAMES.length-1?' admin':' user');
   document.getElementById('sm-name').textContent = state.username;
   document.getElementById('sm-sub').textContent = `/home/${state.username}`;
-  document.getElementById('panel-user-dot').style.background = lvl===0?'var(--text-dim)':lvl>=3?'var(--red)':'var(--blue)';
+  document.getElementById('panel-user-dot').style.background = lvl===0?'var(--text-dim)':lvl===LEVEL_NAMES.length-1?'var(--red)':'var(--blue)';
 
   // Dock unlock
-  [{id:'dock-user',req:1},{id:'dock-edit',req:2},{id:'dock-admin',req:3}].forEach(({id,req})=>{
+  [{id:'dock-user',req:1},{id:'dock-edit',req:2},{id:'dock-admin',req:4}].forEach(({id,req})=>{
     const el=document.getElementById(id);
     if(el&&lvl>=req){el.classList.remove('locked');el.querySelector('.dock-lock-badge')?.remove();}
   });
   document.getElementById('dock-guest')?.classList.toggle('active',lvl===0);
 
   // Progress
-  document.getElementById('progress-fill').style.width=((lvl+1)/4*100)+'%';
+  document.getElementById('progress-fill').style.width=((lvl+1)/LEVEL_NAMES.length*100)+'%';
   document.getElementById('progress-label').textContent = LEVEL_NAMES[lvl];
-  document.getElementById('progress-steps').textContent = `${lvl+1}/4`;
+  document.getElementById('progress-steps').textContent = `${lvl+1}/${LEVEL_NAMES.length}`;
 
   // Secret file
   state.fileContents['secret.txt']=`ACCESSO AMMINISTRATORE SBLOCCATO!\n\nHai completato tutto il percorso.\nUsername: ${state.username}\nLivello: ROOT\n\nPermessi: -rwx------`;
 
   // Admin mode
-  document.body.classList.toggle('admin-mode', lvl>=3);
-  document.getElementById('panel-appname').style.color = lvl>=3?'var(--red)':'';
+  document.body.classList.toggle('admin-mode', lvl===LEVEL_NAMES.length-1);
+  document.getElementById('panel-appname').style.color = lvl===LEVEL_NAMES.length-1?'var(--red)':'';
 }
 
 // ══════════════════════════════════════
@@ -1481,14 +1619,83 @@ function geditSave(fn) {
 //  FOLDER SYSTEM
 // ══════════════════════════════════════
 function openFolder(name) {
-  const req={user:1,edit:2,admin:3};
+  const req={user:1,edit:2,admin:4};
   if(req[name]&&state.level<req[name]) { notify('🔒 Cartella bloccata. Completa i task precedenti!'); return; }
   document.querySelectorAll('.dock-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('dock-'+name)?.classList.add('active');
-  if(name==='guest') showGuestFolder();
-  else if(name==='user') showUserFolder();
-  else if(name==='edit') showEditFolder();
-  else if(name==='admin') showAdminFolder();
+  const titles={guest:'Ospite',user:'Utente',edit:'chmod',admin:'Root'};
+  showLevelTransition(titles[name]||'Argomento', ()=>{
+    if(name==='guest') showGuestFolder();
+    else if(name==='user') showUserFolder();
+    else if(name==='edit') showEditFolder();
+    else if(name==='admin') showAdminFolder();
+  });
+}
+
+function showLevelTransition(title, callback) {
+  const overlay = document.createElement('div');
+  overlay.className = 'level-transition-overlay';
+  overlay.innerHTML = `
+    <div class="level-transition-card">
+      <div class="level-transition-logo">🐧</div>
+      <div class="level-transition-title">Avvio argomento ${escHtml(title)}</div>
+      <div class="level-transition-subtitle">Preparazione dell'ambiente Ubuntu. Un attimo mentre il robot carica il sistema.</div>
+      <div class="level-transition-progress"><div class="level-transition-progress-fill"></div></div>
+      <div class="level-transition-meta"><span>🤖 Robo inizializzato</span><span>🐧 Pinguino pronto</span></div>
+    </div>`;
+  const container = document.getElementById('modal-container');
+  container.appendChild(overlay);
+  setTimeout(()=>{
+    overlay.remove();
+    if(typeof callback==='function') callback();
+  }, 1600);
+}
+
+function showStartupLoading(callback) {
+  const overlay = document.createElement('div');
+  overlay.className = 'level-transition-overlay';
+  overlay.innerHTML = `
+    <div class="startup-card">
+      <div class="startup-logo">🐧</div>
+      <div class="startup-label">Avvio PermissionOS</div>
+      <div class="startup-subtitle">Caricamento del sistema operativo e preparazione dell'ambiente didattico.</div>
+      <div class="startup-progress"><div class="startup-progress-fill"></div></div>
+      <div class="level-transition-meta" style="justify-content:center;margin-top:14px;"><span>🟢 Avvio kernel</span><span>⚙️ Configurazione GNOME</span></div>
+    </div>`;
+  const container = document.getElementById('modal-container');
+  container.appendChild(overlay);
+  setTimeout(()=>{
+    overlay.remove();
+    if(typeof callback==='function') callback();
+  }, 2200);
+}
+
+function chooseLevel(newLevel) {
+  showLevelTransition(LEVEL_NAMES[newLevel], ()=> setLevel(newLevel));
+}
+
+function showLevelsMenu(){
+  showLevelTransition('Argomenti', showLevelsMenuModal);
+}
+
+function showLevelsMenuModal(){
+  showModal(`
+    ${winTitlebar('🧭 Argomenti di PermissionOS')}
+    <div class="win-body">
+      <div class="sh">Argomenti disponibili</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Obiettivo: comprendere Linux/Ubuntu a pezzi, come una ricetta di pasta divisa in passaggi.</div>
+      ${LEVEL_NAMES.map((name,i)=>`
+        <div class="level-row" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);animation:popIn .22s ease both;animation-delay:${i*0.06}s;">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:${i===state.level?'#4ADE80':'var(--text)'};">${name} — ${LEVEL_LABELS[i]}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${['Fondamenti Linux','Gestire file e cartelle','Ubuntu passo passo','Usare chmod e script','Scenari avanzati da admin'][i]}</div>
+          </div>
+          <button class="task-btn level-select-btn" style="min-width:110px;${i===state.level?'border-color:var(--green);color:var(--green);':''}" onclick="chooseLevel(${i})">${i===state.level?'Attivo':'Seleziona'}</button>
+        </div>`).join('')}
+      <div class="sh">Terminale</div>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.6;">Digita <code>admin</code> nel terminale per aprire un pannello in cui puoi modificare l'argomento, il nome utente e i privilegi.</p>
+      <button class="task-btn" onclick="closeModal()">Chiudi</button>
+    </div>`);
 }
 
 function showGuestFolder() {
@@ -1745,7 +1952,7 @@ function runCmd(raw) {
       tPrint('<span class="t-out" style="color:#E3B341;">── Archivi & Compressione ──</span>');
       [['tar -czf out.tar.gz dir/','comprimi con gzip'],['tar -xzf file.tar.gz','estrai tar.gz'],['tar -cjf out.tar.bz2 dir/','comprimi con bzip2'],['zip -r out.zip dir/','comprimi in zip'],['unzip file.zip','estrai zip'],['gzip <file>','comprimi con gzip'],['gunzip <file.gz>','decomprimi gzip'],['bzip2 <file>','comprimi con bzip2']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
       tPrint('<span class="t-out" style="color:#E3B341;">── Shell & Varie ──</span>');
-      [['echo <testo>','stampa testo'],['history','cronologia comandi'],['clear','pulisci terminale'],['alias ll=\'ls -la\'','crea alias'],['export VAR=val','imposta variabile ambiente'],['source <file>','esegui script nel shell corrente'],['which <cmd>','percorso del comando'],['whereis <cmd>','posizioni binario/manuale'],['man <cmd>','manuale del comando'],['info <cmd>','info comando'],['type <cmd>','tipo di comando'],['time <cmd>','misura tempo esecuzione'],['watch -n1 <cmd>','ripeti comando ogni sec'],['xargs','costruisce comandi da input'],['tee <file>','duplica output su file'],['pipe |','collega comandi'],['> file','redireziona output'],['>> file','append output'],['2> file','redireziona errori'],['crontab -e','pianifica task periodici'],['at <ora>','pianifica task una tantum'],['reboot','riavvia sistema (root)'],['shutdown -h now','spegni sistema (root)'],['exit','chiudi sessione']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
+      [['echo <testo>','stampa testo'],['history','cronologia comandi'],['clear','pulisci terminale'],['alias ll=\'ls -la\'','crea alias'],['export VAR=val','imposta variabile ambiente'],['source <file>','esegui script nel shell corrente'],['which <cmd>','percorso del comando'],['whereis <cmd>','posizioni binario/manuale'],['man <cmd>','manuale del comando'],['info <cmd>','info comando'],['type <cmd>','tipo di comando'],['time <cmd>','misura tempo esecuzione'],['watch -n1 <cmd>','ripeti comando ogni sec'],['xargs','costruisce comandi da input'],['tee <file>','duplica output su file'],['pipe |','collega comandi'],['> file','redireziona output'],['>> file','append output'],['2> file','redireziona errori'],['crontab -e','pianifica task periodici'],['at <ora>','pianifica task una tantum'],['reboot','riavvia sistema (root)'],['shutdown -h now','spegni sistema (root)'],['admin','pannello amministrazione (simulato)'],['exit','chiudi sessione']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
       tPrint('<span class="t-out" style="color:#E3B341;">── Git ──</span>');
       [['git status','stato repository'],['git log --oneline','log commit'],['git add <file>','aggiungi file al commit'],['git commit -m \'msg\'','crea commit'],['git diff','differenze non staged'],['git branch','lista branch'],['git checkout -b <br>','crea e cambia branch'],['git merge <branch>','unisce branch'],['git pull','scarica aggiornamenti'],['git push','invia commit al remote'],['git clone <url>','clona repository'],['git stash','salva modifiche temporaneamente']].forEach(([c,d])=>tPrint(`<span class="t-out">  <span style="color:#C084FC;width:230px;display:inline-block;">${c}</span>${d}</span>`));
       break;
@@ -1839,6 +2046,10 @@ function runCmd(raw) {
         tPrint(`<span class="t-ok">chmod ${escHtml(arg)}</span>`);
       } break;
     }
+    case 'admin':
+      tPrint('<span class="t-info">Apro pannello amministrativo…</span>');
+      openAdminPanel();
+      break;
     case 'sudo': case 'su':
       tPrint(`<span class="t-err">[sudo] password for ${state.username}: </span>`);
       setTimeout(()=>tPrint('<span class="t-err">sudo: accesso negato in modalità simulata — usa le cartelle per avanzare</span>'),400); break;
@@ -2423,7 +2634,7 @@ function openUserProfile() {
         <div>
           <div class="profile-name">${escHtml(state.username)}<span class="profile-badge">${LEVEL_LABELS[lvl]}</span></div>
           <div class="profile-detail">
-            Livello: <span style="color:${lvlColors[lvl]};font-weight:700;">${lvl+1}/4</span><br>
+            Argomento: <span style="color:${lvlColors[lvl]};font-weight:700;">${lvl+1}/${LEVEL_NAMES.length}</span><br>
             Home: <span style="color:#C084FC;">/home/${escHtml(state.username)}</span><br>
             Shell: /bin/bash &nbsp;|&nbsp; Ubuntu 24.04 LTS
           </div>
@@ -2435,7 +2646,7 @@ function openUserProfile() {
         <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">${escHtml(state.password||'(nessuna)')}</span></div>
         <div class="cred-row"><span class="cred-label">UID</span><span class="cred-value">${1000+lvl}</span></div>
         <div class="cred-row"><span class="cred-label">GID</span><span class="cred-value">${1000+lvl}</span></div>
-        <div class="cred-row"><span class="cred-label">Gruppi</span><span class="cred-value">${lvl>=3?'root,sudo,adm':lvl>=1?escHtml(state.username)+',users':'guest'}</span></div>
+        <div class="cred-row"><span class="cred-label">Gruppi</span><span class="cred-value">${lvl===LEVEL_NAMES.length-1?'root,sudo,adm':lvl>=1?escHtml(state.username)+',users':'guest'}</span></div>
       </div>
       <div class="sh">Permessi attivi</div>
       ${permRows.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">
@@ -2447,8 +2658,52 @@ function openUserProfile() {
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${folderList}</div>
       <div style="margin-top:18px;display:flex;gap:8px;">
         <button class="task-btn" onclick="closeModal()">Chiudi</button>
-        ${lvl>=3?`<button class="task-btn" style="border-color:var(--red);color:var(--red);" onclick="closeModal();setTimeout(resetSession,200)">↺ Reset</button>`:''}
+        ${lvl===LEVEL_NAMES.length-1?`<button class="task-btn" style="border-color:var(--red);color:var(--red);" onclick="closeModal();setTimeout(resetSession,200)">↺ Reset</button>`:''}
       </div>
+    </div>`);
+}
+
+function setLevel(newLevel){
+  if(newLevel===state.level){
+    notify('📌 Sei già su l\'argomento '+LEVEL_NAMES[newLevel]+'.');
+    return;
+  }
+  state.level=newLevel;
+  if(newLevel>=1) state.tasksCompleted.guest=true;
+  if(newLevel>=2) state.tasksCompleted.user=true;
+  if(newLevel>=3) state.tasksCompleted.edit=true;
+  if(newLevel>0 && state.username==='ospite'){ state.username=generateUsername(); state.password=generatePassword(); }
+  saveState(); updateUI(); closeModal();
+  notify(`🔧 Argomento impostato su ${LEVEL_NAMES[newLevel]} (${LEVEL_LABELS[newLevel]})`);
+}
+
+function showLevelsMenu(){
+  showLevelTransition('Argomenti', showLevelsMenuModal);
+}
+
+function openAdminPanel(){
+  const adminMode=state.level===LEVEL_NAMES.length-1;
+  showModal(`
+    ${winTitlebar('🔑 Pannello Admin')}
+    <div class="win-body">
+      <div class="sh">Impostazioni Argomento</div>
+      <div class="desc-block">${adminMode?'Sei attualmente in modalità amministratore.':'Stai accedendo al pannello admin simulato.'}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+        ${LEVEL_NAMES.map((name,i)=>`
+          <button class="task-btn" style="width:100%;${state.level===i?'border-color:var(--green);color:var(--green);':''}" onclick="setLevel(${i})">${name}<br><span style="font-size:11px;color:var(--text-muted);">${LEVEL_LABELS[i]}</span></button>
+        `).join('')}
+      </div>
+      <div class="sh">Utente</div>
+      <div class="cred-card">
+        <div class="cred-row"><span class="cred-label">Username</span><span class="cred-value">${escHtml(state.username)}</span></div>
+        <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">${escHtml(state.password)}</span></div>
+        <div class="cred-row"><span class="cred-label">Argomento corrente</span><span class="cred-value">${LEVEL_NAMES[state.level]}</span></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;">
+        <button class="task-btn" onclick="setLevel(${state.level===LEVEL_NAMES.length-1?0:LEVEL_NAMES.length-1})">${state.level===LEVEL_NAMES.length-1?'Riduci a GUEST':'Imposta ADMIN'}</button>
+        <button class="task-btn" onclick="closeModal()">Chiudi</button>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-dim);">Questo pannello è una simulazione: puoi usarlo per sperimentare gli argomenti e vedere l'effetto sull'interfaccia.</div>
     </div>`);
 }
 
@@ -3207,10 +3462,13 @@ updateUI();
   state.userFolders=state.userFolders.map(f=>typeof f==='object'?f:{id:'uf-legacy-'+Math.random(),name:f});
 })();
 
-if(state.level===0&&!state.tasksCompleted.welcomed){
-  setTimeout(()=>notify('👋 Benvenuto in PermissionOS! Inizia dalla Lezione 1 — Ospite.'),800);
-  state.tasksCompleted.welcomed=true; saveState();
-}
+showStartupLoading(()=>{
+  showLevelsMenuModal();
+  if(!state.tasksCompleted.welcomed){
+    state.tasksCompleted.welcomed=true;
+    saveState();
+  }
+});
 </script>
 </body>
 </html>
