@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PermissionOS — Processi: comandi Linux spiegati con esempi pratici e terminali simulati.">
+  <title>PermissionOS — Processi | Comandi Base</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+  /* ═══════════════════════════════════════════════════════════════
+     PERMISSIONOS - COMANDI BASE
+     Design system coerente con styles.css (pagina di riferimento:
+     permessi/permessi.html). Tutti gli stili sono self-contained.
+     ═══════════════════════════════════════════════════════════════ */
+
+  :root {
+    /* Modern Developer Color Palette */
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: #34d399;
+    --primary-soft: rgba(16, 185, 129, 0.08);
+    --primary-glow: rgba(16, 185, 129, 0.15);
+
+    /* Neutral Slate Backgrounds */
+    --bg-dark: #080b11;
+    --bg-darker: #05070a;
+    --surface: rgba(17, 22, 33, 0.75);
+    --surface-hover: rgba(25, 32, 48, 0.85);
+    --surface-active: rgba(30, 38, 56, 0.95);
+
+    /* Text Colors */
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-placeholder: #4b5563;
+
+    /* Borders & Highlights */
+    --border-primary: rgba(255, 255, 255, 0.06);
+    --border-secondary: rgba(255, 255, 255, 0.12);
+    --border-subtle: rgba(255, 255, 255, 0.04);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.7);
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+
+    /* Radii */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+
+    /* Transitions */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Typography */
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+
+    --text-xs: 12px;
+    --text-sm: 13.5px;
+    --text-base: 15px;
+    --text-lg: 17px;
+    --text-xl: 19px;
+    --text-2xl: 22px;
+    --text-3xl: 28px;
+    --text-4xl: 36px;
+  }
+
+  /* ── Reset & base ────────────────────────────────────────────── */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 90px;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    background: radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.05), transparent 45%),
+                radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.03), transparent 45%),
+                var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Elegant, stationary technical grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+
+  h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: var(--space-md); }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: var(--space-sm); }
+  h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
+  h4 { font-size: var(--text-xl); }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    font-size: var(--text-base);
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    cursor: pointer;
+  }
+
+  a:hover { color: var(--primary-light); }
+
+  strong, b { color: var(--text-primary); font-weight: 600; }
+
+  code {
+    font-family: var(--font-family-mono);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 2px 6px;
+    color: #34d399;
+    font-size: 0.9em;
+  }
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .button,
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 10px 20px;
+    font-family: var(--font-family-sans);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+
+  .button.primary {
+    background: var(--primary);
+    color: var(--bg-darker);
+    border: 1px solid var(--primary);
+  }
+
+  .button.primary:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px var(--primary-glow);
+  }
+
+  .button.outline {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .button.outline:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary-light);
+  }
+
+  .button.ghost {
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    background: transparent;
+  }
+
+  .button.ghost:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .button.sm {
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+    border-radius: var(--radius-sm);
+  }
+
+  .button.lg {
+    padding: 14px 28px;
+    font-size: var(--text-base);
+    border-radius: var(--radius-lg);
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  /* ── Cards & panels (glassmorphism) ──────────────────────────── */
+  .card, .panel {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    position: relative;
+  }
+
+  .card:hover, .panel:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--surface-hover);
+    box-shadow: var(--shadow-lg), 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ── Topbar / navigation ─────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(17, 22, 33, 0.6);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .topbar .brand {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+  }
+
+  .topbar .nav {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    padding: 6px 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+  .page {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-lg);
+    display: grid;
+    gap: var(--space-lg);
+    z-index: 1;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: var(--space-2xl) var(--space-xl);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(99, 102, 241, 0.03)),
+                var(--surface);
+    border: 1px solid var(--border-primary);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .hero h1 {
+    margin-bottom: var(--space-sm);
+    background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    max-width: 680px;
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+    line-height: 1.65;
+  }
+
+  .headline-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .headline-tag span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary);
+  }
+  /* ── Section blocks (come nella pagina Permessi) ─────────────── */
+  .section-block {
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .section-block h2 {
+    margin-bottom: var(--space-md);
+    font-size: var(--text-2xl);
+    background: linear-gradient(135deg, #ffffff, #a7f3d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .section-block > p {
+    margin: 0 0 var(--space-md);
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .section-block ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .section-block li {
+    padding-left: var(--space-lg);
+    position: relative;
+    color: var(--text-secondary);
+  }
+
+  .section-block li::before {
+    content: '•';
+    position: absolute;
+    left: var(--space-sm);
+    color: var(--primary);
+    font-weight: bold;
+  }
+
+  .section-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .section-list li {
+    padding-left: var(--space-lg);
+    position: relative;
+    color: var(--text-secondary);
+  }
+
+  .section-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ── Code line (mockup terminale inline) ─────────────────────── */
+  .code-line {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding: 12px 18px;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    color: var(--primary-light);
+    font-size: var(--text-sm);
+    font-family: var(--font-family-mono);
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  .code-line::before {
+    content: '$';
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────── */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    background: rgba(17, 22, 33, 0.5);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .footer a { color: var(--primary-light); font-weight: 500; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── Reveal on scroll (come styles.css) ──────────────────────── */
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Quick navigation (chip delle categorie) ─────────────────── */
+  .quicknav {
+    position: sticky;
+    top: 12px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 10px 12px;
+    background: rgba(17, 22, 33, 0.88);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .quicknav::-webkit-scrollbar { display: none; }
+
+  .quicknav a {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+  }
+
+  .quicknav a:hover {
+    color: var(--primary-light);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-primary);
+  }
+
+  .quicknav a.active {
+    background: var(--primary-soft);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: var(--primary-light);
+  }
+  /* ── Card di ogni comando ────────────────────────────────────── */
+  .cmd-list {
+    display: grid;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    scroll-margin-top: 90px;
+  }
+
+  .cmd-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--surface-hover);
+    box-shadow: var(--shadow-lg), 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .cmd-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .cmd-badge {
+    font-family: var(--font-family-mono);
+    background: #090c12;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--primary-light);
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    white-space: nowrap;
+  }
+
+  .cmd-badge::before {
+    content: '$';
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-weight: 500;
+  }
+
+  .cmd-head-info h3 {
+    margin: 0 0 2px;
+    font-size: var(--text-lg);
+  }
+
+  .cmd-cat {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-light);
+    background: var(--primary-soft);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 1px 10px;
+  }
+
+  .cmd-what { margin-top: var(--space-sm); }
+
+  .cmd-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary-light);
+    margin: var(--space-md) 0 var(--space-xs);
+  }
+
+  .cmd-how { color: var(--text-secondary); }
+
+  /* ── Blocco sintassi ─────────────────────────────────────────── */
+  .syntax {
+    font-family: var(--font-family-mono);
+    background: #090c12;
+    border: 1px dashed rgba(16, 185, 129, 0.35);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .syn-cmd { color: var(--primary-light); font-weight: 600; }
+  .syn-opt { color: #fbbf24; }
+  .syn-arg { color: #e5e7eb; }
+
+  /* ── Tabella opzioni ─────────────────────────────────────────── */
+  .opt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+  }
+
+  .opt-table th {
+    text-align: left;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .opt-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  .opt-table tr:last-child td { border-bottom: none; }
+
+  .opt-table td:first-child {
+    font-family: var(--font-family-mono);
+    color: #fbbf24;
+    white-space: nowrap;
+  }
+
+  .opt-note {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: var(--space-sm);
+  }
+
+  /* ── Esempi ──────────────────────────────────────────────────── */
+  .cmd-examples { display: grid; gap: var(--space-xs); }
+  .cmd-examples .code-line { margin-top: 0; }
+
+  /* ── Terminale simulato ──────────────────────────────────────── */
+  .term {
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-top: var(--space-md);
+  }
+
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .term-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .term-dot.r { background: #ff5f57; }
+  .term-dot.y { background: #febc2e; }
+  .term-dot.g { background: #28c840; }
+
+  .term-title {
+    margin-left: var(--space-xs);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-family-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .term-body {
+    padding: 14px 16px;
+    font-family: var(--font-family-mono);
+    font-size: var(--text-sm);
+    line-height: 1.75;
+    min-height: 92px;
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .term-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #d1d5db;
+    animation: termLineIn 0.25s ease;
+  }
+
+  @keyframes termLineIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--primary-light);
+    vertical-align: -2px;
+    margin-left: 2px;
+    animation: cursorBlink 1s steps(1) infinite;
+  }
+
+  @keyframes cursorBlink { 50% { opacity: 0; } }
+
+  /* Colori interni al terminale */
+  .t-user { color: var(--primary-light); font-weight: 600; }
+  .t-sep { color: #e5e7eb; }
+  .t-path { color: #60a5fa; font-weight: 600; }
+  .t-cmd { color: var(--primary-light); font-weight: 600; }
+  .t-flag { color: #fbbf24; }
+  .t-var { color: #c4b5fd; }
+  .t-str { color: #fda4af; }
+  .t-arg { color: #e5e7eb; }
+  .t-out { color: #d1d5db; }
+  .t-dir { color: #60a5fa; font-weight: 600; }
+  .t-ok { color: var(--primary-light); }
+  .t-err { color: #f87171; }
+  .t-warn { color: #fbbf24; }
+  .t-dim { color: var(--text-muted); }
+  /* ── Anatomia del prompt ─────────────────────────────────────── */
+  .anatomy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .anatomy-card {
+    background: rgba(17, 22, 33, 0.35);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+    transition: all var(--transition-base);
+  }
+
+  .anatomy-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(22, 28, 43, 0.5);
+  }
+
+  .anatomy-token {
+    font-family: var(--font-family-mono);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+  }
+
+  .anatomy-card h4 {
+    margin: 0 0 4px;
+    font-size: var(--text-base);
+  }
+
+  .anatomy-card p {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .a-user { color: var(--primary-light); }
+  .a-sep { color: #e5e7eb; }
+  .a-path { color: #60a5fa; }
+  .a-cmd { color: var(--primary-light); }
+
+  /* ── Riepilogo finale ────────────────────────────────────────── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  .summary-table th {
+    text-align: left;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .summary-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+
+  .summary-table tr { transition: background var(--transition-fast); }
+  .summary-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+  .summary-table td:first-child { font-family: var(--font-family-mono); color: var(--primary-light); white-space: nowrap; }
+
+  /* ── Azioni e toast ──────────────────────────────────────────── */
+  .cmd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  #toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1f2937;
+    color: #10b981;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid #10b981;
+    font-weight: 500;
+    font-family: var(--font-family-sans);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  #toast.show { bottom: 40px; }
+
+  /* ── Responsive ──────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    :root {
+      --space-2xl: 32px;
+      --space-xl: 20px;
+      --space-lg: 16px;
+    }
+
+    .page { padding: var(--space-xl) var(--space-md); }
+
+    .footer {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .cmd-head { flex-direction: column; gap: var(--space-sm); }
+
+    .term-body { font-size: 12.5px; padding: 12px; }
+
+    .summary-table { display: block; overflow-x: auto; }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --space-2xl: 24px;
+      --space-xl: 16px;
+    }
+
+    .button { width: auto; }
+    .button-group { flex-direction: column; }
+    .cmd-actions .button { flex: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .term-line, .cursor { animation: none; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+    html { scroll-behavior: auto; }
+  }
+      </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <div class="brand">
+        PermissionOS — Processi
+      </div>
+
+      <nav class="nav">
+        <a class="nav-link" href="sistema.html">← Sistema e informazioni</a>
+        <a class="nav-link" href="comandibase.html">Panoramica</a>
+        <a class="nav-link" href="permessi.html">Permessi →</a>
+        <a class="nav-link" href="../index.html">Homepage</a>
+        <a class="nav-link" href="../permessi/index.html">Desktop</a>
+        <a class="nav-link" href="../permessi/permessi.html">Permessi</a>
+      </nav>
+
+    </div>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="headline-tag">
+        <span></span>
+        Comandi Base — Processi
+      </div>
+
+      <h1>Processi</h1>
+
+      <p>
+        Ogni programma in esecuzione è un processo. Qui impari a vederli, monitorarli e, se serve, a chiuderli.
+      </p>
+
+      <div class="button-group">
+        <a href="#comandi" class="button primary lg">Vai ai comandi</a>
+        <a href="comandibase.html" class="button outline lg">Tutte le categorie</a>
+      </div>
+
+    </section>
+
+
+    <!-- QUICK NAV COMANDI -->
+    <div class="quicknav" id="quicknav" aria-label="Comandi della sezione"></div>
+
+
+    <!-- COMANDI -->
+    <section class="section-block reveal" id="comandi">
+
+      <h2>I comandi di Processi</h2>
+
+      <div class="cmd-list" id="cmd-list"></div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <div>
+        PermissionOS — Sezione Didattica Comandi Base
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="button outline sm" href="sistema.html">← Sistema e informazioni</a>
+        <a class="button outline sm" href="comandibase.html">Tutte le categorie</a>
+        <a class="button outline sm" href="permessi.html">Permessi →</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast per feedback (copia comandi) -->
+  <div id="toast">Comando copiato!</div>
+
+  <script>
+"use strict";
+const CATS = [
+    {
+      id: "navigazione",
+      label: "Navigazione",
+      intro: "I primi comandi da imparare: servono per capire dove ti trovi, vedere cosa contiene una cartella e spostarti nel filesystem."
+    },
+    {
+      id: "file",
+      label: "File e cartelle",
+      intro: "Comandi per creare, copiare, spostare, rinominare, eliminare e leggere file e directory: il pane quotidiano del terminale."
+    },
+    {
+      id: "ricerca",
+      label: "Ricerca",
+      intro: "Quando non ricordi dove si trova un file o cerchi una parola dentro un testo, questi comandi ti fanno trovare tutto in pochi secondi."
+    },
+    {
+      id: "sistema",
+      label: "Sistema e informazioni",
+      intro: "Comandi per conoscere il tuo sistema: chi sei, come si chiama il computer, quale kernel usi e da quanto tempo è acceso."
+    },
+    {
+      id: "processi",
+      label: "Processi",
+      intro: "Ogni programma in esecuzione è un processo. Qui impari a vederli, monitorarli e, se serve, a chiuderli."
+    },
+    {
+      id: "permessi",
+      label: "Permessi",
+      intro: "In Linux ogni file ha un proprietario e dei permessi. Questi comandi ti permettono di cambiarli. Approfondisci l'argomento nella lezione dedicata ai permessi."
+    },
+    {
+      id: "pacchetti",
+      label: "Gestione software",
+      intro: "Su Linux i programmi si installano con i gestori di pacchetti, che scaricano e configurano il software in modo sicuro. Ogni famiglia di distribuzioni ha il suo."
+    },
+    {
+      id: "rete",
+      label: "Rete",
+      intro: "Comandi per diagnosticare la connessione, scaricare file da internet e vedere quali porte sono in ascolto."
+    },
+    {
+      id: "utilita",
+      label: "Terminale e utilità",
+      intro: "Piccoli grandi strumenti di ogni giorno: pulire lo schermo, ritrovare i comandi digitati, consultare il manuale e diventare amministratore."
+    }
+  ];
+
+const CMDS = [
+    {
+      c: "ps", cat: "processi", name: "Elenca i processi in esecuzione",
+      what: "<strong>ps</strong> (process status) fa una fotografia dei processi attivi: senza opzioni mostra quelli della sessione corrente, con aux mostra tutti quelli del sistema.",
+      why: "Serve per capire cosa sta girando sul computer, trovare l'ID (PID) di un programma bloccato da terminare con kill, o verificare che un servizio sia attivo.",
+      syntax: "ps [OPZIONI]",
+      opts: [
+        ["aux", "mostra tutti i processi di tutti gli utenti, con %CPU, %MEM e comando"],
+        ["-e", "equivale a -A: tutti i processi del sistema"],
+        ["-f", "formato completo, con UID, PID e ora di avvio"],
+        ["grep", "spesso si combina con grep: ps aux | grep firefox"]
+      ],
+      ex: ["ps", "ps aux"],
+      how: "Il comando legge la tabella dei processi mantenuta dal kernel (in /proc) e la stampa nello formato richiesto. È un'istantanea: se rilanci ps, i valori saranno già cambiati. Per una visione continua si usa top.",
+      sim: [
+        { p: "user@linux:~", t: "ps" },
+        { o: "    PID TTY          TIME CMD" },
+        { o: "   2141 pts/0    00:00:00 bash" },
+        { o: "   2288 pts/0    00:00:00 ps" },
+        { p: "user@linux:~", t: "ps aux | grep firefox" },
+        { o: "user   1243  8.1  6.2 1428912 486204 ?  Sl 09:45  2:11 firefox" },
+        { h: true, o: '<span class="t-dim">→ trovato: il PID di firefox è 1243</span>' }
+      ]
+    },
+
+    {
+      c: "top", cat: "processi", name: "Monitora i processi in tempo reale",
+      what: "<strong>top</strong> mostra un quadro aggiornato in tempo reale dei processi, ordinati per consumo di CPU e memoria, con statistiche generali di sistema.",
+      why: "È il «gestore attività» del terminale: se il computer rallenta, top ti dice subito quale processo sta mangiando CPU o RAM.",
+      syntax: "top [OPZIONI]",
+      opts: [
+        ["P", "ordina per CPU (default), M per memoria, N per PID"],
+        ["k", "termina un processo: chiede il PID e invia il segnale"],
+        ["q", "esce dal monitor"],
+        ["h", "mostra l'aiuto con tutti i tasti disponibili"]
+      ],
+      ex: ["top", "top -u user"],
+      how: "Il programma resta in esecuzione e aggiorna lo schermo ogni 3 secondi (o con l'intervallo impostato), leggendo le statistiche dal kernel. Premendo k puoi terminare un processo direttamente dalla schermata, senza aprire un'altra finestra.",
+      sim: [
+        { p: "user@linux:~", t: "top" },
+        { o: "top - 10:24:31 up 2 days,  1 user,  load average: 0,15 0,10 0,05" },
+        { o: "Tasks: 183 total,   1 running, 182 sleeping" },
+        { o: "%Cpu(s): 12,3 us,  4,1 sy, 83,6 id" },
+        { o: "MiB Mem :   7842 total,   5210 free,   1480 used" },
+        { o: "  PID USER      %CPU  %MEM  COMMAND" },
+        { o: " 1243 user      15,2   8,4  firefox" },
+        { o: "  968 root       2,1   3,0  Xorg" },
+        { o: "q (esci)   k (termina)   P/M (ordina)", k: "t-dim" }
+      ]
+    },
+
+    {
+      c: "htop", cat: "processi", name: "Monitor interattivo (versione evoluta di top)",
+      what: "<strong>htop</strong> è un monitor dei processi più moderno e colorato di top: barre per CPU e memoria, navigazione con frecce e menu grafici.",
+      why: "Fa le stesse cose di top ma in modo più leggibile: puoi scorrere la lista con le frecce, terminare un processo con F9 e filtrare per utente senza digitare comandi. Non è sempre preinstallato: si installa con apt.",
+      syntax: "htop [OPZIONI]",
+      opts: [
+        ["F9", "termina il processo selezionato (scegli il segnale dal menu)"],
+        ["F6", "cambia l'ordinamento della lista"],
+        ["/", "filtra i processi per nome"],
+        ["F10 o q", "esce dal programma"]
+      ],
+      ex: ["htop"],
+      how: "Come top, legge le statistiche dal kernel, ma le disegna in un'interfaccia con barre e colori che si aggiorna in tempo reale. Le funzioni con i tasti F1-F10 sono sempre visibili in basso.",
+      sim: [
+        { p: "user@linux:~", t: "htop" },
+        { o: "  CPU[|****       12,4%]  Mem[||||      5,1G/7,7G]" },
+        { o: "  PID USER    CPU%  MEM%  COMMAND" },
+        { o: " 1243 user    15,2   8,4  firefox" },
+        { o: "  968 root     2,1   3,0  Xorg" },
+        { o: " 2312 user     0,4   1,2  bash" },
+        { o: "F9 Termina   F6 Ordina   F10 Esci", k: "t-dim" }
+      ]
+    },
+
+    {
+      c: "kill", cat: "processi", name: "Termina un processo con il suo PID",
+      what: "<strong>kill</strong> invia un segnale a un processo identificato dal suo PID. Per default invia SIGTERM, una richiesta educata di chiudersi; con -9 forza la chiusura immediata.",
+      why: "Quando un programma è bloccato e non risponde, kill è il modo per chiuderlo dal terminale. Serve anche per riavviare servizi o interrompere elaborazioni lunghe.",
+      syntax: "kill [SEGALE] PID [PID...]",
+      opts: [
+        ["-15", "SIGTERM (default): chiede al processo di chiudersi pulitamente, salvando i dati"],
+        ["-9", "SIGKILL: il sistema termina il processo immediatamente, senza possibilità di resistere"],
+        ["-l", "elenca tutti i segnali disponibili"],
+        ["-1", "SIGHUP: spesso usato per dire a un servizio di ricaricare la configurazione"]
+      ],
+      ex: ["kill 1243", "kill -9 1243"],
+      how: "Il kernel riceve la richiesta e consegna il segnale al processo indicato. Se il processo accetta SIGTERM, esegue le sue procedure di chiusura; SIGKILL invece lo elimina senza dargli tempo di reagire. Trovi il PID con ps o top.",
+      sim: [
+        { p: "user@linux:~", t: "kill 1243" },
+        { p: "user@linux:~", t: "ps aux | grep firefox" },
+        { o: "user   2288  0.0  0.0   9088  2412 pts/0  S+  10:26  0:00 grep firefox" },
+        { h: true, o: '<span class="t-dim">→ firefox non compare più: il processo è stato chiuso</span>' },
+        { p: "user@linux:~", t: "kill 1243" },
+        { o: "kill: (1243) - Nessun processo corrispondente", k: "t-err" }
+      ]
+    },
+
+    {
+      c: "pkill", cat: "processi", name: "Termina i processi per nome",
+      what: "<strong>pkill</strong> (process kill) fa la stessa cosa di kill, ma invece del PID usa il nome del programma: termina tutti i processi che corrispondono.",
+      why: "È più comodo di kill quando non conosci il PID o vuoi chiudere tutte le istanze di un'applicazione contemporaneamente (ad esempio tutti i processi di firefox).",
+      syntax: "pkill [OPZIONI] NOME_PROCESSO",
+      opts: [
+        ["-f", "cerca la corrispondenza nella riga di comando completa, non solo nel nome"],
+        ["-u USER", "termina solo i processi di un determinato utente"],
+        ["-9", "invia SIGKILL invece di SIGTERM"],
+        ["-l", "mostra i processi che verrebbero terminati senza farlo"]
+      ],
+      ex: ["pkill firefox", "pkill -9 chrome"],
+      how: "Il comando scorre la tabella dei processi, trova quelli il cui nome corrisponde al modello indicato e invia il segnale a ciascuno. Fa attenzione a non terminare se stesso; se nessun processo corrisponde, restituisce un codice di errore.",
+      sim: [
+        { p: "user@linux:~", t: "pkill firefox" },
+        { p: "user@linux:~", t: "pgrep firefox" },
+        { h: true, o: '<span class="t-dim">→ nessun output: non esistono più processi firefox</span>' },
+        { p: "user@linux:~", t: "pkill browserinesistente" },
+        { h: true, o: '<span class="t-dim">→ nessun processo corrispondente trovato</span>' }
+      ]
+    },
+
+];
+const DEFAULT_PROMPT = "user@linux:~";
+  const TYPE_SPEED_BASE = 32;   // ms per carattere
+  const OUTPUT_DELAY = 120;     // ms tra righe di output
+  const COMMAND_PAUSE = 350;    // pausa dopo l'invio di un comando
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* Evidenzia la sintassi di un comando digitato */
+  function highlightCmd(cmd) {
+    return cmd.split(" ").filter(Boolean).map((tok, i) => {
+      const e = esc(tok);
+      if (i === 0 || tok === "sudo") return '<span class="t-cmd">' + e + "</span>";
+      if (tok.startsWith("-")) return '<span class="t-flag">' + e + "</span>";
+      if (tok.startsWith("$")) return '<span class="t-var">' + e + "</span>";
+      if (/^["']/.test(tok)) return '<span class="t-str">' + e + "</span>";
+      return '<span class="t-arg">' + e + "</span>";
+    }).join(" ");
+  }
+
+  /* Renderizza il prompt user@host:percorso$ */
+  function promptHTML(p) {
+    const sep = p.indexOf(":");
+    const userHost = sep === -1 ? p : p.slice(0, sep);
+    const path = sep === -1 ? "" : p.slice(sep + 1);
+    return '<span class="t-user">' + esc(userHost) + '</span>' +
+           '<span class="t-sep">:</span>' +
+           '<span class="t-path">' + esc(path) + '</span>' +
+           '<span class="t-sep">$</span>';
+  }
+
+  /* Renderizza la riga di sintassi di una scheda comando */
+  function syntaxHTML(syn) {
+    return syn.split(" ").filter(Boolean).map((tok, i) => {
+      const e = esc(tok);
+      if (i === 0) return '<span class="syn-cmd">' + e + "</span>";
+      if (tok.startsWith("[")) return '<span class="syn-opt">' + e + "</span>";
+      return '<span class="syn-arg">' + e + "</span>";
+    }).join(" ");
+  }
+
+  /* Simula l'esecuzione di un comando dentro un terminale */
+  function runSim(termEl, cmdData) {
+    const body = termEl.querySelector(".term-body");
+    const runId = (termEl._runId = (termEl._runId || 0) + 1);
+    const steps = cmdData.sim;
+
+    body.innerHTML = "";
+    let lastPrompt = (steps.find(function (s) { return s.p; }) || {}).p || DEFAULT_PROMPT;
+    let cursor = null;
+
+    function newLine() {
+      const line = document.createElement("div");
+      line.className = "term-line";
+      body.appendChild(line);
+      body.scrollTop = body.scrollHeight;
+      return line;
+    }
+
+    function idleLine() {
+      if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+      cursor = document.createElement("span");
+      cursor.className = "cursor";
+      const line = newLine();
+      line.innerHTML = promptHTML(lastPrompt) + " ";
+      line.appendChild(cursor);
+    }
+
+    function typeStep(step) {
+      lastPrompt = step.p || lastPrompt;
+      const line = newLine();
+      line.innerHTML = promptHTML(lastPrompt) + ' <span class="t-in"></span>';
+      const target = line.querySelector(".t-in");
+      cursor = document.createElement("span");
+      cursor.className = "cursor";
+      line.appendChild(cursor);
+      let k = 0;
+      (function tick() {
+        if (runId !== termEl._runId) return;
+        if (k < step.t.length) {
+          target.textContent += step.t[k++];
+          body.scrollTop = body.scrollHeight;
+          setTimeout(tick, TYPE_SPEED_BASE + Math.random() * 38);
+        } else {
+          target.innerHTML = highlightCmd(step.t);
+          if (step.clear) {
+            setTimeout(function () {
+              if (runId !== termEl._runId) return;
+              body.innerHTML = "";
+              next();
+            }, 420);
+          } else {
+            setTimeout(next, COMMAND_PAUSE);
+          }
+        }
+      })();
+    }
+
+    function outStep(step) {
+      if (step.o) {
+        const line = newLine();
+        if (step.h) {
+          line.innerHTML = step.o;
+        } else {
+          line.className = "term-line " + (step.k || "t-out");
+          line.textContent = step.o;
+        }
+        body.scrollTop = body.scrollHeight;
+      }
+      setTimeout(next, OUTPUT_DELAY);
+    }
+
+    let i = 0;
+    function next() {
+      if (runId !== termEl._runId) return;
+      if (i >= steps.length) { idleLine(); return; }
+      const step = steps[i++];
+      if (step.t !== undefined) { typeStep(step); } else { outStep(step); }
+    }
+
+    next();
+  }
+
+function findCat(id) {
+    return CATS.find(function (c) { return c.id === id; }) || { label: id };
+  }
+
+  function buildCard(cmd) {
+    const cat = findCat(cmd.cat);
+    const card = document.createElement("article");
+    card.className = "cmd-card reveal";
+    card.id = "cmd-" + cmd.c;
+
+    const head = document.createElement("div");
+    head.className = "cmd-head";
+    head.innerHTML =
+      '<div class="cmd-badge">' + esc(cmd.c) + "</div>" +
+      '<div class="cmd-head-info"><h3>' + esc(cmd.name) + "</h3>" +
+      '<span class="cmd-cat">' + esc(cat.label) + "</span></div>";
+    card.appendChild(head);
+
+    const pWhat = document.createElement("p");
+    pWhat.className = "cmd-what";
+    pWhat.innerHTML = cmd.what;
+    card.appendChild(pWhat);
+
+    const lblWhy = document.createElement("span");
+    lblWhy.className = "cmd-label";
+    lblWhy.textContent = "A cosa serve";
+    card.appendChild(lblWhy);
+    const pWhy = document.createElement("p");
+    pWhy.innerHTML = cmd.why;
+    card.appendChild(pWhy);
+
+    const lblSyn = document.createElement("span");
+    lblSyn.className = "cmd-label";
+    lblSyn.textContent = "Sintassi di base";
+    card.appendChild(lblSyn);
+    const syn = document.createElement("div");
+    syn.className = "syntax";
+    syn.innerHTML = syntaxHTML(cmd.syntax);
+    card.appendChild(syn);
+
+    if (cmd.opts && cmd.opts.length) {
+      const lblOpt = document.createElement("span");
+      lblOpt.className = "cmd-label";
+      lblOpt.textContent = "Opzioni più importanti";
+      card.appendChild(lblOpt);
+      const table = document.createElement("table");
+      table.className = "opt-table";
+      table.innerHTML =
+        "<thead><tr><th>Opzione</th><th>Descrizione</th></tr></thead><tbody>" +
+        cmd.opts.map(function (o) {
+          return "<tr><td>" + esc(o[0]) + "</td><td>" + esc(o[1]) + "</td></tr>";
+        }).join("") +
+        "</tbody>";
+      card.appendChild(table);
+    }
+
+    const lblHow = document.createElement("span");
+    lblHow.className = "cmd-label";
+    lblHow.textContent = "Cosa succede quando lo esegui";
+    card.appendChild(lblHow);
+    const pHow = document.createElement("p");
+    pHow.className = "cmd-how";
+    pHow.innerHTML = cmd.how;
+    card.appendChild(pHow);
+
+    if (cmd.ex && cmd.ex.length) {
+      const lblEx = document.createElement("span");
+      lblEx.className = "cmd-label";
+      lblEx.textContent = "Esempi pratici";
+      card.appendChild(lblEx);
+      const exWrap = document.createElement("div");
+      exWrap.className = "cmd-examples";
+      cmd.ex.forEach(function (e) {
+        const div = document.createElement("div");
+        div.className = "code-line";
+        div.innerHTML = "<code>" + esc(e) + "</code>";
+        exWrap.appendChild(div);
+      });
+      card.appendChild(exWrap);
+    }
+
+    const term = document.createElement("div");
+    term.className = "term";
+    term.innerHTML =
+      '<div class="term-bar">' +
+      '<span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>' +
+      '<span class="term-title">user@linux — simulazione di ' + esc(cmd.c) + "</span></div>" +
+      '<div class="term-body"></div>';
+    card.appendChild(term);
+
+    const actions = document.createElement("div");
+    actions.className = "cmd-actions";
+    actions.innerHTML =
+      '<button class="button primary sm" data-run>▶ Esegui</button>' +
+      '<button class="button outline sm" data-reset>↻ Riprova</button>' +
+      '<button class="button ghost sm" data-copy="' + esc(cmd.ex[0] || cmd.c) + '">⧉ Copia comando</button>';
+    card.appendChild(actions);
+
+    actions.querySelector("[data-run]").addEventListener("click", function () {
+      runSim(term, cmd);
+    });
+    actions.querySelector("[data-reset]").addEventListener("click", function () {
+      runSim(term, cmd);
+    });
+    actions.querySelector("[data-copy]").addEventListener("click", function () {
+      copyText(cmd.ex[0] || cmd.c);
+    });
+
+    card._term = term;
+    card._cmd = cmd;
+    return card;
+  }
+
+function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._handler);
+    t._handler = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast("Comando copiato: " + text);
+      }, function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      toast("Comando copiato: " + text);
+    } catch (err) {
+      toast("Copia non riuscita — seleziona il comando manualmente");
+    }
+    document.body.removeChild(ta);
+  }
+
+const PAGE_CMDS = CMDS;
+function renderCards() {
+  const list = document.getElementById("cmd-list");
+  PAGE_CMDS.forEach(function (cmd) { list.appendChild(buildCard(cmd)); });
+}
+
+function renderQuickNav() {
+  const nav = document.getElementById("quicknav");
+  PAGE_CMDS.forEach(function (cmd) {
+    const a = document.createElement("a");
+    a.href = "#cmd-" + cmd.c;
+    a.textContent = cmd.c;
+    a.dataset.target = "cmd-" + cmd.c;
+    nav.appendChild(a);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderCards();
+  renderQuickNav();
+
+  const links = document.querySelectorAll("#quicknav a");
+  const spyObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        links.forEach(function (l) {
+          l.classList.toggle("active", l.dataset.target === entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll(".cmd-card").forEach(function (el) { spyObs.observe(el); });
+});
+  </script>
+</body>
+</html>

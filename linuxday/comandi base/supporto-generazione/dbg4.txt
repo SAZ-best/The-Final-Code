@@ -1,0 +1,44 @@
+﻿  actions.querySelector("[data-copy]").addEventListener("click", function () {
+      copyText(cmd.ex[0] || cmd.c);
+    });
+
+    card._term = term;
+    card._cmd = cmd;
+    return card;
+  }
+
+function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._handler);
+    t._handler = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast("Comando copiato: " + text);
+      }, function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      toast("Comando copiato: " + text);
+    } catch (err) {
+      toast("Copia non riuscita — seleziona il comando manualmente");
+    }
+    document.body.removeChild(ta);
+  }
+
+const 

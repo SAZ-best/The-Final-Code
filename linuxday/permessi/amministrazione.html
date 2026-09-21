@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PermissionOS — Amministrazione</title>
+  
+  <!-- Google Fonts Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <main class="page">
+    <!-- Back to desktop button -->
+    <div>
+      <a class="button outline sm" href="index.html">
+        ← Torna al desktop
+      </a>
+    </div>
+
+    <!-- Page Header Card -->
+    <section class="hero card reveal" data-reveal>
+      <div class="hero-content">
+        <div class="headline-tag"><span></span>Sezione Avanzata</div>
+        <h1>Amministrazione di sistema</h1>
+        <p>Questa sezione è dedicata alla configurazione e manutenzione avanzata di Ubuntu, focalizzandosi sulla gestione degli account utente, i privilegi amministrativi e il monitoraggio dei demoni.</p>
+      </div>
+    </section>
+
+    <!-- Content Card -->
+    <section class="card reveal" data-reveal>
+      <h2>Argomenti principali trattati</h2>
+      <p>Nelle guide del simulatore apprenderai ad amministrare correttamente una macchina Linux seguendo questi pilastri:</p>
+      <ul class="section-list">
+        <li><strong>Creazione di utenti e gruppi</strong>: isolamento degli ambienti tramite comandi come <code>useradd</code> e <code>groupadd</code>.</li>
+        <li><strong>Configurazione di sudo</strong>: gestione dei privilegi amministrativi modificando il file di configurazione con <code>visudo</code>.</li>
+        <li><strong>Gestione servizi e demoni</strong>: utilizzo di <code>systemctl</code> per avviare, arrestare e configurare i programmi all'avvio del server.</li>
+        <li><strong>Monitoraggio risorse</strong>: analisi in tempo reale del carico CPU, memoria RAM e processi attivi con <code>htop</code> e <code>ps</code>.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
+</html>

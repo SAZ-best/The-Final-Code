@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PermissionOS — Guida interattiva ai comandi base di Linux, divisa in categorie con terminali simulati ed esempi pratici.">
+  <title>PermissionOS — Comandi Base di Linux</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+  /* ═══════════════════════════════════════════════════════════════
+     PERMISSIONOS - COMANDI BASE
+     Design system coerente con styles.css (pagina di riferimento:
+     permessi/permessi.html). Tutti gli stili sono self-contained.
+     ═══════════════════════════════════════════════════════════════ */
+
+  :root {
+    /* Modern Developer Color Palette */
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: #34d399;
+    --primary-soft: rgba(16, 185, 129, 0.08);
+    --primary-glow: rgba(16, 185, 129, 0.15);
+
+    /* Neutral Slate Backgrounds */
+    --bg-dark: #080b11;
+    --bg-darker: #05070a;
+    --surface: rgba(17, 22, 33, 0.75);
+    --surface-hover: rgba(25, 32, 48, 0.85);
+    --surface-active: rgba(30, 38, 56, 0.95);
+
+    /* Text Colors */
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-placeholder: #4b5563;
+
+    /* Borders & Highlights */
+    --border-primary: rgba(255, 255, 255, 0.06);
+    --border-secondary: rgba(255, 255, 255, 0.12);
+    --border-subtle: rgba(255, 255, 255, 0.04);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.7);
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+
+    /* Radii */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+
+    /* Transitions */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Typography */
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+
+    --text-xs: 12px;
+    --text-sm: 13.5px;
+    --text-base: 15px;
+    --text-lg: 17px;
+    --text-xl: 19px;
+    --text-2xl: 22px;
+    --text-3xl: 28px;
+    --text-4xl: 36px;
+  }
+
+  /* ── Reset & base ────────────────────────────────────────────── */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 90px;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    background: radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.05), transparent 45%),
+                radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.03), transparent 45%),
+                var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Elegant, stationary technical grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+
+  h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: var(--space-md); }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: var(--space-sm); }
+  h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
+  h4 { font-size: var(--text-xl); }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    font-size: var(--text-base);
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    cursor: pointer;
+  }
+
+  a:hover { color: var(--primary-light); }
+
+  strong, b { color: var(--text-primary); font-weight: 600; }
+
+  code {
+    font-family: var(--font-family-mono);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 2px 6px;
+    color: #34d399;
+    font-size: 0.9em;
+  }
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .button,
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 10px 20px;
+    font-family: var(--font-family-sans);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+
+  .button.primary {
+    background: var(--primary);
+    color: var(--bg-darker);
+    border: 1px solid var(--primary);
+  }
+
+  .button.primary:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px var(--primary-glow);
+  }
+
+  .button.outline {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .button.outline:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary-light);
+  }
+
+  .button.ghost {
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    background: transparent;
+  }
+
+  .button.ghost:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .button.sm {
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+    border-radius: var(--radius-sm);
+  }
+
+  .button.lg {
+    padding: 14px 28px;
+    font-size: var(--text-base);
+    border-radius: var(--radius-lg);
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  /* ── Cards & panels (glassmorphism) ──────────────────────────── */
+  .card, .panel {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    position: relative;
+  }
+
+  .card:hover, .panel:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--surface-hover);
+    box-shadow: var(--shadow-lg), 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ── Topbar / navigation ─────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(17, 22, 33, 0.6);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .topbar .brand {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+  }
+
+  .topbar .nav {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    padding: 6px 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+  .page {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-lg);
+    display: grid;
+    gap: var(--space-lg);
+    z-index: 1;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: var(--space-2xl) var(--space-xl);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(99, 102, 241, 0.03)),
+                var(--surface);
+    border: 1px solid var(--border-primary);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .hero h1 {
+    margin-bottom: var(--space-sm);
+    background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    max-width: 680px;
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+    line-height: 1.65;
+  }
+
+  .headline-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .headline-tag span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary);
+  }
+  /* ── Section blocks (come nella pagina Permessi) ─────────────── */
+  .section-block {
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .section-block h2 {
+    margin-bottom: var(--space-md);
+    font-size: var(--text-2xl);
+    background: linear-gradient(135deg, #ffffff, #a7f3d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .section-block > p {
+    margin: 0 0 var(--space-md);
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .section-block ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .section-block li {
+    padding-left: var(--space-lg);
+    position: relative;
+    color: var(--text-secondary);
+  }
+
+  .section-block li::before {
+    content: '•';
+    position: absolute;
+    left: var(--space-sm);
+    color: var(--primary);
+    font-weight: bold;
+  }
+
+  .section-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .section-list li {
+    padding-left: var(--space-lg);
+    position: relative;
+    color: var(--text-secondary);
+  }
+
+  .section-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ── Code line (mockup terminale inline) ─────────────────────── */
+  .code-line {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding: 12px 18px;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    color: var(--primary-light);
+    font-size: var(--text-sm);
+    font-family: var(--font-family-mono);
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  .code-line::before {
+    content: '$';
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────── */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    background: rgba(17, 22, 33, 0.5);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .footer a { color: var(--primary-light); font-weight: 500; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── Reveal on scroll (come styles.css) ──────────────────────── */
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Quick navigation (chip delle categorie) ─────────────────── */
+  .quicknav {
+    position: sticky;
+    top: 12px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 10px 12px;
+    background: rgba(17, 22, 33, 0.88);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .quicknav::-webkit-scrollbar { display: none; }
+
+  .quicknav a {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+  }
+
+  .quicknav a:hover {
+    color: var(--primary-light);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-primary);
+  }
+
+  .quicknav a.active {
+    background: var(--primary-soft);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: var(--primary-light);
+  }
+  /* ── Card di ogni comando ────────────────────────────────────── */
+  .cmd-list {
+    display: grid;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    scroll-margin-top: 90px;
+  }
+
+  .cmd-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--surface-hover);
+    box-shadow: var(--shadow-lg), 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .cmd-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .cmd-badge {
+    font-family: var(--font-family-mono);
+    background: #090c12;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--primary-light);
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    white-space: nowrap;
+  }
+
+  .cmd-badge::before {
+    content: '$';
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-weight: 500;
+  }
+
+  .cmd-head-info h3 {
+    margin: 0 0 2px;
+    font-size: var(--text-lg);
+  }
+
+  .cmd-cat {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-light);
+    background: var(--primary-soft);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 1px 10px;
+  }
+
+  .cmd-what { margin-top: var(--space-sm); }
+
+  .cmd-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary-light);
+    margin: var(--space-md) 0 var(--space-xs);
+  }
+
+  .cmd-how { color: var(--text-secondary); }
+
+  /* ── Blocco sintassi ─────────────────────────────────────────── */
+  .syntax {
+    font-family: var(--font-family-mono);
+    background: #090c12;
+    border: 1px dashed rgba(16, 185, 129, 0.35);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .syn-cmd { color: var(--primary-light); font-weight: 600; }
+  .syn-opt { color: #fbbf24; }
+  .syn-arg { color: #e5e7eb; }
+
+  /* ── Tabella opzioni ─────────────────────────────────────────── */
+  .opt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+  }
+
+  .opt-table th {
+    text-align: left;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .opt-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  .opt-table tr:last-child td { border-bottom: none; }
+
+  .opt-table td:first-child {
+    font-family: var(--font-family-mono);
+    color: #fbbf24;
+    white-space: nowrap;
+  }
+
+  .opt-note {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: var(--space-sm);
+  }
+
+  /* ── Esempi ──────────────────────────────────────────────────── */
+  .cmd-examples { display: grid; gap: var(--space-xs); }
+  .cmd-examples .code-line { margin-top: 0; }
+
+  /* ── Terminale simulato ──────────────────────────────────────── */
+  .term {
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-top: var(--space-md);
+  }
+
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .term-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .term-dot.r { background: #ff5f57; }
+  .term-dot.y { background: #febc2e; }
+  .term-dot.g { background: #28c840; }
+
+  .term-title {
+    margin-left: var(--space-xs);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-family-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .term-body {
+    padding: 14px 16px;
+    font-family: var(--font-family-mono);
+    font-size: var(--text-sm);
+    line-height: 1.75;
+    min-height: 92px;
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .term-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #d1d5db;
+    animation: termLineIn 0.25s ease;
+  }
+
+  @keyframes termLineIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--primary-light);
+    vertical-align: -2px;
+    margin-left: 2px;
+    animation: cursorBlink 1s steps(1) infinite;
+  }
+
+  @keyframes cursorBlink { 50% { opacity: 0; } }
+
+  /* Colori interni al terminale */
+  .t-user { color: var(--primary-light); font-weight: 600; }
+  .t-sep { color: #e5e7eb; }
+  .t-path { color: #60a5fa; font-weight: 600; }
+  .t-cmd { color: var(--primary-light); font-weight: 600; }
+  .t-flag { color: #fbbf24; }
+  .t-var { color: #c4b5fd; }
+  .t-str { color: #fda4af; }
+  .t-arg { color: #e5e7eb; }
+  .t-out { color: #d1d5db; }
+  .t-dir { color: #60a5fa; font-weight: 600; }
+  .t-ok { color: var(--primary-light); }
+  .t-err { color: #f87171; }
+  .t-warn { color: #fbbf24; }
+  .t-dim { color: var(--text-muted); }
+  /* ── Anatomia del prompt ─────────────────────────────────────── */
+  .anatomy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .anatomy-card {
+    background: rgba(17, 22, 33, 0.35);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+    transition: all var(--transition-base);
+  }
+
+  .anatomy-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(22, 28, 43, 0.5);
+  }
+
+  .anatomy-token {
+    font-family: var(--font-family-mono);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+  }
+
+  .anatomy-card h4 {
+    margin: 0 0 4px;
+    font-size: var(--text-base);
+  }
+
+  .anatomy-card p {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .a-user { color: var(--primary-light); }
+  .a-sep { color: #e5e7eb; }
+  .a-path { color: #60a5fa; }
+  .a-cmd { color: var(--primary-light); }
+
+  /* ── Riepilogo finale ────────────────────────────────────────── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  .summary-table th {
+    text-align: left;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .summary-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+
+  .summary-table tr { transition: background var(--transition-fast); }
+  .summary-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+  .summary-table td:first-child { font-family: var(--font-family-mono); color: var(--primary-light); white-space: nowrap; }
+
+  /* ── Azioni e toast ──────────────────────────────────────────── */
+  .cmd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  #toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1f2937;
+    color: #10b981;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid #10b981;
+    font-weight: 500;
+    font-family: var(--font-family-sans);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  #toast.show { bottom: 40px; }
+
+  /* ── Responsive ──────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    :root {
+      --space-2xl: 32px;
+      --space-xl: 20px;
+      --space-lg: 16px;
+    }
+
+    .page { padding: var(--space-xl) var(--space-md); }
+
+    .footer {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .cmd-head { flex-direction: column; gap: var(--space-sm); }
+
+    .term-body { font-size: 12.5px; padding: 12px; }
+
+    .summary-table { display: block; overflow-x: auto; }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --space-2xl: 24px;
+      --space-xl: 16px;
+    }
+
+    .button { width: auto; }
+    .button-group { flex-direction: column; }
+    .cmd-actions .button { flex: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .term-line, .cursor { animation: none; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+    html { scroll-behavior: auto; }
+  }
+    
+  /* ── Griglia delle categorie (solo pagina panoramica) ───────── */
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .hub-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(17, 22, 33, 0.35);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--transition-base);
+  }
+
+  .hub-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(22, 28, 43, 0.5);
+    box-shadow: var(--shadow-md);
+  }
+
+  .hub-title {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+  }
+
+  .hub-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+
+  .hub-cmds {
+    font-family: var(--font-family-mono);
+    font-size: var(--text-xs);
+    color: var(--primary-light);
+  }
+
+  .main-hub #intro,
+  .main-hub #riepilogo,
+  .main-hub .quicknav {
+    display: none;
+  }
+  </style>
+</head>
+
+<body class="main-hub">
+
+  <div class="page">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <div class="brand">
+        PermissionOS — Comandi Base
+      </div>
+
+      <nav class="nav">
+        <a class="nav-link" href="../index.html">Homepage</a>
+        <a class="nav-link" href="../permessi/index.html">Desktop</a>
+        <a class="nav-link" href="../permessi/permessi.html">Permessi</a>
+      </nav>
+
+    </div>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="headline-tag">
+        <span></span>
+        Guida interattiva
+      </div>
+
+      <h1>Comandi Base di Linux</h1>
+
+      <p>
+        Una panoramica compatta dei comandi Linux. Scegli un gruppo per aprire
+        la pagina dedicata con spiegazioni, esempi e terminali simulati.
+      </p>
+
+      <div class="button-group">
+        <a href="#categorie" class="button primary lg">Scegli una categoria</a>
+      </div>
+
+    </section>
+
+
+    <!-- QUICK NAV CATEGORIE -->
+    <div class="quicknav" aria-label="Navigazione tra le categorie">
+        <a href="navigazione.html">Navigazione</a>
+        <a href="file-cartelle.html">File e cartelle</a>
+        <a href="ricerca.html">Ricerca</a>
+        <a href="sistema.html">Sistema e informazioni</a>
+        <a href="processi.html">Processi</a>
+        <a href="permessi.html">Permessi</a>
+        <a href="pacchetti.html">Gestione software</a>
+        <a href="rete.html">Rete</a>
+        <a href="utilita.html">Terminale e utilità</a>
+    </div>
+
+<!-- INTRODUZIONE -->
+    <section class="section-block reveal" id="intro">
+
+      <h2>Il terminale: la tua nuova casa</h2>
+
+      <p>
+        Il <strong>terminale</strong> (detto anche shell o console) è un'applicazione
+        che ti permette di dare comandi al computer scrivendoli, invece di cliccare
+        su icone e pulsanti. All'inizio può sembrare spartano, ma è il modo più
+        rapido e preciso per controllare un sistema Linux.
+      </p>
+
+      <p>
+        Ogni volta che apri il terminale, vedi una riga chiamata
+        <strong>prompt</strong>: è il modo in cui Linux ti dice «sono pronto,
+        scrivi un comando». Ecco come si legge:
+      </p>
+
+
+      <div class="term">
+        <div class="term-bar">
+          <span class="term-dot r"></span>
+          <span class="term-dot y"></span>
+          <span class="term-dot g"></span>
+          <span class="term-title">Anatomia del prompt</span>
+        </div>
+        <div class="term-body">
+          <div class="term-line"><span class="t-user">user@linux</span><span class="t-sep">:</span><span class="t-path">~/Documenti</span><span class="t-sep">$</span> <span class="t-cmd">echo</span> <span class="t-str">"Ciao Linux"</span></div>
+          <div class="term-line t-out">Ciao Linux</div>
+          <div class="term-line"><span class="t-user">user@linux</span><span class="t-sep">:</span><span class="t-path">~/Documenti</span><span class="t-sep">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+
+
+      <div class="anatomy-grid">
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-user">user</div>
+          <h4>Nome utente</h4>
+          <p>Chi sei nel sistema. Tutti i file che crei appartengono a te.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-user">@linux</div>
+          <h4>Nome del computer</h4>
+          <p>La macchina (host) su cui stai lavorando, separata dal simbolo @.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-path">~/Documenti</div>
+          <h4>Directory corrente</h4>
+          <p>La cartella in cui ti trovi ora. Il simbolo ~ è un'abbreviazione per la tua home.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-sep">$</div>
+          <h4>Invito al comando</h4>
+          <p>Segnala che il terminale è pronto. Da utente normale vedi $, da amministratore vedi #.</p>
+        </div>
+
+      </div>
+
+
+      <p style="margin-top: var(--space-md);">
+        La struttura generale di un comando è sempre la stessa:
+        prima il <strong>nome del comando</strong>, poi eventuali
+        <strong>opzioni</strong> (di solito precedute da un trattino, come <code>-l</code>)
+        e infine gli <strong>argomenti</strong> (su cosa agire, ad esempio un file).
+        Ad esempio: <code>ls -l ~/Documenti</code> significa «elenca in formato
+        dettagliato il contenuto della cartella Documenti».
+      </p>
+
+    </section>
+
+
+    
+
+    
+
+    <!-- CATEGORIE -->
+    <section class="section-block reveal" id="categorie">
+
+      <h2>Scegli una categoria</h2>
+
+      <p>
+        Ogni categoria è una pagina dedicata con i suoi comandi, le spiegazioni
+        dettagliate e i terminali simulati da eseguire.
+      </p>
+
+      <div class="hub-grid">
+          <a class="hub-card" href="navigazione.html">
+            <div class="hub-title">Navigazione</div>
+            <p class="hub-desc">I primi comandi da imparare: servono per capire dove ti trovi, vedere cosa contiene una cartella e spostarti nel filesystem.</p>
+            <div class="hub-cmds">pwd · ls · cd</div>
+          </a>
+          <a class="hub-card" href="file-cartelle.html">
+            <div class="hub-title">File e cartelle</div>
+            <p class="hub-desc">Comandi per creare, copiare, spostare, rinominare, eliminare e leggere file e directory: il pane quotidiano del terminale.</p>
+            <div class="hub-cmds">touch · mkdir · cp · mv · rm · rmdir · cat · less · head · tail</div>
+          </a>
+          <a class="hub-card" href="ricerca.html">
+            <div class="hub-title">Ricerca</div>
+            <p class="hub-desc">Quando non ricordi dove si trova un file o cerchi una parola dentro un testo, questi comandi ti fanno trovare tutto in pochi secondi.</p>
+            <div class="hub-cmds">find · locate · grep · which</div>
+          </a>
+          <a class="hub-card" href="sistema.html">
+            <div class="hub-title">Sistema e informazioni</div>
+            <p class="hub-desc">Comandi per conoscere il tuo sistema: chi sei, come si chiama il computer, quale kernel usi e da quanto tempo è acceso.</p>
+            <div class="hub-cmds">whoami · id · uname · hostname · date · uptime</div>
+          </a>
+          <a class="hub-card" href="processi.html">
+            <div class="hub-title">Processi</div>
+            <p class="hub-desc">Ogni programma in esecuzione è un processo. Qui impari a vederli, monitorarli e, se serve, a chiuderli.</p>
+            <div class="hub-cmds">ps · top · htop · kill · pkill</div>
+          </a>
+          <a class="hub-card" href="permessi.html">
+            <div class="hub-title">Permessi</div>
+            <p class="hub-desc">In Linux ogni file ha un proprietario e dei permessi. Questi comandi ti permettono di cambiarli. Approfondisci l'argomento nella lezione dedicata ai permessi.</p>
+            <div class="hub-cmds">chmod · chown · chgrp</div>
+          </a>
+          <a class="hub-card" href="pacchetti.html">
+            <div class="hub-title">Gestione software</div>
+            <p class="hub-desc">Su Linux i programmi si installano con i gestori di pacchetti, che scaricano e configurano il software in modo sicuro. Ogni famiglia di distribuzioni ha il suo.</p>
+            <div class="hub-cmds">apt · apt-get · dnf · yum · pacman</div>
+          </a>
+          <a class="hub-card" href="rete.html">
+            <div class="hub-title">Rete</div>
+            <p class="hub-desc">Comandi per diagnosticare la connessione, scaricare file da internet e vedere quali porte sono in ascolto.</p>
+            <div class="hub-cmds">ip · ping · curl · wget · ss</div>
+          </a>
+          <a class="hub-card" href="utilita.html">
+            <div class="hub-title">Terminale e utilità</div>
+            <p class="hub-desc">Piccoli grandi strumenti di ogni giorno: pulire lo schermo, ritrovare i comandi digitati, consultare il manuale e diventare amministratore.</p>
+            <div class="hub-cmds">clear · history · echo · man · sudo · exit</div>
+          </a>
+      </div>
+
+    </section>
+
+
+    <!-- RIEPILOGO -->
+    <section class="section-block reveal" id="riepilogo">
+
+      <h2>Riepilogo finale dei comandi</h2>
+
+      <p>
+        Tutti i comandi della guida, organizzati per categoria. Clicca su un
+        comando per aprire la sua scheda con la spiegazione e il terminale simulato.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Comando</th>
+            <th>Categoria</th>
+            <th>A cosa serve</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr><td><a class="nav-link" style="padding:0" href="navigazione.html#cmd-pwd">pwd</a></td><td>Navigazione</td><td>Stampa la directory corrente</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="navigazione.html#cmd-ls">ls</a></td><td>Navigazione</td><td>Elenca file e cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="navigazione.html#cmd-cd">cd</a></td><td>Navigazione</td><td>Cambia directory</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-touch">touch</a></td><td>File e cartelle</td><td>Crea file vuoti</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-mkdir">mkdir</a></td><td>File e cartelle</td><td>Crea cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-cp">cp</a></td><td>File e cartelle</td><td>Copia file e cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-mv">mv</a></td><td>File e cartelle</td><td>Sposta o rinomina file e cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-rm">rm</a></td><td>File e cartelle</td><td>Elimina file e cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-rmdir">rmdir</a></td><td>File e cartelle</td><td>Elimina cartelle vuote</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-cat">cat</a></td><td>File e cartelle</td><td>Mostra il contenuto di un file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-less">less</a></td><td>File e cartelle</td><td>Leggi un file una pagina alla volta</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-head">head</a></td><td>File e cartelle</td><td>Mostra l'inizio di un file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="file-cartelle.html#cmd-tail">tail</a></td><td>File e cartelle</td><td>Mostra la fine di un file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="ricerca.html#cmd-find">find</a></td><td>Ricerca</td><td>Cerca file e cartelle nel filesystem</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="ricerca.html#cmd-locate">locate</a></td><td>Ricerca</td><td>Trova file all'istante con il database</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="ricerca.html#cmd-grep">grep</a></td><td>Ricerca</td><td>Cerca testo dentro i file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="ricerca.html#cmd-which">which</a></td><td>Ricerca</td><td>Scopri dove si trova un programma</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-whoami">whoami</a></td><td>Sistema e informazioni</td><td>Mostra il nome utente corrente</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-id">id</a></td><td>Sistema e informazioni</td><td>Mostra UID, GID e gruppi dell'utente</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-uname">uname</a></td><td>Sistema e informazioni</td><td>Mostra informazioni sul kernel</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-hostname">hostname</a></td><td>Sistema e informazioni</td><td>Mostra o imposta il nome del computer</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-date">date</a></td><td>Sistema e informazioni</td><td>Mostra o imposta data e ora</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="sistema.html#cmd-uptime">uptime</a></td><td>Sistema e informazioni</td><td>Da quanto tempo il sistema è acceso</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="processi.html#cmd-ps">ps</a></td><td>Processi</td><td>Elenca i processi in esecuzione</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="processi.html#cmd-top">top</a></td><td>Processi</td><td>Monitora i processi in tempo reale</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="processi.html#cmd-htop">htop</a></td><td>Processi</td><td>Monitor interattivo (versione evoluta di top)</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="processi.html#cmd-kill">kill</a></td><td>Processi</td><td>Termina un processo con il suo PID</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="processi.html#cmd-pkill">pkill</a></td><td>Processi</td><td>Termina i processi per nome</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="permessi.html#cmd-chmod">chmod</a></td><td>Permessi</td><td>Modifica i permessi di file e cartelle</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="permessi.html#cmd-chown">chown</a></td><td>Permessi</td><td>Cambia il proprietario di un file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="permessi.html#cmd-chgrp">chgrp</a></td><td>Permessi</td><td>Cambia il gruppo di un file</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="pacchetti.html#cmd-apt">apt</a></td><td>Gestione software</td><td>Gestore pacchetti di Ubuntu e Debian</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="pacchetti.html#cmd-apt-get">apt-get</a></td><td>Gestione software</td><td>Versione scriptabile di apt</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="pacchetti.html#cmd-dnf">dnf</a></td><td>Gestione software</td><td>Gestore pacchetti di Fedora e RHEL</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="pacchetti.html#cmd-yum">yum</a></td><td>Gestione software</td><td>Il gestore pacchetti storico di Red Hat</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="pacchetti.html#cmd-pacman">pacman</a></td><td>Gestione software</td><td>Gestore pacchetti di Arch Linux</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="rete.html#cmd-ip">ip</a></td><td>Rete</td><td>Gestisce indirizzi IP e configurazioni di rete</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="rete.html#cmd-ping">ping</a></td><td>Rete</td><td>Verifica la connessione con un host</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="rete.html#cmd-curl">curl</a></td><td>Rete</td><td>Trasferisce dati verso e da un URL</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="rete.html#cmd-wget">wget</a></td><td>Rete</td><td>Scarica file da internet</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="rete.html#cmd-ss">ss</a></td><td>Rete</td><td>Mostra porte e connessioni attive</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-clear">clear</a></td><td>Terminale e utilità</td><td>Pulisce lo schermo del terminale</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-history">history</a></td><td>Terminale e utilità</td><td>Mostra i comandi digitati</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-echo">echo</a></td><td>Terminale e utilità</td><td>Stampa testo e valori di variabili</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-man">man</a></td><td>Terminale e utilità</td><td>Consulta il manuale dei comandi</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-sudo">sudo</a></td><td>Terminale e utilità</td><td>Esegui un comando come amministratore</td></tr>
+            <tr><td><a class="nav-link" style="padding:0" href="utilita.html#cmd-exit">exit</a></td><td>Terminale e utilità</td><td>Chiude la sessione del terminale</td></tr>
+        </tbody>
+      </table>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <div>
+        PermissionOS — Sezione Didattica Comandi Base
+      </div>
+
+      <a href="../index.html" class="button outline sm">
+        Torna al Desktop simulato
+      </a>
+
+    </div>
+
+  </div>
+
+  <script>
+"use strict";
+document.addEventListener("DOMContentLoaded", function () {
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PermissionOS — Guida interattiva ai comandi base di Linux, con terminali simulati ed esempi pratici.">
+  <title>PermissionOS — Comandi Base di Linux</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="com.css">
+  
+</head>
+
+<body>
+
+  <div class="page">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <div class="brand">
+        PermissionOS — Comandi Base
+      </div>
+
+      <nav class="nav">
+        <a class="nav-link" href="index.html">Desktop</a>
+      </nav>
+
+    </div>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="headline-tag">
+        <span></span>
+        Guida interattiva
+      </div>
+
+      <h1>Comandi Base di Linux</h1>
+
+      <p>
+        Il terminale è lo strumento più potente di Linux: da qui puoi creare file,
+        spostarti tra le cartelle, gestire processi, permessi e molto altro.
+        In questa lezione imparerai i comandi fondamentali con spiegazioni,
+        esempi e terminali simulati che si eseguono davanti ai tuoi occhi.
+      </p>
+
+    </section>
+
+
+    <!-- QUICK NAV -->
+    <div class="quicknav" id="quicknav" aria-label="Navigazione rapida tra le categorie"></div>
+
+
+    <!-- INTRODUZIONE -->
+    <section class="section-block reveal" id="intro">
+
+      <h2>Il terminale</h2>
+
+      <p>
+        Il <strong>terminale</strong> (detto anche shell o console) è un'applicazione
+        che ti permette di dare comandi al computer scrivendoli, invece di cliccare
+        su icone e pulsanti. All'inizio può sembrare spartano, ma è il modo più
+        rapido e preciso per controllare un sistema Linux.
+      </p>
+
+      <p>
+        Ogni volta che apri il terminale, vedi una riga chiamata
+        <strong>prompt</strong>: è il modo in cui Linux ti dice «sono pronto,
+        scrivi un comando». Ecco come si legge:
+      </p>
+
+
+      <div class="term">
+        <div class="term-bar">
+          <span class="term-dot r"></span>
+          <span class="term-dot y"></span>
+          <span class="term-dot g"></span>
+          <span class="term-title">Anatomia del prompt</span>
+        </div>
+        <div class="term-body">
+          <div class="term-line"><span class="t-user">user@linux</span><span class="t-sep">:</span><span class="t-path">~/Documenti</span><span class="t-sep">$</span> <span class="t-cmd">echo</span> <span class="t-str">"Ciao Linux"</span></div>
+          <div class="term-line t-out">Ciao Linux</div>
+          <div class="term-line"><span class="t-user">user@linux</span><span class="t-sep">:</span><span class="t-path">~/Documenti</span><span class="t-sep">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+
+
+      <div class="anatomy-grid">
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-user">user</div>
+          <h4>Nome utente</h4>
+          <p>Chi sei nel sistema. Tutti i file che crei appartengono a te.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-user">@linux</div>
+          <h4>Nome del computer</h4>
+          <p>La macchina (host) su cui stai lavorando, separata dal simbolo @.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-path">~/Documenti</div>
+          <h4>Directory corrente</h4>
+          <p>La cartella in cui ti trovi ora. Il simbolo ~ è un'abbreviazione per la tua home.</p>
+        </div>
+
+        <div class="anatomy-card">
+          <div class="anatomy-token a-sep">$</div>
+          <h4>Invito al comando</h4>
+          <p>Segnala che il terminale è pronto. Da utente normale vedi $, da amministratore vedi #.</p>
+        </div>
+
+      </div>
+
+
+      <p style="margin-top: var(--space-md);">
+        La struttura generale di un comando è sempre la stessa:
+        prima il <strong>nome del comando</strong>, poi eventuali
+        <strong>opzioni</strong> (di solito precedute da un trattino, come <code>-l</code>)
+        e infine gli <strong>argomenti</strong> (su cosa agire, ad esempio un file).
+        Ad esempio: <code>ls -l ~/Documenti</code> significa «elenca in formato
+        dettagliato il contenuto della cartella Documenti».
+      </p>
+
+    </section>
+
+
+    <!-- SEZIONI DEI COMANDI (generate da JavaScript) -->
+    <div id="cmd-sections"></div>
+
+
+    <!-- RIEPILOGO -->
+    <section class="section-block reveal" id="riepilogo">
+
+      <h2>Riepilogo finale dei comandi</h2>
+
+      <p>
+        Tutti i comandi visti in questa lezione, raccolti in un'unica tabella
+        da tenere come promemoria. Clicca su un comando per tornare alla sua scheda.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Comando</th>
+            <th>Categoria</th>
+            <th>A cosa serve</th>
+          </tr>
+        </thead>
+        <tbody id="summary-body"></tbody>
+      </table>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <div>
+        PermissionOS — Sezione Didattica Comandi Base
+      </div>
+
+      <a href="permessi/index.html" class="button outline sm">
+        Torna al Desktop simulato
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- Toast per feedback (copia comandi) -->
+  <div id="toast">Comando copiato!</div>
+
+  <script>
+  "use strict";
+  /* ═══════════════════════════════════════════════════════════════
+     DATI DELLA LEZIONE
+     Ogni categoria ha id, titolo e introduzione. Ogni comando
+     definisce: descrizione, utilità, sintassi, opzioni, esempi,
+     cosa succede quando viene eseguito e la simulazione del terminale.
+     Passi della simulazione:
+       { p:"user@linux:~", t:"comando" }  → comando digitato
+       { o:"testo", k:"t-dir" }           → riga di output (k = colore)
+       { h:true, o:"<span>...</span>" }   → riga di output in HTML
+       { t:"clear", clear:true }          → comando che pulisce lo schermo
+     ═══════════════════════════════════════════════════════════════ */
+
+  const CATS = [
+    {
+      id: "navigazione",
+      label: "Navigazione",
+      intro: "I primi comandi da imparare: servono per capire dove ti trovi, vedere cosa contiene una cartella e spostarti nel filesystem."
+    },
+    {
+      id: "file",
+      label: "File e cartelle",
+      intro: "Comandi per creare, copiare, spostare, rinominare, eliminare e leggere file e directory: il pane quotidiano del terminale."
+    },
+    {
+      id: "ricerca",
+      label: "Ricerca",
+      intro: "Quando non ricordi dove si trova un file o cerchi una parola dentro un testo, questi comandi ti fanno trovare tutto in pochi secondi."
+    },
+    {
+      id: "sistema",
+      label: "Sistema e informazioni",
+      intro: "Comandi per conoscere il tuo sistema: chi sei, come si chiama il computer, quale kernel usi e da quanto tempo è acceso."
+    },
+    {
+      id: "processi",
+      label: "Processi",
+      intro: "Ogni programma in esecuzione è un processo. Qui impari a vederli, monitorarli e, se serve, a chiuderli."
+    },
+    {
+      id: "permessi",
+      label: "Permessi",
+      intro: "In Linux ogni file ha un proprietario e dei permessi. Questi comandi ti permettono di cambiarli. Approfondisci l'argomento nella lezione dedicata ai permessi."
+    },
+    {
+      id: "pacchetti",
+      label: "Gestione software",
+      intro: "Su Linux i programmi si installano con i gestori di pacchetti, che scaricano e configurano il software in modo sicuro. Ogni famiglia di distribuzioni ha il suo."
+    },
+    {
+      id: "rete",
+      label: "Rete",
+      intro: "Comandi per diagnosticare la connessione, scaricare file da internet e vedere quali porte sono in ascolto."
+    },
+    {
+      id: "utilita",
+      label: "Terminale e utilità",
+      intro: "Piccoli grandi strumenti di ogni giorno: pulire lo schermo, ritrovare i comandi digitati, consultare il manuale e diventare amministratore."
+    }
+  ];
+
+  const CMDS = [
+    /* ──────────────── NAVIGAZIONE ──────────────── */
+    {
+      c: "pwd", cat: "navigazione", name: "Stampa la directory corrente",
+      what: "<strong>pwd</strong> (Print Working Directory) mostra il percorso completo della cartella in cui ti trovi in questo momento.",
+      why: "Nel terminale non hai icone o barre degli indirizzi: pwd è il tuo «dove sono?». È utile controllarlo prima di spostare o cancellare file, per essere sicuri di lavorare nella cartella giusta.",
+      syntax: "pwd [OPZIONE]",
+      opts: [
+        ["-L", "mostra il percorso logico, cioè quello che segue i link simbolici (comportamento predefinito)"],
+        ["-P", "mostra il percorso fisico reale, risolvendo tutti i link simbolici"]
+      ],
+      ex: ["pwd"],
+      how: "La shell legge il valore della variabile speciale PWD, che tiene traccia della directory di lavoro corrente, e lo stampa a schermo. Nessun file viene letto o modificato: è un'operazione istantanea.",
+      sim: [
+        { p: "user@linux:~", t: "pwd" },
+        { o: "/home/user" },
+        { p: "user@linux:~", t: "cd Documenti" },
+        { p: "user@linux:~/Documenti", t: "pwd" },
+        { o: "/home/user/Documenti" }
+      ]
+    },
+    {
+      c: "ls", cat: "navigazione", name: "Elenca file e cartelle",
+      what: "<strong>ls</strong> (list) mostra il contenuto di una directory: file, cartelle e, con le opzioni, anche dettagli come dimensioni e permessi.",
+      why: "È l'equivalente testuale dell'aprire una cartella nel file manager. Ti serve per verificare che un file esista, controllare le dimensioni, vedere i permessi o trovare elementi nascosti.",
+      syntax: "ls [OPZIONI] [PERCORSO]",
+      opts: [
+        ["-l", "formato lungo: permessi, proprietario, gruppo, dimensione e data di modifica"],
+        ["-a", "include anche i file nascosti, quelli che iniziano con un punto (come .bashrc)"],
+        ["-h", "con -l, mostra le dimensioni in formato leggibile (K, M, G)"],
+        ["-t", "ordina per data di modifica, dal più recente"],
+        ["-S", "ordina per dimensione, dal più grande"]
+      ],
+      ex: ["ls -l ~/Documenti", "ls -a"],
+      how: "Il comando chiede al sistema l'elenco dei contenuti della directory indicata (o di quella corrente), li ordina alfabeticamente e li stampa. Con -l vengono letti anche i metadati di ogni file: permessi, proprietario, dimensione e data.",
+      sim: [
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>  <span class="t-out">nota.txt</span>  <span class="t-dir">progetto</span>' },
+        { p: "user@linux:~", t: "ls -l" },
+        { o: "totale 20" },
+        { o: "drwxr-xr-x 2 user user 4096 set  9 10:12 Documenti" },
+        { o: "-rw-r--r-- 1 user user 2,1M set  9 10:15 foto.jpg" },
+        { o: "-rw-r--r-- 1 user user  102 set  9 10:20 nota.txt" },
+        { o: "drwxr-xr-x 3 user user 4096 set  9 10:22 progetto" }
+      ]
+    },
+    {
+      c: "cd", cat: "navigazione", name: "Cambia directory",
+      what: "<strong>cd</strong> (change directory) ti sposta in un'altra cartella del filesystem. Il prompt cambia e mostra il nuovo percorso.",
+      why: "Prima di lavorare sui file devi raggiungerli. cd ti porta nella home, in una sottocartella, o indietro di un livello: è il movimento di base nel terminale.",
+      syntax: "cd [PERCORSO]",
+      opts: [
+        ["cd ~", "ti porta direttamente alla tua home directory"],
+        ["cd ..", "sale di un livello, nella cartella superiore"],
+        ["cd -", "ti riporta all'ultima directory in cui eri"],
+        ["cd /", "ti porta alla radice del filesystem"]
+      ],
+      ex: ["cd Documenti", "cd ~/progetto/src", "cd .."],
+      how: "La shell cambia la propria directory di lavoro corrente aggiornando la variabile PWD. Se il percorso non esiste ricevi un errore come «No such file or directory»; se invece esiste ma mancano i permessi di lettura, ricevi «Permission denied».",
+      sim: [
+        { p: "user@linux:~", t: "cd Documenti" },
+        { p: "user@linux:~/Documenti", t: "cd progetto" },
+        { p: "user@linux:~/Documenti/progetto", t: "cd .." },
+        { p: "user@linux:~/Documenti", t: "cd ../.." },
+        { p: "user@linux:~", t: "" }
+      ]
+    },
+    /* ──────────────── FILE E CARTELLE ──────────────── */
+    {
+      c: "touch", cat: "file", name: "Crea file vuoti",
+      what: "<strong>touch</strong> crea un file vuoto con il nome indicato. Se il file esiste già, ne aggiorna soltanto la data di modifica senza toccare il contenuto.",
+      why: "È il modo più rapido per creare un file di partenza: uno script, un documento di testo, un file di configurazione. Lo riempirai dopo con un editor o con la redirezione.",
+      syntax: "touch NOME_FILE [ALTRO_FILE...]",
+      opts: [
+        ["-a", "aggiorna solo la data dell'ultimo accesso"],
+        ["-m", "aggiorna solo la data dell'ultima modifica"],
+        ["-c", "non creare il file se non esiste, aggiorna solo i timestamp"]
+      ],
+      ex: ["touch nota.txt", "touch index.html stile.css script.js"],
+      how: "Il sistema cerca il file nella directory corrente: se non esiste, lo crea vuoto (0 byte) con i permessi predefiniti; se esiste, aggiorna l'orario di modifica. A schermo non compare nulla: in Linux «nessun messaggio» significa quasi sempre «operazione riuscita».",
+      sim: [
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>' },
+        { p: "user@linux:~", t: "touch nota.txt" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>  <span class="t-ok">nota.txt</span>' },
+        { h: true, o: '<span class="t-dim">→ nota.txt è stato creato vuoto (0 byte)</span>' }
+      ]
+    },
+    {
+      c: "mkdir", cat: "file", name: "Crea cartelle",
+      what: "<strong>mkdir</strong> (make directory) crea una o più nuove cartelle nella posizione corrente o nel percorso indicato.",
+      why: "Serve per organizzare il tuo lavoro: una cartella per i progetti, una per le foto, una per gli appunti. È l'equivalente del «Nuova cartella» nel file manager.",
+      syntax: "mkdir [OPZIONI] NOME_CARTELLA",
+      opts: [
+        ["-p", "crea anche tutte le cartelle intermedie mancanti, ad esempio src/moduli/ui"],
+        ["-v", "verbose: stampa un messaggio per ogni cartella creata"],
+        ["-m", "imposta subito i permessi della nuova cartella, ad esempio -m 700"]
+      ],
+      ex: ["mkdir progetto", "mkdir -p progetto/src/moduli"],
+      how: "Il sistema aggiunge una nuova directory al filesystem. Se la cartella esiste già ricevi l'errore «File exists»; con -p invece il comando prosegue senza protestare, creando solo ciò che manca.",
+      sim: [
+        { p: "user@linux:~", t: "mkdir progetto" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>  <span class="t-ok">progetto</span>' },
+        { p: "user@linux:~", t: "mkdir -p progetto/src/moduli" },
+        { p: "user@linux:~", t: "ls progetto" },
+        { h: true, o: '<span class="t-dir">src</span>' },
+        { h: true, o: '<span class="t-dim">→ con -p sono state create anche le cartelle intermedie</span>' }
+      ]
+    },
+    {
+      c: "cp", cat: "file", name: "Copia file e cartelle",
+      what: "<strong>cp</strong> (copy) duplica un file, o un'intera cartella con -r, in un'altra posizione o con un altro nome.",
+      why: "Serve per creare copie di sicurezza, duplicare file in un'altra cartella o preparare un modello da modificare. L'originale resta intatto.",
+      syntax: "cp [OPZIONI] ORIGINE DESTINAZIONE",
+      opts: [
+        ["-r", "recursive: copia un'intera cartella con tutto il suo contenuto"],
+        ["-i", "interactive: chiede conferma prima di sovrascrivere un file esistente"],
+        ["-v", "verbose: mostra ogni file mentre viene copiato"],
+        ["-u", "copia solo se l'origine è più recente della destinazione"]
+      ],
+      ex: ["cp nota.txt nota_backup.txt", "cp -r progetto progetto_backup"],
+      how: "Il sistema legge il contenuto del file di origine e lo riscrive in un nuovo file di destinazione. Se la destinazione è una cartella esistente, il file viene copiato dentro di essa mantenendo il nome; se esiste già un file con lo stesso nome, viene sovrascritto (a meno che tu non usi -i).",
+      sim: [
+        { p: "user@linux:~", t: "cp nota.txt nota_backup.txt" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>  <span class="t-ok">nota.txt</span>  <span class="t-ok">nota_backup.txt</span>' },
+        { p: "user@linux:~", t: "cp nota.txt Documenti/" },
+        { p: "user@linux:~", t: "ls Documenti" },
+        { h: true, o: '<span class="t-out">nota.txt</span>  <span class="t-dim">→ copiato dentro Documenti</span>' }
+      ]
+    },
+    {
+      c: "mv", cat: "file", name: "Sposta o rinomina file e cartelle",
+      what: "<strong>mv</strong> (move) sposta un file o una cartella in un'altra posizione. Se cambia solo il nome e non la posizione, equivale a rinominare.",
+      why: "È il coltellino svizzero dei file: serve per rinominare (mv vecchio.txt nuovo.txt) e per spostare elementi tra cartelle. A differenza di cp, l'originale nella posizione di partenza non viene conservato.",
+      syntax: "mv [OPZIONI] ORIGINE DESTINAZIONE",
+      opts: [
+        ["-i", "interactive: chiede conferma prima di sovrascrivere"],
+        ["-v", "verbose: mostra ogni operazione effettuata"],
+        ["-n", "no-clobber: non sovrascrivere mai i file esistenti"]
+      ],
+      ex: ["mv bozza.txt appunti.txt", "mv appunti.txt ~/Documenti/"],
+      how: "Nel caso più comune mv aggiorna il puntamento del file: il contenuto non viene copiato, ma cambia il suo «indirizzo» nel filesystem, per questo è immediato anche su file enormi. Se nella destinazione esiste già un file con lo stesso nome, viene sostituito.",
+      sim: [
+        { p: "user@linux:~", t: "mv nota_backup.txt appunti.txt" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">appunti.txt</span>  <span class="t-out">foto.jpg</span>  <span class="t-ok">nota.txt</span>' },
+        { p: "user@linux:~", t: "mv appunti.txt Documenti/" },
+        { p: "user@linux:~", t: "ls Documenti" },
+        { h: true, o: '<span class="t-out">appunti.txt</span>  <span class="t-out">nota.txt</span>' },
+        { h: true, o: '<span class="t-dim">→ appunti.txt non è più nella home: è stato spostato</span>' }
+      ]
+    },
+    {
+      c: "rm", cat: "file", name: "Elimina file e cartelle",
+      what: "<strong>rm</strong> (remove) cancella in modo permanente file e, con l'opzione -r, intere cartelle. Non esiste un cestino dal terminale: ciò che rimuovi è perso.",
+      why: "Serve a liberare spazio e a ripulire il progetto da file inutili. È potentissimo e va usato con attenzione: -rf su una cartella sbagliata può cancellare tutto il sistema.",
+      syntax: "rm [OPZIONI] FILE [FILE...]",
+      opts: [
+        ["-r", "recursive: elimina anche le cartelle e il loro contenuto"],
+        ["-f", "force: non chiede conferma e ignora i file inesistenti"],
+        ["-i", "interactive: chiede conferma prima di ogni cancellazione"],
+        ["-v", "verbose: mostra il nome di ogni file eliminato"]
+      ],
+      ex: ["rm vecchio.txt", "rm -ri vecchio_progetto"],
+      how: "Il sistema rimuove il collegamento al file: lo spazio torna disponibile e il file scompare per sempre, senza passare dal cestino. Con -i la shell ti chiede y/n prima di ogni elemento; con -f elimina tutto silenziosamente.",
+      sim: [
+        { p: "user@linux:~", t: "rm vecchio.txt" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">foto.jpg</span>  <span class="t-out">nota.txt</span>' },
+        { h: true, o: '<span class="t-dim">→ vecchio.txt è stato eliminato definitivamente</span>' },
+        { p: "user@linux:~", t: "rm foto_vacanze.jpg" },
+        { o: "rm: impossibile rimuovere 'foto_vacanze.jpg': File inesistente", k: "t-err" }
+      ]
+    },
+    {
+      c: "rmdir", cat: "file", name: "Elimina cartelle vuote",
+      what: "<strong>rmdir</strong> (remove directory) cancella una cartella, ma solo se è completamente vuota: se contiene anche un solo file, il comando si rifiuta.",
+      why: "È una versione «sicura» di rm -r: ti protegge cancellando per errore cartelle piene. Utile per rimuovere scaffali vuoti dopo aver riordinato i file.",
+      syntax: "rmdir [OPZIONI] CARTELLA [CARTELLA...]",
+      opts: [
+        ["-p", "elimina anche le cartelle superiori, se diventate vuote"],
+        ["-v", "verbose: mostra ogni cartella rimossa"]
+      ],
+      ex: ["rmdir vecchia_cartella", "rmdir -p a/b/c"],
+      how: "Il sistema controlla che la directory non contenga nulla: se è vuota la rimuove; se contiene file ricevi l'errore «Directory not empty» e non viene toccato nulla. Per cancellare cartelle piene serve rm -r.",
+      sim: [
+        { p: "user@linux:~", t: "rmdir temp" },
+        { p: "user@linux:~", t: "ls" },
+        { h: true, o: '<span class="t-dir">Documenti</span>  <span class="t-out">nota.txt</span>  <span class="t-dir">progetto</span>' },
+        { p: "user@linux:~", t: "rmdir Documenti" },
+        { o: "rmdir: impossibile rimuovere 'Documenti': Directory non vuota", k: "t-err" },
+        { h: true, o: '<span class="t-dim">→ rmdir non cancella mai cartelle che contengono file</span>' }
+      ]
+    },
+    {
+      c: "cat", cat: "file", name: "Mostra il contenuto di un file",
+      what: "<strong>cat</strong> (concatenate) stampa a schermo l'intero contenuto di uno o più file di testo, uno dopo l'altro.",
+      why: "È il modo più veloce per dare un'occhiata al contenuto di un file breve: file di configurazione, note, script. Per file lunghi è meglio less, perché permette di scorrere.",
+      syntax: "cat [OPZIONI] FILE [FILE...]",
+      opts: [
+        ["-n", "numera tutte le righe di output"],
+        ["-b", "numera solo le righe non vuote"],
+        ["-s", "comprime più righe vuote consecutive in una sola"],
+        ["-A", "mostra anche i caratteri invisibili, come fine riga e tabulazioni"]
+      ],
+      ex: ["cat nota.txt", "cat -n script.sh"],
+      how: "Il comando legge il file dall'inizio alla fine e lo riversa nel flusso di output (lo schermo). Se il file è più lungo dello schermo, le prime righe scorrono via rapidamente: in quel caso conviene less.",
+      sim: [
+        { p: "user@linux:~", t: "cat nota.txt" },
+        { o: "Benvenuto in Linux!" },
+        { o: "Questo file è stato creato con touch." },
+        { o: "Ora ne leggiamo il contenuto con cat." },
+        { p: "user@linux:~", t: "cat -n nota.txt" },
+        { o: "     1  Benvenuto in Linux!" },
+        { o: "     2  Questo file è stato creato con touch." },
+        { o: "     3  Ora ne leggiamo il contenuto con cat." }
+      ]
+    },
+    {
+      c: "less", cat: "file", name: "Leggi un file una pagina alla volta",
+      what: "<strong>less</strong> apre un file di testo in un visualizzatore a pagine: puoi scorrere con le frecce o con Spazio, cercare parole e uscire premendo q.",
+      why: "Per file lunghi come log e manuali, cat non basta: less ti permette di leggere con calma senza riempire lo schermo. Si chiama «less» come scherzo su «less is more».",
+      syntax: "less [OPZIONI] FILE",
+      opts: [
+        ["Spazio", "avanza di una schermata intera"],
+        ["frecce / PgUp / PgDn", "scorrono riga o pagina per volta"],
+        ["/parola", "cerca una parola nel testo (n va alla occorrenza successiva)"],
+        ["q", "esce dal visualizzatore e torna al prompt"]
+      ],
+      ex: ["less /var/log/syslog", "less -N script.sh"],
+      how: "Il file non viene caricato tutto in memoria: less carica e mostra solo la prima schermata e legge il resto man mano che scorri. Per questo si apre istantaneamente anche su file di gigabyte. Alla pressione di q il programma si chiude e il prompt torna com'era.",
+      sim: [
+        { p: "user@linux:~", t: "less log_grande.txt" },
+        { o: "set  9 10:01 avvio servizio di rete" },
+        { o: "set  9 10:02 connessione stabilita" },
+        { o: "set  9 10:05 avvio aggiornamento" },
+        { o: "set  9 10:06 aggiornamento completato" },
+        { o: ": (premi ↓ per scorrere, q per uscire)", k: "t-dim" }
+      ]
+    },
+    {
+      c: "head", cat: "file", name: "Mostra l'inizio di un file",
+      what: "<strong>head</strong> stampa le prime righe di un file. Per impostazione predefinita sono 10, ma puoi sceglierne quante vuoi con -n.",
+      why: "Spesso ti interessa solo l'inizio di un file: controllare l'intestazione di un CSV, verificare che un download sia completo o dare un'occhiata al log più recente.",
+      syntax: "head [OPZIONI] FILE",
+      opts: [
+        ["-n NUM", "mostra le prime NUM righe invece di 10"],
+        ["-c NUM", "mostra i primi NUM byte invece delle righe"],
+        ["-q", "con più file, non stampare le intestazioni dei nomi"]
+      ],
+      ex: ["head report.txt", "head -n 3 report.txt"],
+      how: "Il comando legge il file dall'inizio fino alla riga richiesta e si ferma: non scorre tutto il file, quindi è istantaneo anche su file enormi. L'output è identico a cat, ma troncato alle prime righe.",
+      sim: [
+        { p: "user@linux:~", t: "head -n 3 report.txt" },
+        { o: "1. Introduzione" },
+        { o: "2. Metodologia" },
+        { o: "3. Risultati" },
+        { h: true, o: '<span class="t-dim">→ mostrate solo le prime 3 righe del file</span>' }
+      ]
+    },
+    {
+      c: "tail", cat: "file", name: "Mostra la fine di un file",
+      what: "<strong>tail</strong> stampa le ultime righe di un file. È il complemento di head: guarda la parte finale, dove di solito ci sono i dati più recenti.",
+      why: "I log crescono verso il basso: per vedere gli ultimi errori di un servizio non devi leggere migliaia di righe, ma solo la coda del file. Con -f segue il file in tempo reale.",
+      syntax: "tail [OPZIONI] FILE",
+      opts: [
+        ["-n NUM", "mostra le ultime NUM righe invece di 10"],
+        ["-f", "follow: resta in attesa e mostra le nuove righe man mano che vengono scritte (Ctrl+C per uscire)"],
+        ["-c NUM", "mostra gli ultimi NUM byte"]
+      ],
+      ex: ["tail -n 5 sistema.log", "tail -f /var/log/syslog"],
+      how: "Il comando parte dalla fine del file e risale fino al numero di righe richiesto. Con -f il processo resta attivo: ogni volta che un programma scrive una nuova riga nel log, tail la stampa a schermo, come un feed live.",
+      sim: [
+        { p: "user@linux:~", t: "tail -n 3 sistema.log" },
+        { o: "10:12 servizio riavviato" },
+        { o: "10:15 backup completato" },
+        { o: "10:18 sistema operativo" },
+        { p: "user@linux:~", t: "tail -f sistema.log" },
+        { o: "10:21 nuovo accesso utente" },
+        { o: "10:24 nuovo accesso utente" },
+        { o: "^C  (Ctrl+C interrompe l'attesa)", k: "t-dim" }
+      ]
+    },
+    /* ──────────────── RICERCA ──────────────── */
+    {
+      c: "find", cat: "ricerca", name: "Cerca file e cartelle nel filesystem",
+      what: "<strong>find</strong> esplora una directory e tutte le sue sottocartelle alla ricerca di elementi che corrispondono ai criteri indicati: nome, tipo, dimensione, data e altro.",
+      why: "È la ricerca più potente di Linux: funziona anche su file appena creati e permette criteri combinati, come «tutti i .log più grandi di 100 MB modificati negli ultimi 7 giorni».",
+      syntax: "find [PERCORSO] [CRITERI]",
+      opts: [
+        ["-name", "cerca per nome; i caratteri jolly vanno tra virgolette, come \"*.txt\""],
+        ["-type f / d", "limita la ricerca a file (f) o cartelle (d)"],
+        ["-size", "filtra per dimensione, ad esempio -size +10M"],
+        ["-mtime N", "modificati da N giorni; -mtime -7 significa «negli ultimi 7 giorni»"],
+        ["-exec CMD {} ;", "esegue un comando su ogni risultato trovato"]
+      ],
+      ex: ["find . -name \"*.txt\"", "find /var -type f -size +100M"],
+      how: "Il comando visita ricorsivamente l'albero delle directory a partire dal percorso dato e valuta ogni elemento contro i criteri: ogni corrispondenza viene stampata. Il punto (.) indica «parti dalla directory corrente».",
+      sim: [
+        { p: "user@linux:~", t: 'find . -name "*.txt"' },
+        { o: "./nota.txt" },
+        { o: "./Documenti/appunti.txt" },
+        { o: "./progetto/README.txt" },
+        { p: "user@linux:~", t: "find . -type d -name progetto" },
+        { o: "./progetto" },
+        { h: true, o: '<span class="t-dim">→ -type d ha filtrato solo le cartelle</span>' }
+      ]
+    },
+    {
+      c: "locate", cat: "ricerca", name: "Trova file all'istante con il database",
+      what: "<strong>locate</strong> cerca un file per nome, ma invece di esplorare il disco interroga un indice precompilato: il risultato è praticamente istantaneo.",
+      why: "Quando ricordi (anche in parte) il nome di un file ma non hai idea di dove sia, locate lo trova in tutto il sistema in una frazione di secondo, senza impazzire tra le cartelle.",
+      syntax: "locate [OPZIONI] MODELLO",
+      opts: [
+        ["-i", "ignora maiuscole e minuscole nella ricerca"],
+        ["-n NUM", "limita il numero di risultati"],
+        ["-c", "mostra solo il conteggio dei file trovati"],
+        ["sudo updatedb", "aggiorna l'indice (da eseguire dopo aver creato nuovi file)"]
+      ],
+      ex: ["locate nota.txt", "locate -i readme"],
+      how: "Il database viene costruito dal comando updatedb, di solito eseguito automaticamente una volta al giorno. La ricerca avviene in memoria, per questo è velocissima; il rovescio della medaglia è che i file creati da pochi minuti potrebbero non comparire finché l'indice non viene aggiornato.",
+      sim: [
+        { p: "user@linux:~", t: "locate nota.txt" },
+        { o: "/home/user/nota.txt" },
+        { o: "/home/user/Documenti/nota_2025.txt" },
+        { o: "/etc/skel/nota.txt" },
+        { p: "user@linux:~", t: "locate -c jpg" },
+        { o: "1842" },
+        { h: true, o: '<span class="t-dim">→ -c mostra solo quanti file corrispondono</span>' }
+      ]
+    },
+    {
+      c: "grep", cat: "ricerca", name: "Cerca testo dentro i file",
+      what: "<strong>grep</strong> scansiona file o output alla ricerca di righe che contengono una determinata parola o espressione e stampa solo quelle.",
+      why: "È il comando ideale per non leggere file interi: trovi subito le righe di errore in un log, una funzione in mille file di codice o una parola in una documentazione.",
+      syntax: "grep [OPZIONI] TESTO FILE",
+      opts: [
+        ["-i", "ignora la differenza tra maiuscole e minuscole"],
+        ["-r", "recursive: cerca in tutte le cartelle e sottocartelle"],
+        ["-n", "mostra il numero della riga in cui si trova la corrispondenza"],
+        ["-v", "inverte: mostra le righe che NON contengono il testo"],
+        ["-c", "mostra solo quante righe corrispondono"]
+      ],
+      ex: ["grep \"errore\" sistema.log", "grep -rn \"TODO\" progetto/"],
+      how: "Il comando legge il file riga per riga e confronta ciascuna con il testo cercato (che può essere un'espressione regolare). Le righe che corrispondono vengono stampate, le altre ignorate. Se non trova nulla, non stampa nulla e restituisce un codice di errore.",
+      sim: [
+        { p: "user@linux:~", t: 'grep -n "errore" sistema.log' },
+        { o: "12: [errore] connessione al database non riuscita" },
+        { o: "40: [errore] timeout sulla richiesta n.8812" },
+        { h: true, o: '<span class="t-dim">→ -n mostra il numero di riga prima di ogni risultato</span>' }
+      ]
+    },
+    {
+      c: "which", cat: "ricerca", name: "Scopri dove si trova un programma",
+      what: "<strong>which</strong> mostra il percorso esatto dell'eseguibile che la shell lancia quando digiti un certo comando.",
+      why: "Utile per capire quale versione di un programma viene usata (ce ne possono essere più installate) o per verificare che un comando sia effettivamente installato nel PATH.",
+      syntax: "which [-a] COMANDO",
+      opts: [
+        ["-a", "mostra tutte le occorrenze trovate nel PATH, non solo la prima"],
+        ["codice d'uscita", "se il comando non esiste, which non stampa nulla e restituisce errore"]
+      ],
+      ex: ["which python3", "which -a gcc"],
+      how: "La shell cerca il nome del comando dentro le cartelle elencate nella variabile PATH, nell'ordine in cui compaiono. Il primo eseguibile trovato è quello che verrebbe eseguito, e which ne stampa il percorso completo.",
+      sim: [
+        { p: "user@linux:~", t: "which python3" },
+        { o: "/usr/bin/python3" },
+        { p: "user@linux:~", t: "which firefox" },
+        { o: "/usr/bin/firefox" },
+        { p: "user@linux:~", t: "which browserfanto" },
+        { h: true, o: '<span class="t-dim">→ nessun risultato: il comando non è installato</span>' }
+      ]
+    },
+
+    /* ──────────────── SISTEMA E INFORMAZIONI ──────────────── */
+    {
+      c: "whoami", cat: "sistema", name: "Mostra il nome utente corrente",
+      what: "<strong>whoami</strong> (who am I?) stampa il nome dell'utente con cui stai lavorando in questa sessione.",
+      why: "Serve per capire con quale identità stai operando, ad esempio dopo aver usato sudo o cambiato utente con su: è un controllo rapido prima di fare operazioni delicate.",
+      syntax: "whoami",
+      opts: [
+        ["--help", "mostra l'aiuto del comando"],
+        ["--version", "mostra la versione del programma"]
+      ],
+      ex: ["whoami"],
+      how: "Il comando chiede al sistema l'ID dell'utente proprietario del processo corrente (l'UID effettivo) e ne stampa il nome. È istantaneo e non modifica nulla.",
+      sim: [
+        { p: "user@linux:~", t: "whoami" },
+        { o: "user" },
+        { p: "user@linux:~", t: "sudo su" },
+        { p: "root@linux:/home/user", t: "whoami" },
+        { o: "root", k: "t-warn" },
+        { h: true, o: '<span class="t-dim">→ ora stai operando come amministratore</span>' }
+      ]
+    },
+    {
+      c: "id", cat: "sistema", name: "Mostra UID, GID e gruppi dell'utente",
+      what: "<strong>id</strong> mostra i numeri identificativi dell'utente (UID), del suo gruppo principale (GID) e di tutti i gruppi a cui appartiene.",
+      why: "I permessi di Linux si basano su questi numeri. Con id capisci perché puoi accedere a certi file e ad altri no: conta l'appartenenza ai gruppi, come il gruppo sudo o il gruppo audio.",
+      syntax: "id [OPZIONI] [UTENTE]",
+      opts: [
+        ["-u", "mostra solo l'UID dell'utente"],
+        ["-g", "mostra solo il GID del gruppo principale"],
+        ["-G", "mostra tutti i GID dei gruppi di appartenenza"],
+        ["-n", "con -u, -g o -G mostra i nomi invece dei numeri"]
+      ],
+      ex: ["id", "id root"],
+      how: "Il comando interroga la tabella degli account di sistema (/etc/passwd e /etc/group) e compone la riga con UID, GID e elenco dei gruppi. Con un nome utente come argomento, mostra i dati di quell'utente invece dei tuoi.",
+      sim: [
+        { p: "user@linux:~", t: "id" },
+        { o: "uid=1000(user) gid=1000(user) gruppi=1000(user),27(sudo),1001(sviluppatori)" },
+        { p: "user@linux:~", t: "id -u" },
+        { o: "1000" },
+        { p: "user@linux:~", t: "id root" },
+        { o: "uid=0(root) gid=0(root) gruppi=0(root)" },
+        { h: true, o: '<span class="t-dim">→ UID 0 è sempre l\'amministratore</span>' }
+      ]
+    },
+    {
+      c: "uname", cat: "sistema", name: "Mostra informazioni sul kernel",
+      what: "<strong>uname</strong> (unix name) stampa informazioni sul kernel Linux in uso e, con -a, sul sistema completo: nome host, versione, architettura.",
+      why: "Serve per sapere su cosa stai lavorando: utile quando scarichi software (serve l'architettura giusta?), segnalazioni di bug o verifiche di compatibilità.",
+      syntax: "uname [OPZIONE]",
+      opts: [
+        ["-a", "tutte le informazioni disponibili in un'unica riga"],
+        ["-r", "solo la versione del kernel, ad esempio 6.8.0-40-generic"],
+        ["-m", "solo l'architettura della macchina, ad esempio x86_64"],
+        ["-s", "solo il nome del kernel (Linux)"]
+      ],
+      ex: ["uname -a", "uname -r"],
+      how: "Il comando interroga una chiamata di sistema del kernel e ne formatta i campi. Con nessuna opzione stampa solo «Linux»: per il quadro completo si usa -a.",
+      sim: [
+        { p: "user@linux:~", t: "uname" },
+        { o: "Linux" },
+        { p: "user@linux:~", t: "uname -r" },
+        { o: "6.8.0-40-generic" },
+        { p: "user@linux:~", t: "uname -a" },
+        { o: "Linux linux-pc 6.8.0-40-generic #40-Ubuntu SMP ... x86_64 GNU/Linux" }
+      ]
+    },
+    {
+      c: "hostname", cat: "sistema", name: "Mostra o imposta il nome del computer",
+      what: "<strong>hostname</strong> stampa il nome con cui la macchina si presenta in rete (l'host). Con privilegi di amministratore può anche cambiarlo.",
+      why: "Il nome host identifica il computer in una rete locale (ad esempio durante una connessione SSH). È utile controllarlo quando gestisci più macchine.",
+      syntax: "hostname [OPZIONE] [NUOVO_NOME]",
+      opts: [
+        ["-I", "mostra gli indirizzi IP della macchina"],
+        ["-f", "mostra il nome completo (FQDN), incluso il dominio"],
+        ["-s", "mostra solo la parte breve del nome, senza dominio"]
+      ],
+      ex: ["hostname", "hostname -I"],
+      how: "Il comando legge il nome memorizzato dal kernel per la macchina corrente. Se lo esegui con sudo e un nuovo nome, lo cambia temporaneamente; per renderlo permanente va modificato il file /etc/hostname.",
+      sim: [
+        { p: "user@linux:~", t: "hostname" },
+        { o: "linux-pc" },
+        { p: "user@linux:~", t: "hostname -I" },
+        { o: "192.168.1.42" },
+        { h: true, o: '<span class="t-dim">→ l\'indirizzo IP della macchina nella rete locale</span>' }
+      ]
+    },
+    {
+      c: "date", cat: "sistema", name: "Mostra o imposta data e ora",
+      what: "<strong>date</strong> stampa la data e l'ora correnti del sistema, con un formato che puoi personalizzare in molti modi.",
+      why: "Utile per controllare l'orologio di sistema, per aggiungere un timestamp a un file o a uno script (ad esempio nel nome di un backup) e per calcolare date con gli specifier.",
+      syntax: "date [OPZIONE] [+FORMATO]",
+      opts: [
+        ["+%d/%m/%Y", "personalizza il formato: giorno/mese/anno"],
+        ["+%H:%M:%S", "estrae solo l'ora nel formato 24 ore"],
+        ["-u", "mostra l'ora UTC invece dell'ora locale"],
+        ["-d \"...\"", "mostra una data diversa da oggi, ad esempio -d \"domani\""]
+      ],
+      ex: ["date", "date +%d/%m/%Y"],
+      how: "Il comando legge l'orologio di sistema e lo formatta secondo le convenzioni locali o secondo il formato indicato dopo il +. Con privilegi di amministratore può anche impostare l'orologio.",
+      sim: [
+        { p: "user@linux:~", t: "date" },
+        { o: "mer 09 set 2026, 10:24:31 CEST" },
+        { p: "user@linux:~", t: "date +%d/%m/%Y" },
+        { o: "09/09/2026" },
+        { p: "user@linux:~", t: "date +%H:%M" },
+        { o: "10:24" }
+      ]
+    },
+    {
+      c: "uptime", cat: "sistema", name: "Da quanto tempo il sistema è acceso",
+      what: "<strong>uptime</strong> mostra l'ora attuale, da quanto tempo il computer è acceso, quanti utenti sono collegati e il carico medio della CPU.",
+      why: "È il controllo rapido per la salute del sistema: un carico medio più alto del numero di core indica che la macchina è sotto pressione; l'uptime conferma da quanto non si riavvia.",
+      syntax: "uptime [OPZIONE]",
+      opts: [
+        ["-p", "formato compatto, solo il tempo di attività"],
+        ["-s", "mostra da quando/data esatta dell'ultimo avvio"]
+      ],
+      ex: ["uptime", "uptime -p"],
+      how: "Il comando legge l'orario e le statistiche di caricamento mantenute dal kernel (in /proc/uptime e /proc/loadavg) e le presenta in una riga leggibile. Il carico medio è riportato per 1, 5 e 15 minuti.",
+      sim: [
+        { p: "user@linux:~", t: "uptime" },
+        { o: " 10:24:31 up 2 days,  3:14,  1 user,  load average: 0,15 0,10 0,05" },
+        { p: "user@linux:~", t: "uptime -p" },
+        { o: "up 2 days, 3 hours, 14 minutes" },
+        { h: true, o: '<span class="t-dim">→ carico basso: la macchina sta lavorando senza stress</span>' }
+      ]
+    },
+    /* ──────────────── PROCESSI ──────────────── */
+    {
+      c: "ps", cat: "processi", name: "Elenca i processi in esecuzione",
+      what: "<strong>ps</strong> (process status) fa una fotografia dei processi attivi: senza opzioni mostra quelli della sessione corrente, con aux mostra tutti quelli del sistema.",
+      why: "Serve per capire cosa sta girando sul computer, trovare l'ID (PID) di un programma bloccato da terminare con kill, o verificare che un servizio sia attivo.",
+      syntax: "ps [OPZIONI]",
+      opts: [
+        ["aux", "mostra tutti i processi di tutti gli utenti, con %CPU, %MEM e comando"],
+        ["-e", "equivale a -A: tutti i processi del sistema"],
+        ["-f", "formato completo, con UID, PID e ora di avvio"],
+        ["grep", "spesso si combina con grep: ps aux | grep firefox"]
+      ],
+      ex: ["ps", "ps aux"],
+      how: "Il comando legge la tabella dei processi mantenuta dal kernel (in /proc) e la stampa nello formato richiesto. È un'istantanea: se rilanci ps, i valori saranno già cambiati. Per una visione continua si usa top.",
+      sim: [
+        { p: "user@linux:~", t: "ps" },
+        { o: "    PID TTY          TIME CMD" },
+        { o: "   2141 pts/0    00:00:00 bash" },
+        { o: "   2288 pts/0    00:00:00 ps" },
+        { p: "user@linux:~", t: "ps aux | grep firefox" },
+        { o: "user   1243  8.1  6.2 1428912 486204 ?  Sl 09:45  2:11 firefox" },
+        { h: true, o: '<span class="t-dim">→ trovato: il PID di firefox è 1243</span>' }
+      ]
+    },
+    {
+      c: "top", cat: "processi", name: "Monitora i processi in tempo reale",
+      what: "<strong>top</strong> mostra un quadro aggiornato in tempo reale dei processi, ordinati per consumo di CPU e memoria, con statistiche generali di sistema.",
+      why: "È il «gestore attività» del terminale: se il computer rallenta, top ti dice subito quale processo sta mangiando CPU o RAM.",
+      syntax: "top [OPZIONI]",
+      opts: [
+        ["P", "ordina per CPU (default), M per memoria, N per PID"],
+        ["k", "termina un processo: chiede il PID e invia il segnale"],
+        ["q", "esce dal monitor"],
+        ["h", "mostra l'aiuto con tutti i tasti disponibili"]
+      ],
+      ex: ["top", "top -u user"],
+      how: "Il programma resta in esecuzione e aggiorna lo schermo ogni 3 secondi (o con l'intervallo impostato), leggendo le statistiche dal kernel. Premendo k puoi terminare un processo direttamente dalla schermata, senza aprire un'altra finestra.",
+      sim: [
+        { p: "user@linux:~", t: "top" },
+        { o: "top - 10:24:31 up 2 days,  1 user,  load average: 0,15 0,10 0,05" },
+        { o: "Tasks: 183 total,   1 running, 182 sleeping" },
+        { o: "%Cpu(s): 12,3 us,  4,1 sy, 83,6 id" },
+        { o: "MiB Mem :   7842 total,   5210 free,   1480 used" },
+        { o: "  PID USER      %CPU  %MEM  COMMAND" },
+        { o: " 1243 user      15,2   8,4  firefox" },
+        { o: "  968 root       2,1   3,0  Xorg" },
+        { o: "q (esci)   k (termina)   P/M (ordina)", k: "t-dim" }
+      ]
+    },
+    {
+      c: "htop", cat: "processi", name: "Monitor interattivo (versione evoluta di top)",
+      what: "<strong>htop</strong> è un monitor dei processi più moderno e colorato di top: barre per CPU e memoria, navigazione con frecce e menu grafici.",
+      why: "Fa le stesse cose di top ma in modo più leggibile: puoi scorrere la lista con le frecce, terminare un processo con F9 e filtrare per utente senza digitare comandi. Non è sempre preinstallato: si installa con apt.",
+      syntax: "htop [OPZIONI]",
+      opts: [
+        ["F9", "termina il processo selezionato (scegli il segnale dal menu)"],
+        ["F6", "cambia l'ordinamento della lista"],
+        ["/", "filtra i processi per nome"],
+        ["F10 o q", "esce dal programma"]
+      ],
+      ex: ["htop"],
+      how: "Come top, legge le statistiche dal kernel, ma le disegna in un'interfaccia con barre e colori che si aggiorna in tempo reale. Le funzioni con i tasti F1-F10 sono sempre visibili in basso.",
+      sim: [
+        { p: "user@linux:~", t: "htop" },
+        { o: "  CPU[|****       12,4%]  Mem[||||      5,1G/7,7G]" },
+        { o: "  PID USER    CPU%  MEM%  COMMAND" },
+        { o: " 1243 user    15,2   8,4  firefox" },
+        { o: "  968 root     2,1   3,0  Xorg" },
+        { o: " 2312 user     0,4   1,2  bash" },
+        { o: "F9 Termina   F6 Ordina   F10 Esci", k: "t-dim" }
+      ]
+    },
+    {
+      c: "kill", cat: "processi", name: "Termina un processo con il suo PID",
+      what: "<strong>kill</strong> invia un segnale a un processo identificato dal suo PID. Per default invia SIGTERM, una richiesta educata di chiudersi; con -9 forza la chiusura immediata.",
+      why: "Quando un programma è bloccato e non risponde, kill è il modo per chiuderlo dal terminale. Serve anche per riavviare servizi o interrompere elaborazioni lunghe.",
+      syntax: "kill [SEGALE] PID [PID...]",
+      opts: [
+        ["-15", "SIGTERM (default): chiede al processo di chiudersi pulitamente, salvando i dati"],
+        ["-9", "SIGKILL: il sistema termina il processo immediatamente, senza possibilità di resistere"],
+        ["-l", "elenca tutti i segnali disponibili"],
+        ["-1", "SIGHUP: spesso usato per dire a un servizio di ricaricare la configurazione"]
+      ],
+      ex: ["kill 1243", "kill -9 1243"],
+      how: "Il kernel riceve la richiesta e consegna il segnale al processo indicato. Se il processo accetta SIGTERM, esegue le sue procedure di chiusura; SIGKILL invece lo elimina senza dargli tempo di reagire. Trovi il PID con ps o top.",
+      sim: [
+        { p: "user@linux:~", t: "kill 1243" },
+        { p: "user@linux:~", t: "ps aux | grep firefox" },
+        { o: "user   2288  0.0  0.0   9088  2412 pts/0  S+  10:26  0:00 grep firefox" },
+        { h: true, o: '<span class="t-dim">→ firefox non compare più: il processo è stato chiuso</span>' },
+        { p: "user@linux:~", t: "kill 1243" },
+        { o: "kill: (1243) - Nessun processo corrispondente", k: "t-err" }
+      ]
+    },
+    {
+      c: "pkill", cat: "processi", name: "Termina i processi per nome",
+      what: "<strong>pkill</strong> (process kill) fa la stessa cosa di kill, ma invece del PID usa il nome del programma: termina tutti i processi che corrispondono.",
+      why: "È più comodo di kill quando non conosci il PID o vuoi chiudere tutte le istanze di un'applicazione contemporaneamente (ad esempio tutti i processi di firefox).",
+      syntax: "pkill [OPZIONI] NOME_PROCESSO",
+      opts: [
+        ["-f", "cerca la corrispondenza nella riga di comando completa, non solo nel nome"],
+        ["-u USER", "termina solo i processi di un determinato utente"],
+        ["-9", "invia SIGKILL invece di SIGTERM"],
+        ["-l", "mostra i processi che verrebbero terminati senza farlo"]
+      ],
+      ex: ["pkill firefox", "pkill -9 chrome"],
+      how: "Il comando scorre la tabella dei processi, trova quelli il cui nome corrisponde al modello indicato e invia il segnale a ciascuno. Fa attenzione a non terminare se stesso; se nessun processo corrisponde, restituisce un codice di errore.",
+      sim: [
+        { p: "user@linux:~", t: "pkill firefox" },
+        { p: "user@linux:~", t: "pgrep firefox" },
+        { h: true, o: '<span class="t-dim">→ nessun output: non esistono più processi firefox</span>' },
+        { p: "user@linux:~", t: "pkill browserinesistente" },
+        { h: true, o: '<span class="t-dim">→ nessun processo corrispondente trovato</span>' }
+      ]
+    },
+
+    /* ──────────────── PERMESSI ──────────────── */
+    {
+      c: "chmod", cat: "permessi", name: "Modifica i permessi di file e cartelle",
+      what: "<strong>chmod</strong> (change mode) cambia i permessi di lettura (r=4), scrittura (w=2) ed esecuzione (x=1) di file e cartelle, per proprietario, gruppo e altri.",
+      why: "Serve per rendere eseguibile uno script, proteggere un file privato o aprire una cartella alla condivisione. Approfondisci il sistema dei permessi nella lezione dedicata.",
+      syntax: "chmod [OPZIONI] PERMESSI FILE",
+      opts: [
+        ["755", "notazione numerica: rwx per il proprietario, r-x per gruppo e altri"],
+        ["+x", "aggiunge il permesso di esecuzione a tutti (equivalente a a+x)"],
+        ["u+x / go-w", "notazione simbolica: u=proprietario, g=gruppo, o=altri, a=tutti"],
+        ["-R", "recursive: applica i permessi a tutta la cartella e al suo contenuto"],
+        ["-v", "mostra ogni modifica effettuata"]
+      ],
+      ex: ["chmod +x avvia.sh", "chmod 644 nota.txt", "chmod -R 755 progetto/"],
+      how: "Il sistema aggiorna i bit di permesso nei metadati del file: puoi verificarli con ls -l. Con la notazione numerica ogni cifra è la somma di r(4)+w(2)+x(1) per proprietario, gruppo e altri; con quella simbolica si aggiungono o tolgono singoli permessi con +, - e =.",
+      sim: [
+        { p: "user@linux:~/script", t: "ls -l avvia.sh" },
+        { o: "-rw-r--r-- 1 user user 45 set  9 10:40 avvia.sh" },
+        { p: "user@linux:~/script", t: "chmod +x avvia.sh" },
+        { p: "user@linux:~/script", t: "ls -l avvia.sh" },
+        { h: true, o: '<span class="t-ok">-rwxr-xr-x</span><span class="t-out"> 1 user user 45 set  9 10:40 avvia.sh</span>' },
+        { h: true, o: '<span class="t-dim">→ le x evidenziate: ora il file è eseguibile</span>' }
+      ]
+    },
+    {
+      c: "chown", cat: "permessi", name: "Cambia il proprietario di un file",
+      what: "<strong>chown</strong> (change owner) assegna un file a un nuovo proprietario e, se vuoi, anche a un nuovo gruppo, con la sintassi utente:gruppo.",
+      why: "Serve quando un file è stato creato da root (ad esempio da un servizio) e un utente normale deve poterlo modificare, oppure quando trasferisci file tra utenti. Richiede sudo.",
+      syntax: "sudo chown [OPZIONI] UTENTE[:GRUPPO] FILE",
+      opts: [
+        ["user:group", "cambia proprietario e gruppo insieme"],
+        ["-R", "recursive: cambia proprietario a tutta la cartella e al contenuto"],
+        ["-v", "mostra ogni file modificato"],
+        ["--reference=FILE", "copia proprietario e gruppo da un altro file"]
+      ],
+      ex: ["sudo chown user nota.txt", "sudo chown -R www-data:www-data /var/www"],
+      how: "Solo root può cedere un file a un altro proprietario: il comando aggiorna i campi UID e GID nei metadati del file. Il nuovo proprietario riceve subito i permessi associati al suo ruolo.",
+      sim: [
+        { p: "user@linux:~", t: "ls -l report.txt" },
+        { o: "-rw-r--r-- 1 root root 512 set  9 11:02 report.txt" },
+        { p: "user@linux:~", t: "sudo chown user report.txt" },
+        { o: "[sudo] password di user:" },
+        { p: "user@linux:~", t: "ls -l report.txt" },
+        { h: true, o: '<span class="t-out">-rw-r--r-- 1 </span><span class="t-ok">user</span><span class="t-out"> root 512 set  9 11:02 report.txt</span>' },
+        { h: true, o: '<span class="t-dim">→ il proprietario è cambiato: ora è user</span>' }
+      ]
+    },
+    {
+      c: "chgrp", cat: "permessi", name: "Cambia il gruppo di un file",
+      what: "<strong>chgrp</strong> (change group) modifica il gruppo associato a un file o a una cartella, senza toccare il proprietario.",
+      why: "I permessi di gruppo permettono a più utenti di condividere file. Se un file appartiene al gruppo sviluppatori, tutti i membri del gruppo hanno i permessi previsti per il gruppo.",
+      syntax: "chgrp [OPZIONI] GRUPPO FILE",
+      opts: [
+        ["-R", "recursive: applica il cambio a tutta la cartella e al contenuto"],
+        ["-v", "mostra ogni modifica effettuata"],
+        ["--reference=FILE", "copia il gruppo da un altro file"]
+      ],
+      ex: ["chgrp sviluppatori app.py", "sudo chgrp -R audio /dati/musica"],
+      how: "Il comando aggiorna il GID del file nei suoi metadati. Un utente può cambiare gruppo solo a file propri e solo verso gruppi di cui fa parte; per gli altri casi serve sudo. Verifica il risultato con ls -l.",
+      sim: [
+        { p: "user@linux:~", t: "ls -l app.py" },
+        { o: "-rw-r--r-- 1 user user 312 set  9 11:08 app.py" },
+        { p: "user@linux:~", t: "chgrp sviluppatori app.py" },
+        { p: "user@linux:~", t: "ls -l app.py" },
+        { h: true, o: '<span class="t-out">-rw-r--r-- 1 user </span><span class="t-ok">sviluppatori</span><span class="t-out"> 312 set  9 11:08 app.py</span>' },
+        { h: true, o: '<span class="t-dim">→ ora anche i membri del gruppo hanno i permessi di gruppo</span>' }
+      ]
+    },
+
+    /* ──────────────── GESTIONE SOFTWARE ──────────────── */
+    {
+      c: "apt", cat: "pacchetti", name: "Gestore pacchetti di Ubuntu e Debian",
+      what: "<strong>apt</strong> (Advanced Package Tool) installa, aggiorna e rimuove i programmi dai repository ufficiali di Debian, Ubuntu e derivate, occupandosi anche delle dipendenze.",
+      why: "È il modo raccomandato per installare software su Ubuntu: scarica programmi verificati, gestisce automaticamente le librerie necessarie e tiene aggiornato tutto il sistema.",
+      syntax: "sudo apt [SOTTOCOMANDO] [PACCHETTO]",
+      opts: [
+        ["update", "aggiorna l'elenco dei pacchetti disponibili dai repository"],
+        ["upgrade", "aggiorna all'ultima versione tutti i pacchetti installati"],
+        ["install PKG", "installa un pacchetto e le sue dipendenze"],
+        ["remove PKG", "disinstalla un pacchetto (i file di configurazione restano)"],
+        ["search PAROLA", "cerca pacchetti per nome o descrizione"]
+      ],
+      ex: ["sudo apt update", "sudo apt install htop"],
+      how: "apt contatta i repository online, scarica il pacchetto richiesto e le sue dipendenze, li spacchetta e li configura nel sistema. update non installa nulla: aggiorna soltanto l'elenco di ciò che è disponibile.",
+      sim: [
+        { p: "user@linux:~", t: "sudo apt install htop" },
+        { o: "[sudo] password di user:" },
+        { o: "Lettura elenco dei pacchetti... Fatto" },
+        { o: "Generazione albero delle dipendenze... Fatto" },
+        { o: "I seguenti pacchetti NUOVI saranno installati: htop" },
+        { o: "Scaricamento di: htop amd64 3.3.0 [110 kB]" },
+        { o: "Selezionato il pacchetto htop non precedentemente selezionato." },
+        { o: "Configurazione di htop (3.3.0)..." , k: "t-ok" }
+      ]
+    },
+    {
+      c: "apt-get", cat: "pacchetti", name: "Versione scriptabile di apt",
+      what: "<strong>apt-get</strong> è lo strumento storico per la gestione dei pacchetti Debian: funziona come apt, ma ha un output più stabile ed è pensato per script e automazioni.",
+      why: "Nei terminali e nei tutorial più vecchi troverai sempre apt-get. L'output prevedibile lo rende affidabile in script automatici, mentre apt è più adatto all'uso interattivo.",
+      syntax: "sudo apt-get [SOTTOCOMANDO] [PACCHETTO]",
+      opts: [
+        ["install PKG", "installa un pacchetto"],
+        ["remove PKG", "rimuove un pacchetto"],
+        ["update / upgrade", "aggiorna l'elenco e poi i pacchetti"],
+        ["-y", "risponde automaticamente «sì» a tutte le domande"],
+        ["autoremove", "elimina le dipendenze orfane non più necessarie"]
+      ],
+      ex: ["sudo apt-get update", "sudo apt-get install -y htop"],
+      how: "Le operazioni sono identiche a quelle di apt: apt-get contatta i repository, risolve le dipendenze e configura i pacchetti. La differenza è essenzialmente di interfaccia: output meno decorato e comportamento pensato per la riga di comando pura.",
+      sim: [
+        { p: "user@linux:~", t: "sudo apt-get install -y htop" },
+        { o: "[sudo] password di user:" },
+        { o: "Lettura elenco dei pacchetti... Fatto" },
+        { o: "Scaricamento di: htop amd64 3.3.0 [110 kB]" },
+        { o: "Selezionato il pacchetto htop non precedentemente selezionato." },
+        { o: "Configurazione di htop (3.3.0)...", k: "t-ok" },
+        { h: true, o: '<span class="t-dim">→ -y ha risposto «sì» a tutte le domande</span>' }
+      ]
+    },
+    {
+      c: "dnf", cat: "pacchetti", name: "Gestore pacchetti di Fedora e RHEL",
+      what: "<strong>dnf</strong> (Dandified YUM) è il gestore di pacchetti delle distribuzioni della famiglia Red Hat: Fedora, RHEL, Rocky e CentOS Stream.",
+      why: "Se usi Fedora o una derivata di Red Hat, dnf è l'equivalente di apt: gestisce i pacchetti RPM, risolve le dipendenze e aggiorna il sistema.",
+      syntax: "sudo dnf [SOTTOCOMANDO] [PACCHETTO]",
+      opts: [
+        ["install PKG", "installa un pacchetto"],
+        ["remove PKG", "rimuove un pacchetto"],
+        ["update", "aggiorna tutti i pacchetti installati"],
+        ["search PAROLA", "cerca pacchetti nei repository"],
+        ["info PKG", "mostra descrizione, versione e dimensione di un pacchetto"]
+      ],
+      ex: ["sudo dnf install htop", "sudo dnf update"],
+      how: "dnf scarica i pacchetti RPM dai repository configurati, verifica le firme digitali, risolve le dipendenze e li installa. È il successore moderno di yum, con una gestione delle dipendenze più rapida e precisa.",
+      sim: [
+        { p: "user@linux:~", t: "sudo dnf install htop" },
+        { o: "[sudo] password di user:" },
+        { o: "Ultima verifica della scadenza dei metadati: 0:04:12 fa" },
+        { o: "Dipendenze risolte." },
+        { o: "Installa:  htop-3.3.0-4.fc41.x86_64            110 kB" },
+        { o: "Sto installando: htop ... completato.", k: "t-ok" }
+      ]
+    },
+    {
+      c: "yum", cat: "pacchetti", name: "Il gestore pacchetti storico di Red Hat",
+      what: "<strong>yum</strong> (Yellowdog Updater Modified) era il gestore di pacchetti delle distribuzioni Red Hat, oggi sostituito da dnf, che ne mantiene gli stessi comandi.",
+      why: "Lo incontri ancora su sistemi più vecchi come CentOS 7 o RHEL 7. I comandi sono gli stessi di dnf, quindi imparare uno significa saper usare l'altro.",
+      syntax: "sudo yum [SOTTOCOMANDO] [PACCHETTO]",
+      opts: [
+        ["install PKG", "installa un pacchetto"],
+        ["remove PKG", "rimuove un pacchetto"],
+        ["update", "aggiorna i pacchetti installati"],
+        ["info PKG", "mostra le informazioni di un pacchetto"],
+        ["list installed", "elenca tutti i pacchetti installati"]
+      ],
+      ex: ["sudo yum install htop", "sudo yum update"],
+      how: "Come dnf, yum scarica i pacchetti RPM dai repository e gestisce le dipendenze. Sui sistemi recenti il comando yum è in realtà un puntamento a dnf: il comportamento è identico.",
+      sim: [
+        { p: "user@linux:~", t: "sudo yum install htop" },
+        { o: "[sudo] password di user:" },
+        { o: "Repo centos-base elencati: 4" },
+        { o: "Risoluzione delle dipendenze --> Fatto" },
+        { o: "Installato:  htop-3.0.5-3.el8.x86_64" },
+        { o: "Completo!", k: "t-ok" }
+      ]
+    },
+    {
+      c: "pacman", cat: "pacchetti", name: "Gestore pacchetti di Arch Linux",
+      what: "<strong>pacman</strong> è il gestore di pacchetti di Arch Linux e derivate (come Manjaro). Usa lettere brevi al posto delle parole: -S per installare, -R per rimuovere.",
+      why: "Su Arch è l'unico strumento ufficiale per gestire il software, con repository sempre aggiornati all'ultima versione. La sua sintassi compatta è un po' diversa da apt e dnf.",
+      syntax: "sudo pacman [OPERAZIONE] [PACCHETTO]",
+      opts: [
+        ["-S PKG", "Sync: installa un pacchetto dai repository"],
+        ["-R PKG", "Remove: rimuove un pacchetto"],
+        ["-Syu", "aggiorna l'elenco e poi tutto il sistema (il famoso aggiornamento completo)"],
+        ["-Ss PAROLA", "cerca pacchetti nei repository"],
+        ["-Q", "interroga il database locale dei pacchetti installati"]
+      ],
+      ex: ["sudo pacman -S htop", "sudo pacman -Syu"],
+      how: "pacman scarica i pacchetti .pkg.tar.zst dai repository, verifica le firme, risolve le dipendenze e li installa. Con -Syu fa il rollover completo: prima aggiorna l'indice remoto, poi porta ogni pacchetto installato all'ultima versione.",
+      sim: [
+        { p: "user@linux:~", t: "sudo pacman -S htop" },
+        { o: "[sudo] password di user:" },
+        { o: "Risoluzione delle dipendenze in corso..." },
+        { o: "Pacchetti (1): htop-3.3.0-1" },
+        { o: "Dimensione totale da installare: 0,22 MiB" },
+        { o: ":: Proceed with installation? [Y/n] Y" },
+        { o: "(1/1) verifica delle chiavi in corso   [##########] 100%", k: "t-ok" },
+        { o: "(1/1) installazione in corso           [##########] 100%", k: "t-ok" }
+      ]
+    },
+
+    /* ──────────────── RETE ──────────────── */
+    {
+      c: "ip", cat: "rete", name: "Gestisce indirizzi IP e configurazioni di rete",
+      what: "<strong>ip</strong> è il comando moderno per visualizzare e configurare la rete: indirizzi delle schede (ip a), tabelle di routing (ip r) e collegamenti (ip link).",
+      why: "Serve per conoscere l'indirizzo IP della macchina, verificare che una scheda di rete sia attiva o diagnosticare problemi di connessione. Ha sostituito il vecchio comando ifconfig.",
+      syntax: "ip [OGGETTO] [COMANDO]",
+      opts: [
+        ["ip a", "address: mostra gli indirizzi IP di tutte le schede di rete"],
+        ["ip r", "route: mostra la tabella di routing (verso dove vengono spediti i pacchetti)"],
+        ["ip link", "mostra lo stato delle interfacce di rete (attiva, disattiva)"],
+        ["ip a add ...", "con sudo, assegna un nuovo indirizzo a una scheda"]
+      ],
+      ex: ["ip a", "ip r"],
+      how: "Il comando interroga (o modifica, se hai i permessi) le configurazioni di rete del kernel. Con a vedrai per ogni scheda lo stato UP e l'indirizzo assegnato, ad esempio 192.168.1.42/24; l'interfaccia lo è il loopback, la rete interna di test (127.0.0.1).",
+      sim: [
+        { p: "user@linux:~", t: "ip a" },
+        { o: "1: lo: <LOOPBACK,UP> mtu 65536" },
+        { o: "    inet 127.0.0.1/8 scope host lo" },
+        { o: "2: wlp3s0: <BROADCAST,MULTICAST,UP> mtu 1500" },
+        { h: true, o: '    <span class="t-ok">inet 192.168.1.42/24</span> <span class="t-out">brd 192.168.1.255 scope global wlp3s0</span>' },
+        { h: true, o: '<span class="t-dim">→ l\'indirizzo IP della macchina nella rete locale</span>' }
+      ]
+    },
+    {
+      c: "ping", cat: "rete", name: "Verifica la connessione con un host",
+      what: "<strong>ping</strong> invia piccoli pacchetti di prova a un altro computer e misura se e quanto velocemente rispondono: è il test di base della connettività.",
+      why: "«C'è internet? Il server risponde? La latenza è alta?» — ping risponde a queste domande in un secondo. Usalo verso un sito o verso il router per capire dove si interrompe la connessione.",
+      syntax: "ping [OPZIONI] HOST",
+      opts: [
+        ["-c NUM", "invia NUM pacchetti e si ferma (senza -c continua all'infinito)"],
+        ["-i SEC", "attende SEC secondi tra un pacchetto e l'altro"],
+        ["-w SEC", "interrompe il test dopo SEC secondi"],
+        ["Ctrl+C", "interrompe il ping e mostra le statistiche"]
+      ],
+      ex: ["ping -c 3 linux.org", "ping -c 4 192.168.1.1"],
+      how: "Ogni pacchetto ICMP Echo Request raggiunge l'host, che risponde con un Echo Reply: ping misura il tempo di andata e ritorno (tempo=24ms) e segnala eventuali perdite. Il 0% packet loss indica una connessione stabile.",
+      sim: [
+        { p: "user@linux:~", t: "ping -c 3 linux.org" },
+        { o: "PING linux.org (104.26.10.229) 56(84) bytes of data." },
+        { o: "64 bytes da linux.org: icmp_seq=1 ttl=57 tempo=24.3 ms" },
+        { o: "64 bytes da linux.org: icmp_seq=2 ttl=57 tempo=23.9 ms" },
+        { o: "64 bytes da linux.org: icmp_seq=3 ttl=57 tempo=24.1 ms" },
+        { o: "--- statistiche ping ---" },
+        { o: "3 pacchetti trasmessi, 3 ricevuti, 0% packet loss", k: "t-ok" }
+      ]
+    },
+    {
+      c: "curl", cat: "rete", name: "Trasferisce dati verso e da un URL",
+      what: "<strong>curl</strong> (client URL) comunica con i server web: scarica una pagina, legge le intestazioni HTTP, invia dati con POST e più in generale dialoga con le API.",
+      why: "È lo strumento standard per provare un sito o un'API dal terminale: vedi subito la risposta del server senza aprire il browser, con la possibilità di scegliere metodo, intestazioni e formato.",
+      syntax: "curl [OPZIONI] URL",
+      opts: [
+        ["-O", "salva il file con il suo nome originale"],
+        ["-o NOME", "salva l'output in un file con il nome scelto"],
+        ["-I", "scarica solo le intestazioni HTTP della risposta"],
+        ["-L", "segue i reindirizzamenti (301, 302)"],
+        ["-X POST", "usa un metodo HTTP diverso, ad esempio POST o PUT"]
+      ],
+      ex: ["curl https://esempio.it", "curl -I https://esempio.it"],
+      how: "curl apre una connessione verso il server, invia la richiesta HTTP e stampa nel terminale ciò che il server risponde. Con -I mostra solo le righe di intestazione (codice di stato, tipo di contenuto); con -O il corpo della risposta viene salvato su file.",
+      sim: [
+        { p: "user@linux:~", t: "curl https://esempio.it" },
+        { o: "<!DOCTYPE html>" },
+        { o: "<html>" },
+        { o: "  <head><title>Benvenuto</title></head>" },
+        { o: "  <body><h1>Ciao!</h1></body>" },
+        { o: "</html>" },
+        { p: "user@linux:~", t: "curl -I https://esempio.it" },
+        { o: "HTTP/2 200", k: "t-ok" },
+        { o: "content-type: text/html; charset=UTF-8" }
+      ]
+    },
+    {
+      c: "wget", cat: "rete", name: "Scarica file da internet",
+      what: "<strong>wget</strong> scarica file da URL HTTP e FTP direttamente nel terminale, mostrando l'avanzamento del download.",
+      why: "È il comando ideale per scaricare file, archivi e script senza browser: funziona anche in sessioni remote via SSH e può riprendere i download interrotti.",
+      syntax: "wget [OPZIONI] URL",
+      opts: [
+        ["-O NOME", "salva il download con un nome diverso"],
+        ["-c", "continue: riprende un download interrotto da dove si era fermato"],
+        ["-q", "quiet: scarica senza mostrare l'avanzamento"],
+        ["-P CARTELLA", "salva il file in una cartella specifica"]
+      ],
+      ex: ["wget https://esempio.it/file.zip", "wget -c https://esempio.it/iso/ubuntu.iso"],
+      how: "wget apre la connessione, scarica i dati in blocchi e li scrive nel file indicato, aggiornando una barra di avanzamento con percentuale e velocità. Al termine stampa «saved» e il file compare nella cartella corrente.",
+      sim: [
+        { p: "user@linux:~", t: "wget https://esempio.it/immagine.zip" },
+        { o: "--2026-09-09 10:31:02--  https://esempio.it/immagine.zip" },
+        { o: "Risoluzione di esempio.it... 93.184.216.34" },
+        { o: "Connessione... richiesta HTTP inviata... 200 OK" },
+        { o: "Lunghezza: 1048576 (1,0M) [application/zip]" },
+        { o: "Salvataggio in: \"immagine.zip\"", k: "t-ok" },
+        { h: true, o: '<span class="t-ok">immagine.zip  100%[==================&gt;]   1,00M  2,31MB/s  in 0,4s</span>' }
+      ]
+    },
+    {
+      c: "ss", cat: "rete", name: "Mostra porte e connessioni attive",
+      what: "<strong>ss</strong> (socket statistics) elenca le connessioni di rete attive e le porte su cui i servizi del sistema sono in ascolto.",
+      why: "Serve per capire quale server sta girando (ssh? web?), su quale porta, e per verificare che un servizio sia raggiungibile. È il successore moderno del comando netstat.",
+      syntax: "ss [OPZIONI]",
+      opts: [
+        ["-t", "mostra solo i socket TCP"],
+        ["-u", "mostra solo i socket UDP"],
+        ["-l", "solo le porte in ascolto (listening)"],
+        ["-p", "mostra quale processo usa ogni socket (richiede sudo per i processi altrui)"],
+        ["-n", "mostra i numeri di porta invece dei nomi dei servizi"]
+      ],
+      ex: ["ss -tulpn", "ss -tl"],
+      how: "Il comando interroga il kernel sulle connessioni correnti e le stampa in una tabella: stato (LISTEN, ESTAB), indirizzo e porta locale, peer remoto e processo. Con -tulpn hai il quadro completo di tutti i servizi in ascolto.",
+      sim: [
+        { p: "user@linux:~", t: "ss -tulpn" },
+        { o: "Netid State  Local Address:Port   Peer Address:Port  Process" },
+        { o: "tcp   LISTEN 0.0.0.0:22             0.0.0.0:*          sshd" },
+        { o: "tcp   LISTEN 127.0.0.1:631          0.0.0.0:*          cupsd" },
+        { h: true, o: '<span class="t-out">tcp   LISTEN </span><span class="t-ok">0.0.0.0:80</span><span class="t-out">           0.0.0.0:*          nginx</span>' },
+        { h: true, o: '<span class="t-dim">→ la porta 80 in ascolto: è un server web attivo</span>' }
+      ]
+    },
+
+    /* ──────────────── TERMINALE E UTILITÀ ──────────────── */
+    {
+      c: "clear", cat: "utilita", name: "Pulisce lo schermo del terminale",
+      what: "<strong>clear</strong> cancella tutto il testo visibile nel terminale e riporta il prompt in alto, come uno schermo appena acceso.",
+      why: "Dopo lunghe sequenze di comandi e output, clear ridà ordine alla vista mantenendo intatta la sessione: nessuna impostazione o file viene toccato.",
+      syntax: "clear",
+      opts: [
+        ["Ctrl+L", "scorciatoia da tastiera equivalente al comando clear"]
+      ],
+      ex: ["clear"],
+      how: "Il comando invia al terminale una sequenza di escape che cancella lo schermo. La cronologia della sessione resta in memoria: è una pulizia solo visiva, non definitiva.",
+      sim: [
+        { p: "user@linux:~", t: "ls" },
+        { o: "Documenti  foto.jpg  nota.txt  progetto" },
+        { p: "user@linux:~", t: "clear", clear: true },
+        { h: true, o: '<span class="t-dim">→ lo schermo è stato ripulito: resta solo il prompt</span>' }
+      ]
+    },
+    {
+      c: "history", cat: "utilita", name: "Mostra i comandi digitati",
+      what: "<strong>history</strong> elenca tutti i comandi che hai digitato nella sessione (e in quelle precedenti), numerati in ordine.",
+      why: "Ti serve per ritrovare un comando lungo dato prima, per ripeterlo con !NUM o con le frecce ↑↓, e per capire cosa è stato fatto su una macchina.",
+      syntax: "history [OPZIONI]",
+      opts: [
+        ["!NUM", "riesegue il comando con quel numero, ad esempio !12"],
+        ["!!", "riesegue l'ultimo comando (spesso con sudo: sudo !!)"],
+        ["-c", "cancella la cronologia della sessione corrente"],
+        ["| grep X", "filtra la cronologia: history | grep apt"]
+      ],
+      ex: ["history", "history | grep apt"],
+      how: "La shell conserva ogni comando eseguito in un file (di solito ~/.bash_history): history lo legge e lo numera. Con !NUM la shell sostituisce il segno con il comando corrispondente e lo esegue.",
+      sim: [
+        { p: "user@linux:~", t: "history" },
+        { o: "    1  pwd" },
+        { o: "    2  ls -l" },
+        { o: "    3  cd Documenti" },
+        { o: "    4  touch nota.txt" },
+        { o: "    5  history" },
+        { p: "user@linux:~", t: "!!" },
+        { h: true, o: '<span class="t-dim">→ riesegue l\'ultimo comando: history</span>' }
+      ]
+    },
+    {
+      c: "echo", cat: "utilita", name: "Stampa testo e valori di variabili",
+      what: "<strong>echo</strong> stampa a schermo il testo che gli passi. Con le variabili ($HOME, $USER) ne mostra il valore: è il «print» della shell.",
+      why: "Serve per scrivere messaggi negli script, controllare il valore di una variabile d'ambiente e creare file al volo con la redirezione: echo \"testo\" > file.txt.",
+      syntax: "echo [OPZIONI] TESTO [$VARIABILE]",
+      opts: [
+        ["-e", "interpreta i caratteri speciali come \\n (nuova riga) e \\t (tabulazione)"],
+        ["-n", "non va a capo alla fine del testo"],
+        ["$VAR", "stampa il valore della variabile, ad esempio $USER o $HOME"],
+        ["> FILE", "redirezione: scrive il testo dentro un file (lo sovrascrive)"],
+        [">> FILE", "aggiunge il testo in coda al file, senza sovrascriverlo"]
+      ],
+      ex: ["echo \"Ciao Linux\"", "echo $HOME", "echo \"appunti\" > lista.txt"],
+      how: "La shell espande prima le variabili (sostituisce $HOME con /home/user) e poi passa il testo a echo, che lo stampa seguito da un invio. Con la redirezione > l'output non va a schermo ma viene scritto nel file indicato.",
+      sim: [
+        { p: "user@linux:~", t: 'echo "Ciao Linux!"' },
+        { o: "Ciao Linux!" },
+        { p: "user@linux:~", t: "echo $HOME" },
+        { o: "/home/user" },
+        { p: "user@linux:~", t: 'echo "appunti" > lista.txt' },
+        { p: "user@linux:~", t: "cat lista.txt" },
+        { o: "appunti" },
+        { h: true, o: '<span class="t-dim">→ la redirezione > ha creato il file con il testo di echo</span>' }
+      ]
+    },
+    {
+      c: "man", cat: "utilita", name: "Consulta il manuale dei comandi",
+      what: "<strong>man</strong> (manual) apre la pagina di manuale di un comando: descrizione, tutte le opzioni, esempi e dettagli tecnici.",
+      why: "Quando non ricordi un'opzione o vuoi scoprire tutto ciò che un comando sa fare, man è la documentazione ufficiale sempre disponibile, anche senza internet.",
+      syntax: "man COMANDO",
+      opts: [
+        ["q", "esce dal manuale"],
+        ["freccia / Spazio", "scorrono il testo riga o pagina per pagina"],
+        ["/parola", "cerca una parola all'interno del manuale"],
+        ["-k PAROLA", "cerca in tutti i manuali i comandi relativi a una parola"]
+      ],
+      ex: ["man ls", "man chmod"],
+      how: "Il manuale è organizzato in sezioni numerate (i comandi utente sono nella sezione 1, come in LS(1)). man trova la pagina richiesta e la mostra dentro less: tutte le scorciatoie di less funzionano anche qui.",
+      sim: [
+        { p: "user@linux:~", t: "man ls" },
+        { o: "LS(1)                     User Commands                    LS(1)" },
+        { o: "NOME" },
+        { o: "       ls - elenca il contenuto delle directory" },
+        { o: "SINOSSI" },
+        { o: "       ls [OPZIONE]... [FILE]..." },
+        { o: ": (usa ↓ per scorrere, q per uscire)", k: "t-dim" }
+      ]
+    },
+    {
+      c: "sudo", cat: "utilita", name: "Esegui un comando come amministratore",
+      what: "<strong>sudo</strong> (superuser do) esegue il comando che lo segue con i privilegi dell'amministratore (root), dopo aver verificato la tua password.",
+      why: "Le operazioni importanti del sistema — installare software, cambiare permessi, modificare file di sistema — richiedono privilegi elevati. sudo li concede solo per quel singolo comando, in modo sicuro.",
+      syntax: "sudo [OPZIONI] COMANDO",
+      opts: [
+        ["password", "alla prima esecuzione chiede la tua password (quella del tuo utente, non di root)"],
+        ["-i", "avvia una shell di root completa: da qui in poi tutti i comandi sono da amministratore"],
+        ["-u USER", "esegue il comando come un altro utente invece che come root"],
+        ["-l", "elenca i comandi sudo che sei autorizzato a usare"]
+      ],
+      ex: ["sudo apt update", "sudo chown user report.txt"],
+      how: "sudo controlla nella lista dei permessi (/etc/sudoers) che tu abbia il diritto di elevarti; dopo la password corretta esegue il comando come UID 0. Il privilegio vale solo per quel comando e viene memorizzato qualche minuto, per evitare di ripetere la password.",
+      sim: [
+        { p: "user@linux:~", t: "sudo apt update" },
+        { o: "[sudo] password di user:" },
+        { o: "Trovato: http://it.archive.ubuntu.com/ubuntu noble InRelease" },
+        { o: "Lettura elenco dei pacchetti... Fatto" },
+        { o: "Calcolo dell'aggiornamento... Fatto" },
+        { h: true, o: '<span class="t-ok">→ eseguito con privilegi di amministratore</span>' }
+      ]
+    },
+    {
+      c: "exit", cat: "utilita", name: "Chiude la sessione del terminale",
+      what: "<strong>exit</strong> termina la shell corrente: se eri in una finestra di terminale, la chiude; se eri dentro una sotto-shell (ad esempio dopo su), ci fa uscire.",
+      why: "Chiude in modo pulito una sessione, tornando alla shell precedente o alla finestra di login. È anche il modo corretto per uscire da un login SSH remoto.",
+      syntax: "exit [CODICE]",
+      opts: [
+        ["0", "codice di uscita convenzionale per «tutto ok»"],
+        ["1-255", "codici di errore: raccontano agli script cosa è andato storto"],
+        ["Ctrl+D", "scorciatoia equivalente quando il prompt è vuoto"]
+      ],
+      ex: ["exit"],
+      how: "La shell termina il proprio processo e restituisce il controllo al padre: la finestra si chiude, oppure torni nella shell da cui eri partito (ad esempio da root all'utente normale). Il codice di uscita resta disponibile per chi ti ha chiamato.",
+      sim: [
+        { p: "root@linux:/home/user", t: "exit" },
+        { o: "logout" },
+        { p: "user@linux:~", t: "exit" },
+        { o: "logout" },
+        { h: true, o: '<span class="t-dim">→ sessione terminata: la finestra del terminale si chiude</span>' }
+      ]
+    }
+  ];
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOTORE DI SIMULAZIONE E RENDERING
+     ═══════════════════════════════════════════════════════════════ */
+
+  const DEFAULT_PROMPT = "user@linux:~";
+  const TYPE_SPEED_BASE = 32;   // ms per carattere
+  const OUTPUT_DELAY = 120;     // ms tra righe di output
+  const COMMAND_PAUSE = 350;    // pausa dopo l'invio di un comando
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* Evidenzia la sintassi di un comando digitato */
+  function highlightCmd(cmd) {
+    return cmd.split(" ").filter(Boolean).map((tok, i) => {
+      const e = esc(tok);
+      if (i === 0 || tok === "sudo") return '<span class="t-cmd">' + e + "</span>";
+      if (tok.startsWith("-")) return '<span class="t-flag">' + e + "</span>";
+      if (tok.startsWith("$")) return '<span class="t-var">' + e + "</span>";
+      if (/^["']/.test(tok)) return '<span class="t-str">' + e + "</span>";
+      return '<span class="t-arg">' + e + "</span>";
+    }).join(" ");
+  }
+
+  /* Renderizza il prompt user@host:percorso$ */
+  function promptHTML(p) {
+    const sep = p.indexOf(":");
+    const userHost = sep === -1 ? p : p.slice(0, sep);
+    const path = sep === -1 ? "" : p.slice(sep + 1);
+    return '<span class="t-user">' + esc(userHost) + '</span>' +
+           '<span class="t-sep">:</span>' +
+           '<span class="t-path">' + esc(path) + '</span>' +
+           '<span class="t-sep">$</span>';
+  }
+
+  /* Renderizza la riga di sintassi di una scheda comando */
+  function syntaxHTML(syn) {
+    return syn.split(" ").filter(Boolean).map((tok, i) => {
+      const e = esc(tok);
+      if (i === 0) return '<span class="syn-cmd">' + e + "</span>";
+      if (tok.startsWith("[")) return '<span class="syn-opt">' + e + "</span>";
+      return '<span class="syn-arg">' + e + "</span>";
+    }).join(" ");
+  }
+
+  /* Simula l'esecuzione di un comando dentro un terminale */
+  function runSim(termEl, cmdData) {
+    const body = termEl.querySelector(".term-body");
+    const runId = (termEl._runId = (termEl._runId || 0) + 1);
+    const steps = cmdData.sim;
+
+    body.innerHTML = "";
+    let lastPrompt = (steps.find(function (s) { return s.p; }) || {}).p || DEFAULT_PROMPT;
+    let cursor = null;
+
+    function newLine() {
+      const line = document.createElement("div");
+      line.className = "term-line";
+      body.appendChild(line);
+      body.scrollTop = body.scrollHeight;
+      return line;
+    }
+
+    function idleLine() {
+      if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+      cursor = document.createElement("span");
+      cursor.className = "cursor";
+      const line = newLine();
+      line.innerHTML = promptHTML(lastPrompt) + " ";
+      line.appendChild(cursor);
+    }
+
+    function typeStep(step) {
+      lastPrompt = step.p || lastPrompt;
+      const line = newLine();
+      line.innerHTML = promptHTML(lastPrompt) + ' <span class="t-in"></span>';
+      const target = line.querySelector(".t-in");
+      cursor = document.createElement("span");
+      cursor.className = "cursor";
+      line.appendChild(cursor);
+      let k = 0;
+      (function tick() {
+        if (runId !== termEl._runId) return;
+        if (k < step.t.length) {
+          target.textContent += step.t[k++];
+          body.scrollTop = body.scrollHeight;
+          setTimeout(tick, TYPE_SPEED_BASE + Math.random() * 38);
+        } else {
+          target.innerHTML = highlightCmd(step.t);
+          if (step.clear) {
+            setTimeout(function () {
+              if (runId !== termEl._runId) return;
+              body.innerHTML = "";
+              next();
+            }, 420);
+          } else {
+            setTimeout(next, COMMAND_PAUSE);
+          }
+        }
+      })();
+    }
+
+    function outStep(step) {
+      if (step.o) {
+        const line = newLine();
+        if (step.h) {
+          line.innerHTML = step.o;
+        } else {
+          line.className = "term-line " + (step.k || "t-out");
+          line.textContent = step.o;
+        }
+        body.scrollTop = body.scrollHeight;
+      }
+      setTimeout(next, OUTPUT_DELAY);
+    }
+
+    let i = 0;
+    function next() {
+      if (runId !== termEl._runId) return;
+      if (i >= steps.length) { idleLine(); return; }
+      const step = steps[i++];
+      if (step.t !== undefined) { typeStep(step); } else { outStep(step); }
+    }
+
+    next();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDERING DELLA PAGINA
+     ═══════════════════════════════════════════════════════════════ */
+
+  function findCat(id) {
+    return CATS.find(function (c) { return c.id === id; }) || { label: id };
+  }
+
+  function buildCard(cmd) {
+    const cat = findCat(cmd.cat);
+    const card = document.createElement("article");
+    card.className = "cmd-card reveal";
+    card.id = "cmd-" + cmd.c;
+
+    const head = document.createElement("div");
+    head.className = "cmd-head";
+    head.innerHTML =
+      '<div class="cmd-badge">' + esc(cmd.c) + "</div>" +
+      '<div class="cmd-head-info"><h3>' + esc(cmd.name) + "</h3>" +
+      '<span class="cmd-cat">' + esc(cat.label) + "</span></div>";
+    card.appendChild(head);
+
+    const pWhat = document.createElement("p");
+    pWhat.className = "cmd-what";
+    pWhat.innerHTML = cmd.what;
+    card.appendChild(pWhat);
+
+    const lblWhy = document.createElement("span");
+    lblWhy.className = "cmd-label";
+    lblWhy.textContent = "A cosa serve";
+    card.appendChild(lblWhy);
+    const pWhy = document.createElement("p");
+    pWhy.innerHTML = cmd.why;
+    card.appendChild(pWhy);
+
+    const lblSyn = document.createElement("span");
+    lblSyn.className = "cmd-label";
+    lblSyn.textContent = "Sintassi di base";
+    card.appendChild(lblSyn);
+    const syn = document.createElement("div");
+    syn.className = "syntax";
+    syn.innerHTML = syntaxHTML(cmd.syntax);
+    card.appendChild(syn);
+
+    if (cmd.opts && cmd.opts.length) {
+      const lblOpt = document.createElement("span");
+      lblOpt.className = "cmd-label";
+      lblOpt.textContent = "Opzioni più importanti";
+      card.appendChild(lblOpt);
+      const table = document.createElement("table");
+      table.className = "opt-table";
+      table.innerHTML =
+        "<thead><tr><th>Opzione</th><th>Descrizione</th></tr></thead><tbody>" +
+        cmd.opts.map(function (o) {
+          return "<tr><td>" + esc(o[0]) + "</td><td>" + esc(o[1]) + "</td></tr>";
+        }).join("") +
+        "</tbody>";
+      card.appendChild(table);
+    }
+
+    const lblHow = document.createElement("span");
+    lblHow.className = "cmd-label";
+    lblHow.textContent = "Cosa succede quando lo esegui";
+    card.appendChild(lblHow);
+    const pHow = document.createElement("p");
+    pHow.className = "cmd-how";
+    pHow.innerHTML = cmd.how;
+    card.appendChild(pHow);
+
+    if (cmd.ex && cmd.ex.length) {
+      const lblEx = document.createElement("span");
+      lblEx.className = "cmd-label";
+      lblEx.textContent = "Esempi pratici";
+      card.appendChild(lblEx);
+      const exWrap = document.createElement("div");
+      exWrap.className = "cmd-examples";
+      cmd.ex.forEach(function (e) {
+        const div = document.createElement("div");
+        div.className = "code-line";
+        div.innerHTML = "<code>" + esc(e) + "</code>";
+        exWrap.appendChild(div);
+      });
+      card.appendChild(exWrap);
+    }
+
+    const term = document.createElement("div");
+    term.className = "term";
+    term.innerHTML =
+      '<div class="term-bar">' +
+      '<span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>' +
+      '<span class="term-title">user@linux — simulazione di ' + esc(cmd.c) + "</span></div>" +
+      '<div class="term-body"></div>';
+    card.appendChild(term);
+
+    const actions = document.createElement("div");
+    actions.className = "cmd-actions";
+    actions.innerHTML =
+      '<button class="button primary sm" data-run>▶ Esegui</button>' +
+      '<button class="button outline sm" data-reset>↻ Riprova</button>' +
+      '<button class="button ghost sm" data-copy="' + esc(cmd.ex[0] || cmd.c) + '">⧉ Copia comando</button>';
+    card.appendChild(actions);
+
+    actions.querySelector("[data-run]").addEventListener("click", function () {
+      runSim(term, cmd);
+    });
+    actions.querySelector("[data-reset]").addEventListener("click", function () {
+      runSim(term, cmd);
+    });
+    actions.querySelector("[data-copy]").addEventListener("click", function () {
+      copyText(cmd.ex[0] || cmd.c);
+    });
+
+    card._term = term;
+    card._cmd = cmd;
+    return card;
+  }
+
+  function renderSections() {
+    const root = document.getElementById("cmd-sections");
+    CATS.forEach(function (cat) {
+      const sec = document.createElement("section");
+      sec.className = "section-block reveal";
+      sec.id = "cat-" + cat.id;
+      sec.innerHTML = "<h2>" + esc(cat.label) + "</h2><p>" + esc(cat.intro) + "</p>";
+      const list = document.createElement("div");
+      list.className = "cmd-list";
+      CMDS.filter(function (c) { return c.cat === cat.id; })
+          .forEach(function (c) { list.appendChild(buildCard(c)); });
+      sec.appendChild(list);
+      root.appendChild(sec);
+    });
+  }
+
+  function renderQuickNav() {
+    const nav = document.getElementById("quicknav");
+    CATS.forEach(function (cat) {
+      const a = document.createElement("a");
+      a.href = "#cat-" + cat.id;
+      a.textContent = cat.label;
+      a.dataset.target = "cat-" + cat.id;
+      nav.appendChild(a);
+    });
+  }
+
+  function renderSummary() {
+    const tbody = document.getElementById("summary-body");
+    CMDS.forEach(function (cmd) {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td><a href="#cmd-' + esc(cmd.c) + '" class="nav-link" style="padding:0">' + esc(cmd.c) + "</a></td>" +
+        "<td>" + esc(findCat(cmd.cat).label) + "</td>" +
+        "<td>" + esc(cmd.name) + "</td>";
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITÀ DI PAGINA
+     ═══════════════════════════════════════════════════════════════ */
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._handler);
+    t._handler = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast("Comando copiato: " + text);
+      }, function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      toast("Comando copiato: " + text);
+    } catch (err) {
+      toast("Copia non riuscita — seleziona il comando manualmente");
+    }
+    document.body.removeChild(ta);
+  }
+
+  /* ── Inizializzazione ────────────────────────────────────────── */
+
+  document.addEventListener("DOMContentLoaded", function () {
+    renderSections();
+    renderQuickNav();
+    renderSummary();
+
+    /* Reveal on scroll: stessa animazione di styles.css */
+    const revealObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll(".reveal").forEach(function (el) { revealObs.observe(el); });
+
+    /* Auto-avvio della simulazione quando il terminale entra a schermo */
+    const termObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          const card = entry.target.closest(".cmd-card");
+          termObs.unobserve(entry.target);
+          if (card && card._cmd) {
+            setTimeout(function () { runSim(entry.target, card._cmd); }, 350);
+          }
+        }
+      });
+    }, { threshold: 0.35 });
+    document.querySelectorAll(".cmd-card .term").forEach(function (el) { termObs.observe(el); });
+
+    /* Scrollspy: evidenzia la categoria corrente nella quick-nav */
+    const links = document.querySelectorAll("#quicknav a");
+    const spyObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          links.forEach(function (l) {
+            l.classList.toggle("active", l.dataset.target === entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll("#cmd-sections .section-block").forEach(function (sec) {
+      spyObs.observe(sec);
+    });
+  });
+
+  </script>
+</body>
+</html>

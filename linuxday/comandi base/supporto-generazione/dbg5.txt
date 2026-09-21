@@ -1,0 +1,14 @@
+﻿indice: 28218
+const CMDS = [
+
+];
+const DEFAULT_PROMPT = "user@linux:~";
+  const TYPE_SPEED_BASE = 32;   // ms per carattere
+  const OUTPUT_DELAY = 120;     // ms tra righe di output
+  const COMMAND_PAUSE = 350;    // pausa dopo l'invio di un comando
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* Evidenzia la sintassi di un comando

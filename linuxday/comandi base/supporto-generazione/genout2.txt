@@ -1,0 +1,19 @@
+﻿
+
+    Directory: C:\Users\cryxo\Desktop\linuxday-20260909T112444Z-1-001\linuxday\comandi base
+
+
+Mode                 LastWriteTime         Length Name                                                                                                        
+----                 -------------         ------ ----                                                                                                        
+-a----        09/09/2026     15:22          45264 comandibase.html                                                                                            
+-a----        09/09/2026     15:22          41856 file-cartelle.html                                                                                          
+-a----        09/09/2026     15:22          41709 navigazione.html                                                                                            
+-a----        09/09/2026     15:22          41882 pacchetti.html                                                                                              
+-a----        09/09/2026     15:22          41862 permessi.html                                                                                               
+-a----        09/09/2026     15:22          41814 processi.html                                                                                               
+-a----        09/09/2026     15:22          41808 rete.html                                                                                                   
+-a----        09/09/2026     15:22          41861 ricerca.html                                                                                                
+-a----        09/09/2026     15:22          41884 sistema.html                                                                                                
+-a----        09/09/2026     15:22          41738 utilita.html                                                                                                
+
+

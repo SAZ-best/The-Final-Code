@@ -1,0 +1,934 @@
+```html
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PermissionOS — Introduzione a Linux</title>
+  
+  <!-- Google Fonts Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- Navigation header -->
+    <div class="topbar">
+      <div class="brand">PermissionOS — Introduzione a Linux</div>
+
+      <div class="nav">
+        <a class="nav-link" href="index.html">Desktop</a>
+      </div>
+    </div>
+
+
+    <!-- Hero introduction -->
+    <section class="hero">
+      <h1>Introduzione a Linux e ai sistemi operativi</h1>
+
+      <p>
+        Prima di imparare a utilizzare i comandi e a gestire i permessi,
+        è importante capire che cos'è un sistema operativo, che cos'è Linux
+        e come è organizzato un computer.
+      </p>
+    </section>
+
+
+    <!-- COMPUTER -->
+    <section class="section-block" id="computer">
+
+      <h2>Che cos'è un computer?</h2>
+
+      <p>
+        Un <strong>computer</strong> è una macchina elettronica in grado di
+        ricevere informazioni, elaborarle, conservarle e produrre un risultato.
+      </p>
+
+      <p>
+        Quando utilizziamo un computer, svolgiamo continuamente queste operazioni.
+        Per esempio, quando apriamo un programma, scriviamo un documento,
+        guardiamo un video o navighiamo su Internet, il computer riceve
+        dei dati e li elabora.
+      </p>
+
+      <p>
+        Per funzionare, un computer ha bisogno sia di componenti fisici
+        sia di programmi.
+      </p>
+
+      <ul>
+        <li><strong>Hardware</strong> — le parti fisiche del computer.</li>
+        <li><strong>Software</strong> — i programmi e le istruzioni che il computer esegue.</li>
+      </ul>
+
+    </section>
+
+
+    <!-- HARDWARE -->
+    <section class="section-block" id="hardware">
+
+      <h2>Che cos'è l'Hardware?</h2>
+
+      <p>
+        Con il termine <strong>hardware</strong> si indicano tutte le parti
+        fisiche di un computer, cioè quelle che possiamo materialmente
+        vedere o toccare.
+      </p>
+
+      <p>
+        Alcuni esempi di componenti hardware sono:
+      </p>
+
+      <ul>
+        <li><strong>CPU</strong> — esegue le istruzioni e svolge i calcoli.</li>
+        <li><strong>RAM</strong> — conserva temporaneamente i dati utilizzati dai programmi.</li>
+        <li><strong>SSD/HDD</strong> — conserva permanentemente file e programmi.</li>
+        <li><strong>Scheda madre</strong> — collega e permette la comunicazione tra i vari componenti.</li>
+        <li><strong>Scheda video</strong> — gestisce l'elaborazione grafica.</li>
+        <li><strong>Tastiera e mouse</strong> — permettono all'utente di interagire con il computer.</li>
+      </ul>
+
+      <p>
+        L'hardware, però, da solo non è sufficiente. Il computer ha bisogno
+        di software per sapere cosa deve fare.
+      </p>
+
+    </section>
+
+
+    <!-- SOFTWARE -->
+    <section class="section-block" id="software">
+
+      <h2>Che cos'è il Software?</h2>
+
+      <p>
+        Il <strong>software</strong> è l'insieme dei programmi e delle
+        istruzioni che permettono al computer di svolgere determinate attività.
+      </p>
+
+      <p>
+        Esistono moltissimi tipi di software. Per esempio:
+      </p>
+
+      <ul>
+        <li>browser Web;</li>
+        <li>videogiochi;</li>
+        <li>programmi di videoscrittura;</li>
+        <li>programmi per modificare immagini e video;</li>
+        <li>programmi di programmazione;</li>
+        <li>sistemi operativi.</li>
+      </ul>
+
+      <p>
+        Tra tutti questi software, uno dei più importanti è proprio
+        il <strong>sistema operativo</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- SISTEMA OPERATIVO -->
+    <section class="section-block" id="sistema-operativo">
+
+      <h2>Che cos'è un sistema operativo?</h2>
+
+      <p>
+        Il <strong>sistema operativo</strong>, spesso abbreviato in
+        <strong>OS</strong> (<em>Operating System</em>), è il software principale
+        di un computer.
+      </p>
+
+      <p>
+        Il suo compito è mettere in comunicazione l'utente e i programmi
+        con l'hardware del computer.
+      </p>
+
+      <p>
+        In altre parole, il sistema operativo permette ai programmi
+        di utilizzare le risorse del computer senza dover comunicare
+        direttamente con ogni singolo componente hardware.
+      </p>
+
+      <p>
+        Possiamo quindi immaginare il sistema operativo come un
+        <strong>intermediario</strong> tra i programmi e l'hardware.
+      </p>
+
+      <pre><code>UTENTE
+   ↓
+PROGRAMMI
+   ↓
+SISTEMA OPERATIVO
+   ↓
+HARDWARE</code></pre>
+
+    </section>
+
+
+    <!-- FUNZIONI OS -->
+    <section class="section-block" id="funzioni-os">
+
+      <h2>Cosa fa un sistema operativo?</h2>
+
+      <p>
+        Un sistema operativo svolge moltissimi compiti fondamentali
+        per il funzionamento del computer.
+      </p>
+
+      <h3>Gestione della CPU</h3>
+
+      <p>
+        Il sistema operativo decide quali programmi possono utilizzare
+        il processore e per quanto tempo.
+      </p>
+
+      <h3>Gestione della memoria</h3>
+
+      <p>
+        Il sistema operativo gestisce la memoria RAM e assegna ai programmi
+        lo spazio necessario per funzionare.
+      </p>
+
+      <h3>Gestione dei file</h3>
+
+      <p>
+        Organizza file e cartelle e permette ai programmi e agli utenti
+        di crearli, modificarli, spostarli e cancellarli.
+      </p>
+
+      <h3>Gestione dell'hardware</h3>
+
+      <p>
+        Permette ai programmi di utilizzare dispositivi come tastiera,
+        mouse, stampante, disco, scheda audio e scheda di rete.
+      </p>
+
+      <h3>Gestione degli utenti</h3>
+
+      <p>
+        Può gestire diversi utenti e stabilire quali operazioni possono
+        effettuare sul sistema.
+      </p>
+
+      <h3>Sicurezza</h3>
+
+      <p>
+        Il sistema operativo controlla l'accesso a file, cartelle,
+        dispositivi e altre risorse. Questo è uno dei motivi per cui
+        in Linux esiste il sistema dei <strong>permessi</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- SISTEMI OPERATIVI -->
+    <section class="section-block" id="sistemi">
+
+      <h2>Quali sistemi operativi esistono?</h2>
+
+      <p>
+        Esistono diversi sistemi operativi, progettati per dispositivi
+        e utilizzi differenti.
+      </p>
+
+      <ul>
+
+        <li>
+          <strong>Windows</strong> — molto diffuso su computer desktop
+          e portatili.
+        </li>
+
+        <li>
+          <strong>macOS</strong> — sistema operativo sviluppato da Apple
+          per i computer Mac.
+        </li>
+
+        <li>
+          <strong>Linux</strong> — famiglia di sistemi costruiti
+          utilizzando il kernel Linux.
+        </li>
+
+        <li>
+          <strong>Android</strong> — sistema operativo mobile basato
+          sul kernel Linux.
+        </li>
+
+        <li>
+          <strong>iOS</strong> — sistema operativo mobile sviluppato
+          da Apple per iPhone.
+        </li>
+
+      </ul>
+
+      <p>
+        Anche se hanno caratteristiche differenti, tutti questi sistemi
+        operativi hanno un obiettivo comune: permettere al dispositivo
+        di funzionare e fornire un ambiente nel quale eseguire programmi.
+      </p>
+
+    </section>
+
+
+    <!-- STRUTTURA -->
+    <section class="section-block" id="struttura">
+
+      <h2>Come è organizzato un sistema operativo?</h2>
+
+      <p>
+        Un sistema operativo è composto da diversi elementi che collaborano
+        tra loro.
+      </p>
+
+      <p>
+        Una rappresentazione semplificata può essere questa:
+      </p>
+
+      <pre><code>┌─────────────────────────────┐
+│           UTENTE            │
+├─────────────────────────────┤
+│       APPLICAZIONI          │
+├─────────────────────────────┤
+│      SISTEMA OPERATIVO      │
+├─────────────────────────────┤
+│           KERNEL            │
+├─────────────────────────────┤
+│          HARDWARE           │
+└─────────────────────────────┘</code></pre>
+
+      <p>
+        Uno degli elementi più importanti è il <strong>kernel</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- KERNEL -->
+    <section class="section-block" id="kernel">
+
+      <h2>Che cos'è il Kernel?</h2>
+
+      <p>
+        Il <strong>kernel</strong> è il componente centrale di un sistema
+        operativo.
+      </p>
+
+      <p>
+        Il suo compito è gestire le risorse hardware del computer e fornire
+        ai programmi i servizi necessari per poter funzionare.
+      </p>
+
+      <p>
+        Per esempio, quando un programma deve leggere un file dal disco,
+        non comunica direttamente con l'SSD. La richiesta passa attraverso
+        il sistema operativo e il kernel.
+      </p>
+
+      <p>
+        Il kernel gestisce, tra le altre cose:
+      </p>
+
+      <ul>
+        <li>il processore;</li>
+        <li>la memoria;</li>
+        <li>i dispositivi hardware;</li>
+        <li>i dispositivi di archiviazione;</li>
+        <li>i processi;</li>
+        <li>la comunicazione tra programmi e hardware;</li>
+        <li>diversi aspetti della sicurezza.</li>
+      </ul>
+
+    </section>
+
+
+    <!-- LINUX -->
+    <section class="section-block" id="linux">
+
+      <h2>Che cos'è Linux?</h2>
+
+      <p>
+        <strong>Linux</strong> è un kernel libero e open source.
+        È stato creato da <strong>Linus Torvalds</strong> nel 1991.
+      </p>
+
+      <p>
+        Il termine <strong>open source</strong> indica che il codice sorgente
+        del progetto può essere studiato, modificato e distribuito
+        secondo i termini della relativa licenza.
+      </p>
+
+      <p>
+        Linux è diventato uno dei kernel più importanti al mondo.
+        Viene utilizzato in computer, server, dispositivi embedded,
+        supercomputer, smartphone e molti altri sistemi.
+      </p>
+
+      <p>
+        È importante però fare una distinzione:
+      </p>
+
+      <div class="info-box">
+
+        <p>
+          <strong>Linux, tecnicamente, è il kernel.</strong>
+        </p>
+
+        <p>
+          Quando parliamo di un sistema completo come Ubuntu, invece,
+          stiamo parlando di una <strong>distribuzione Linux</strong>,
+          cioè di un insieme di software che utilizza il kernel Linux.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- DISTRIBUZIONI -->
+    <section class="section-block" id="distribuzioni">
+
+      <h2>Che cos'è una distribuzione Linux?</h2>
+
+      <p>
+        Una <strong>distribuzione Linux</strong>, spesso chiamata
+        semplicemente <strong>distro</strong>, è un sistema completo
+        costruito utilizzando il kernel Linux insieme ad altri componenti.
+      </p>
+
+      <p>
+        Una distribuzione può includere:
+      </p>
+
+      <ul>
+
+        <li>il kernel Linux;</li>
+
+        <li>programmi di sistema;</li>
+
+        <li>strumenti da terminale;</li>
+
+        <li>un sistema di gestione dei pacchetti;</li>
+
+        <li>un ambiente grafico;</li>
+
+        <li>applicazioni preinstallate;</li>
+
+        <li>strumenti per configurare e amministrare il computer.</li>
+
+      </ul>
+
+      <p>
+        Per questo motivo esistono molte distribuzioni diverse.
+        Ognuna può avere caratteristiche, programmi e configurazioni
+        differenti.
+      </p>
+
+    </section>
+
+
+    <!-- DISTRIBUZIONI PRINCIPALI -->
+    <section class="section-block" id="distro-principali">
+
+      <h2>Alcune delle principali distribuzioni Linux</h2>
+
+      <p>
+        Nel mondo Linux esistono centinaia di distribuzioni.
+        Alcune delle più conosciute sono:
+      </p>
+
+      <ul>
+
+        <li>
+          <strong>Ubuntu</strong> — distribuzione molto utilizzata
+          sia sui computer desktop sia sui server.
+        </li>
+
+        <li>
+          <strong>Debian</strong> — distribuzione conosciuta per
+          stabilità e affidabilità.
+        </li>
+
+        <li>
+          <strong>Fedora</strong> — distribuzione orientata a tecnologie
+          recenti e sviluppo.
+        </li>
+
+        <li>
+          <strong>Arch Linux</strong> — distribuzione molto personalizzabile
+          e pensata per utenti che vogliono configurare direttamente
+          molti aspetti del sistema.
+        </li>
+
+        <li>
+          <strong>Linux Mint</strong> — distribuzione pensata per offrire
+          un'esperienza desktop semplice e familiare.
+        </li>
+
+      </ul>
+
+      <p>
+        Anche se possono essere molto diverse tra loro, queste distribuzioni
+        utilizzano il kernel Linux.
+      </p>
+
+    </section>
+
+
+    <!-- UBUNTU -->
+    <section class="section-block" id="ubuntu">
+
+      <h2>Che cos'è Ubuntu?</h2>
+
+      <p>
+        <strong>Ubuntu</strong> è una distribuzione Linux basata su Debian.
+        È una delle distribuzioni Linux più conosciute e utilizzate.
+      </p>
+
+      <p>
+        Ubuntu viene utilizzato sia su computer personali sia su server.
+        Esistono diverse versioni ed edizioni, tra cui Ubuntu Desktop
+        e Ubuntu Server.
+      </p>
+
+      <p>
+        Ubuntu è particolarmente adatto per imparare Linux perché offre
+        sia un'interfaccia grafica sia un potente terminale.
+      </p>
+
+      <p>
+        Nel progetto <strong>PermissionOS</strong> utilizziamo proprio
+        Ubuntu come riferimento per imparare i concetti fondamentali
+        di Linux.
+      </p>
+
+    </section>
+
+
+    <!-- GUI -->
+    <section class="section-block" id="gui">
+
+      <h2>Che cos'è una GUI?</h2>
+
+      <p>
+        La <strong>GUI</strong>, cioè <em>Graphical User Interface</em>,
+        è l'interfaccia grafica che permette all'utente di utilizzare
+        il computer attraverso finestre, icone, menu e pulsanti.
+      </p>
+
+      <p>
+        Per esempio, quando apriamo una cartella facendo doppio clic
+        sulla sua icona, stiamo utilizzando una GUI.
+      </p>
+
+      <p>
+        La GUI rende molte operazioni più semplici per gli utenti,
+        perché non è necessario conoscere tutti i comandi del sistema.
+      </p>
+
+    </section>
+
+
+    <!-- TERMINALE -->
+    <section class="section-block" id="terminale">
+
+      <h2>Che cos'è il Terminale?</h2>
+
+      <p>
+        Il <strong>terminale</strong> è un programma che permette di
+        interagire con il sistema operativo attraverso comandi testuali.
+      </p>
+
+      <p>
+        Invece di utilizzare finestre e pulsanti, l'utente scrive
+        istruzioni che vengono interpretate dalla <strong>shell</strong>.
+      </p>
+
+      <p>
+        Per esempio:
+      </p>
+
+      <pre><code>pwd</code></pre>
+
+      <p>
+        Il comando <code>pwd</code> permette di visualizzare il percorso
+        della directory in cui ci troviamo.
+      </p>
+
+      <p>
+        Un altro esempio:
+      </p>
+
+      <pre><code>ls</code></pre>
+
+      <p>
+        Il comando <code>ls</code> mostra i file e le cartelle presenti
+        nella directory corrente.
+      </p>
+
+      <p>
+        Il terminale è particolarmente importante in Linux perché permette
+        di eseguire rapidamente molte operazioni e di amministrare
+        il sistema in modo preciso.
+      </p>
+
+    </section>
+
+
+    <!-- FILE E CARTELLE -->
+    <section class="section-block" id="file-cartelle">
+
+      <h2>File e cartelle</h2>
+
+      <p>
+        Un <strong>file</strong> è un insieme di dati memorizzati
+        sul dispositivo.
+      </p>
+
+      <p>
+        Per esempio:
+      </p>
+
+      <ul>
+        <li>un documento di testo è un file;</li>
+        <li>una fotografia è un file;</li>
+        <li>un video è un file;</li>
+        <li>un programma può essere composto da uno o più file.</li>
+      </ul>
+
+      <p>
+        Le <strong>cartelle</strong> servono invece a organizzare
+        i file e altre cartelle.
+      </p>
+
+      <p>
+        In Linux, una cartella viene spesso chiamata
+        <strong>directory</strong>.
+      </p>
+
+    </section>
+
+
+    <!-- FILESYSTEM -->
+    <section class="section-block" id="filesystem">
+
+      <h2>Il filesystem di Linux</h2>
+
+      <p>
+        Il <strong>filesystem</strong> è il modo in cui il sistema operativo
+        organizza file e directory all'interno del dispositivo di
+        archiviazione.
+      </p>
+
+      <p>
+        In Linux la struttura parte da una directory principale chiamata
+        <strong>root</strong>, rappresentata dal simbolo:
+      </p>
+
+      <pre><code>/</code></pre>
+
+      <p>
+        Da questa directory partono tutte le altre directory del sistema.
+      </p>
+
+      <pre><code>/
+├── home
+├── etc
+├── usr
+├── var
+├── tmp
+├── dev
+└── boot</code></pre>
+
+      <p>
+        Questa struttura è diversa da quella normalmente utilizzata
+        da Windows, dove vengono utilizzate unità come <code>C:</code>
+        e <code>D:</code>.
+      </p>
+
+    </section>
+
+
+    <!-- CARTELLE IMPORTANTI -->
+    <section class="section-block" id="cartelle-linux">
+
+      <h2>Alcune directory importanti di Linux</h2>
+
+      <p>
+        Linux utilizza directory con funzioni differenti.
+        Alcune delle più importanti sono:
+      </p>
+
+      <ul>
+
+        <li>
+          <strong>/home</strong> — contiene le directory personali
+          degli utenti.
+        </li>
+
+        <li>
+          <strong>/etc</strong> — contiene molti file di configurazione
+          del sistema e dei programmi.
+        </li>
+
+        <li>
+          <strong>/usr</strong> — contiene una grande quantità di
+          programmi, librerie e altri dati utilizzati dal sistema.
+        </li>
+
+        <li>
+          <strong>/var</strong> — contiene dati che cambiano durante
+          il funzionamento del sistema, come molti file di log.
+        </li>
+
+        <li>
+          <strong>/tmp</strong> — viene utilizzata per dati temporanei.
+        </li>
+
+        <li>
+          <strong>/dev</strong> — contiene rappresentazioni dei
+          dispositivi gestiti dal sistema.
+        </li>
+
+        <li>
+          <strong>/boot</strong> — contiene file necessari per
+          l'avvio del sistema.
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <!-- UTENTI -->
+    <section class="section-block" id="utenti">
+
+      <h2>Utenti e gruppi</h2>
+
+      <p>
+        Linux è progettato come un sistema <strong>multiutente</strong>.
+        Questo significa che sullo stesso computer possono esistere
+        più utenti.
+      </p>
+
+      <p>
+        Ogni utente può avere:
+      </p>
+
+      <ul>
+        <li>una propria directory personale;</li>
+        <li>un proprio nome utente;</li>
+        <li>specifiche autorizzazioni;</li>
+        <li>accesso a determinate risorse.</li>
+      </ul>
+
+      <p>
+        Gli utenti possono inoltre essere organizzati in
+        <strong>gruppi</strong>.
+      </p>
+
+      <p>
+        I gruppi permettono di assegnare determinate autorizzazioni
+        a più utenti contemporaneamente.
+      </p>
+
+    </section>
+
+
+    <!-- ROOT -->
+    <section class="section-block" id="root">
+
+      <h2>Che cos'è l'utente root?</h2>
+
+      <p>
+        In Linux, <strong>root</strong> è l'utente con privilegi
+        amministrativi molto elevati.
+      </p>
+
+      <p>
+        Un utente root può eseguire operazioni che un normale utente
+        non può effettuare, come modificare importanti configurazioni
+        del sistema o accedere a determinate risorse.
+      </p>
+
+      <p>
+        Proprio perché dispone di grandi privilegi, utilizzare
+        i poteri amministrativi richiede attenzione.
+      </p>
+
+      <p>
+        Nei sistemi Ubuntu viene spesso utilizzato il comando
+        <code>sudo</code> per eseguire una singola operazione
+        con privilegi amministrativi.
+      </p>
+
+      <pre><code>sudo apt update</code></pre>
+
+    </section>
+
+
+    <!-- PERMESSI -->
+    <section class="section-block" id="perche-permessi">
+
+      <h2>Perché esistono i permessi?</h2>
+
+      <p>
+        Immaginiamo che un computer venga utilizzato da più persone.
+        Non sarebbe sicuro permettere a qualsiasi utente di modificare
+        o cancellare tutti i file del sistema.
+      </p>
+
+      <p>
+        Linux utilizza quindi un sistema di <strong>permessi</strong>
+        per controllare quali operazioni possono essere effettuate
+        sui file e sulle directory.
+      </p>
+
+      <p>
+        I permessi permettono, per esempio, di stabilire:
+      </p>
+
+      <ul>
+        <li>chi può leggere un file;</li>
+        <li>chi può modificarlo;</li>
+        <li>chi può eseguirlo;</li>
+        <li>chi può accedere a una directory.</li>
+      </ul>
+
+      <p>
+        Questo sistema è fondamentale per la sicurezza e
+        l'organizzazione di Linux.
+      </p>
+
+    </section>
+
+
+    <!-- INTRO PERMESSI -->
+    <section class="section-block" id="introduzione-permessi">
+
+      <h2>Introduzione ai permessi Linux</h2>
+
+      <p>
+        In Linux i permessi principali sono rappresentati dalle lettere:
+      </p>
+
+      <ul>
+        <li><code>r</code> — <strong>read</strong>, lettura;</li>
+        <li><code>w</code> — <strong>write</strong>, scrittura;</li>
+        <li><code>x</code> — <strong>execute</strong>, esecuzione.</li>
+      </ul>
+
+      <p>
+        I permessi vengono assegnati considerando tre categorie:
+      </p>
+
+      <ul>
+        <li><strong>u</strong> — user, il proprietario;</li>
+        <li><strong>g</strong> — group, il gruppo;</li>
+        <li><strong>o</strong> — others, tutti gli altri utenti.</li>
+      </ul>
+
+      <p>
+        Per esempio, possiamo trovare una sequenza simile:
+      </p>
+
+      <pre><code>-rwxr-xr--</code></pre>
+
+      <p>
+        Questa sequenza indica quali operazioni sono consentite
+        al proprietario, al gruppo e agli altri utenti.
+      </p>
+
+      <p>
+        Il sistema dei permessi permette quindi di controllare
+        l'accesso alle risorse e di impedire che un utente possa
+        eseguire operazioni non autorizzate.
+      </p>
+
+    </section>
+
+
+    <!-- RIEPILOGO -->
+    <section class="section-block" id="riepilogo">
+
+      <h2>Riepilogo</h2>
+
+      <p>
+        Prima di iniziare a lavorare con i permessi Linux è importante
+        ricordare alcuni concetti fondamentali:
+      </p>
+
+      <ul>
+
+        <li>
+          Il <strong>computer</strong> è una macchina che elabora dati.
+        </li>
+
+        <li>
+          L'<strong>hardware</strong> rappresenta le parti fisiche
+          del computer.
+        </li>
+
+        <li>
+          Il <strong>software</strong> rappresenta programmi e istruzioni.
+        </li>
+
+        <li>
+          Il <strong>sistema operativo</strong> gestisce le risorse
+          del computer e permette ai programmi di funzionare.
+        </li>
+
+        <li>
+          Il <strong>kernel</strong> è il componente centrale che
+          gestisce le risorse hardware e fornisce servizi al sistema.
+        </li>
+
+        <li>
+          <strong>Linux</strong> è il nome del kernel open source.
+        </li>
+
+        <li>
+          Una <strong>distribuzione Linux</strong> combina il kernel
+          con programmi e strumenti necessari per creare un sistema completo.
+        </li>
+
+        <li>
+          <strong>Ubuntu</strong> è una delle distribuzioni Linux
+          più conosciute.
+        </li>
+
+        <li>
+          Il <strong>terminale</strong> permette di interagire
+          con il sistema attraverso comandi.
+        </li>
+
+        <li>
+          Linux gestisce <strong>utenti, gruppi e permessi</strong>
+          per proteggere le risorse del sistema.
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <!-- Footer -->
+    <div class="footer">
+
+      <div>
+        PermissionOS — Didattica di base
+      </div>
+
+      <a href="index.html" class="button outline sm">
+        Torna al Desktop simulato
+      </a>
+
+    </div>
+
+  </div>
+</body>
+</html>
+```

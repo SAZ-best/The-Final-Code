@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PermissionOS — Terminale Ubuntu</title>
+  
+  <!-- Google Fonts JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Ubuntu terminal styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: #2c001e; /* Official Ubuntu dark purple/aubergine background */
+      color: #ffffff;
+      font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+      font-size: 15px;
+      line-height: 1.4;
+      padding: 18px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      cursor: text;
+    }
+    
+    /* Screen element styles */
+    #terminal {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .history-line {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin-bottom: 4px;
+    }
+    
+    .input-line {
+      display: flex;
+      align-items: center;
+      margin-top: 6px;
+    }
+    
+    .prompt {
+      white-space: nowrap;
+      user-select: none;
+    }
+    
+    .prompt-user {
+      color: #8ae234; /* Bright green Ubuntu username prompt */
+      font-weight: bold;
+    }
+    
+    .prompt-delim {
+      color: #ffffff;
+    }
+    
+    .prompt-path {
+      color: #729fcf; /* Bright blue Ubuntu path prompt */
+      font-weight: bold;
+    }
+    
+    .input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      margin-left: 8px;
+    }
+    
+    .command-input-visual {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      outline: none;
+      border: none;
+      background: transparent;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: inherit;
+    }
+    
+    /* Blinking console cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 17px;
+      background-color: #dfdbd2;
+      margin-left: 2px;
+      animation: blink 1s step-start infinite;
+    }
+    
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    
+    /* Text colors matching GNU ls */
+    .dir-name {
+      color: #729fcf;
+      font-weight: bold;
+    }
+    
+    .exec-name {
+      color: #8ae234;
+      font-weight: bold;
+    }
+    
+    .err-text {
+      color: #ef2929; /* Ubuntu red error text */
+    }
+    
+    .info-text {
+      color: #fcaf3e; /* Ubuntu orange highlight */
+    }
+    
+    /* Hidden native input to capture keyboard events properly on mobile */
+    #terminal-input {
+      position: absolute;
+      opacity: 0;
+      left: -9999px;
+      pointer-events: none;
+    }
+    
+    /* Back button */
+    .exit-btn {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-family: sans-serif;
+      opacity: 0.35;
+      transition: opacity 0.2s, background 0.2s;
+      user-select: none;
+    }
+    
+    .exit-btn:hover {
+      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.12);
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating exit button for ease of use -->
+  <a href="index.html" class="exit-btn" title="Ritorna al desktop grafico">[ Chiudi Terminale ]</a>
+
+  <!-- Terminal window content -->
+  <div id="terminal">
+    <div id="history"></div>
+    <div class="input-line">
+      <div class="prompt" id="current-prompt">
+        <span class="prompt-user">ospite@permissionos</span><span class="prompt-delim">:</span><span class="prompt-path">~</span><span class="prompt-delim">$</span>
+      </div>
+      <div class="input-wrapper">
+        <span id="visual-input" class="command-input-visual"></span><span class="cursor" id="visual-cursor"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real hidden input to capture keystrokes globally -->
+  <input type="text" id="terminal-input" autocomplete="off" autogrid="off" autocapitalize="none" spellcheck="false">
+
+  <script>
+    const inputElement = document.getElementById('terminal-input');
+    const visualInput = document.getElementById('visual-input');
+    const historyContainer = document.getElementById('history');
+    const currentPrompt = document.getElementById('current-prompt');
+    
+    let currentDir = '/home/ospite';
+    let currentUser = 'ospite';
+    let commandHistory = [];
+    let historyPointer = -1;
+    let isSudoPasswordPrompt = false;
+    let sudoPendingCommand = '';
+    
+    // Output redirection state
+    let redirectTarget = null;
+    let redirectMode = null; // '>' or '>>'
+    let stdoutBuffer = '';
+
+    // In-memory simulated filesystem state
+    const fileSystem = {
+      '/': {
+        type: 'dir',
+        owner: 'root',
+        group: 'root',
+        permissions: 'drwxr-xr-x',
+        children: ['home']
+      },
+      '/home': {
+        type: 'dir',
+        owner: 'root',
+        group: 'root',
+        permissions: 'drwxr-xr-x',
+        children: ['ospite', 'lince']
+      },
+      '/home/ospite': {
+        type: 'dir',
+        owner: 'ospite',
+        group: 'ospite',
+        permissions: 'drwxr-xr-x',
+        children: ['appunti.txt', 'test.txt']
+      },
+      '/home/ospite/appunti.txt': {
+        type: 'file',
+        owner: 'ospite',
+        group: 'ospite',
+        permissions: '-rw-r--r--',
+        content: ''
+      },
+      '/home/ospite/test.txt': {
+        type: 'file',
+        owner: 'ospite',
+        group: 'ospite',
+        permissions: '-rw-r--r--',
+        content: ''
+      },
+      '/home/lince': {
+        type: 'dir',
+        owner: 'lince',
+        group: 'lince',
+        permissions: 'drwxr-xr-x',
+        children: []
+      }
+    };
+
+    // Print welcome banner at startup
+    function showWelcomeMessage() {
+      const banner = `Welcome to PermissionOS Terminal Simulator v2.0
+Ubuntu 24.04 LTS (GNU/Linux 6.8.0-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Tip: Digita '<span class="info-text">help</span>' per una lista dei comandi disponibili.
+Tip: Digita '<span class="info-text">exit</span>' per ritornare al desktop grafico.
+Tip: Puoi usare la redirezione '<span class="info-text">></span>' e '<span class="info-text">>></span>', e diventare root con '<span class="info-text">sudo -i</span>'.
+
+`;
+      appendToHistory(banner, true);
+    }
+    
+    // Focus terminal input on click anywhere
+    document.body.addEventListener('click', () => {
+      inputElement.focus();
+    });
+    
+    // Sync visible buffer with input
+    inputElement.addEventListener('input', () => {
+      if (isSudoPasswordPrompt) {
+        visualInput.textContent = '';
+      } else {
+        visualInput.textContent = inputElement.value;
+      }
+    });
+
+    // Capture keys
+    inputElement.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const inputCommand = inputElement.value;
+        inputElement.value = '';
+        visualInput.textContent = '';
+        
+        handleCommandExecution(inputCommand);
+        window.scrollTo(0, document.body.scrollHeight);
+      } else if (e.key === 'Escape') {
+        window.location.href = 'index.html';
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (commandHistory.length > 0 && !isSudoPasswordPrompt) {
+          if (historyPointer === -1) {
+            historyPointer = commandHistory.length - 1;
+          } else if (historyPointer > 0) {
+            historyPointer--;
+          }
+          inputElement.value = commandHistory[historyPointer];
+          visualInput.textContent = commandHistory[historyPointer];
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!isSudoPasswordPrompt) {
+          if (historyPointer !== -1) {
+            if (historyPointer < commandHistory.length - 1) {
+              historyPointer++;
+              inputElement.value = commandHistory[historyPointer];
+              visualInput.textContent = commandHistory[historyPointer];
+            } else {
+              historyPointer = -1;
+              inputElement.value = '';
+              visualInput.textContent = '';
+            }
+          }
+        }
+      }
+    });
+
+    // Append visual lines to logs
+    function appendToHistory(text, isHtml = false) {
+      const line = document.createElement('div');
+      line.className = 'history-line';
+      if (isHtml) {
+        line.innerHTML = text;
+      } else {
+        line.textContent = text;
+      }
+      historyContainer.appendChild(line);
+    }
+    
+    // Redirectable printing helper
+    function termPrint(text, isHtml = false) {
+      if (redirectTarget) {
+        // Strip html tags if redirecting to file
+        let cleanText = text;
+        if (isHtml) {
+          let tempDiv = document.createElement('div');
+          tempDiv.innerHTML = text;
+          cleanText = tempDiv.textContent || tempDiv.innerText || '';
+        }
+        stdoutBuffer += cleanText + '\n';
+      } else {
+        appendToHistory(text, isHtml);
+      }
+    }
+    
+    // Render prompt string
+    function getPromptString() {
+      if (isSudoPasswordPrompt) {
+        return '[sudo] password for ospite: ';
+      }
+      
+      const userColor = currentUser === 'root' ? '#ef2929' : '#8ae234';
+      const user = `<span style="color: ${userColor}; font-weight: bold;">${currentUser}@permissionos</span>`;
+      const delim1 = '<span class="prompt-delim">:</span>';
+      
+      let pathVal = currentDir;
+      let homePath = currentUser === 'root' ? '/root' : '/home/ospite';
+      if (pathVal === homePath) {
+        pathVal = '~';
+      }
+      
+      const path = `<span class="prompt-path">${pathVal}</span>`;
+      const delimSymbol = currentUser === 'root' ? '#' : '$';
+      const delim2 = `<span class="prompt-delim">${delimSymbol}</span>`;
+      
+      return `${user}${delim1}${path}${delim2}`;
+    }
+    
+    function updatePromptView() {
+      currentPrompt.innerHTML = getPromptString();
+    }
+
+    // Resolve paths helper
+    function resolvePath(path) {
+      if (!path) return currentDir;
+      let target = path.trim();
+      
+      // Handle ~ replacement
+      let homePath = currentUser === 'root' ? '/root' : '/home/ospite';
+      if (target === '~') {
+        return homePath;
+      } else if (target.startsWith('~/')) {
+        target = homePath + target.substring(1);
+      }
+      
+      if (!target.startsWith('/')) {
+        target = currentDir === '/' ? '/' + target : currentDir + '/' + target;
+      }
+      
+      let parts = target.split('/').filter(p => p !== '' && p !== '.');
+      let newParts = [];
+      for (let p of parts) {
+        if (p === '..') {
+          newParts.pop();
+        } else {
+          newParts.push(p);
+        }
+      }
+      return '/' + newParts.join('/');
+    }
+
+    // Helper functions for path details
+    function getParentPath(path) {
+      if (path === '/') return null;
+      let parts = path.split('/').filter(p => p !== '');
+      parts.pop();
+      return '/' + parts.join('/');
+    }
+    
+    function getFilename(path) {
+      let parts = path.split('/').filter(p => p !== '');
+      return parts[parts.length - 1];
+    }
+
+    // Numerical chmod helper
+    function octalToPermissions(octalStr, isDir = false) {
+      const mapping = {
+        '0': '---',
+        '1': '--x',
+        '2': '-w-',
+        '3': '-wx',
+        '4': 'r--',
+        '5': 'r-x',
+        '6': 'rw-',
+        '7': 'rwx'
+      };
+      if (octalStr.length !== 3) return null;
+      let res = isDir ? 'd' : '-';
+      for (let char of octalStr) {
+        let p = mapping[char];
+        if (!p) return null;
+        res += p;
+      }
+      return res;
+    }
+
+    // Check permissions on filesystem
+    function checkPermission(path, type, user) {
+      if (user === 'root') return true;
+      let fileObj = fileSystem[path];
+      if (!fileObj) return false;
+      
+      let p = fileObj.permissions;
+      let offset = 7; // defaults to others
+      if (fileObj.owner === user) {
+        offset = 1;
+      } else if (fileObj.group === user) {
+        offset = 4;
+      }
+      
+      let pos = 0;
+      if (type === 'r') pos = offset;
+      else if (type === 'w') pos = offset + 1;
+      else if (type === 'x') pos = offset + 2;
+      
+      return p[pos] === type;
+    }
+
+    // Command executor
+    function handleCommandExecution(input) {
+      if (isSudoPasswordPrompt) {
+        isSudoPasswordPrompt = false;
+        updatePromptView();
+        appendToHistory(' '); // print space / newline
+        
+        // Execute pending sudo command
+        executeCommandLogic(sudoPendingCommand, true);
+        sudoPendingCommand = '';
+        updatePromptView();
+        return;
+      }
+      
+      const trimmed = input.trim();
+      if (trimmed !== '') {
+        commandHistory.push(trimmed);
+        historyPointer = -1;
+      }
+      
+      // Print command line
+      const currentPromptText = getPromptString();
+      appendToHistory(`${currentPromptText} ${input}`, true);
+      
+      // Check for output redirection (> or >>)
+      let redMatches = trimmed.match(/(.*?)\s*(>>|>)\s*(.*)/);
+      if (redMatches) {
+        let cmdPart = redMatches[1].trim();
+        let modePart = redMatches[2];
+        let filePart = redMatches[3].trim();
+        
+        redirectTarget = resolvePath(filePart);
+        redirectMode = modePart;
+        stdoutBuffer = '';
+        
+        executeCommandLogic(cmdPart, currentUser === 'root');
+        
+        // Write the captured buffer to the resolved file
+        writeRedirectionOutput();
+        
+        // Reset redirection
+        redirectTarget = null;
+        redirectMode = null;
+        stdoutBuffer = '';
+      } else {
+        executeCommandLogic(trimmed, currentUser === 'root');
+      }
+      
+      updatePromptView();
+    }
+    
+    function writeRedirectionOutput() {
+      let targetPath = redirectTarget;
+      let fileObj = fileSystem[targetPath];
+      let parentPath = getParentPath(targetPath);
+      let parentObj = fileSystem[parentPath];
+      
+      if (!parentObj || parentObj.type !== 'dir') {
+        appendToHistory(`bash: ${targetPath}: No such file or directory`);
+        return;
+      }
+      
+      // Write requires w permission on the parent folder (if creating file) or on the file itself (if modifying)
+      let allowed = false;
+      if (fileObj) {
+        allowed = checkPermission(targetPath, 'w', currentUser);
+      } else {
+        allowed = checkPermission(parentPath, 'w', currentUser);
+      }
+      
+      if (!allowed) {
+        appendToHistory(`bash: ${targetPath}: Permission denied`);
+        return;
+      }
+      
+      // Trim final newline from buffer if present
+      let writeContent = stdoutBuffer;
+      if (writeContent.endsWith('\n')) {
+        writeContent = writeContent.substring(0, writeContent.length - 1);
+      }
+      
+      if (fileObj) {
+        if (redirectMode === '>') {
+          fileObj.content = writeContent;
+        } else {
+          fileObj.content += '\n' + writeContent;
+        }
+      } else {
+        // Create new file
+        let newName = getFilename(targetPath);
+        fileSystem[targetPath] = {
+          type: 'file',
+          owner: currentUser,
+          group: currentUser === 'root' ? 'root' : 'ospite',
+          permissions: '-rw-r--r--',
+          content: writeContent
+        };
+        parentObj.children.push(newName);
+      }
+    }
+    
+    function executeCommandLogic(commandStr, asRoot = false) {
+      if (commandStr === '') return;
+      
+      const args = commandStr.split(/\s+/);
+      const mainCmd = args[0];
+      
+      // Sudo execution check
+      if (mainCmd === 'sudo') {
+        if (args.length < 2) {
+          termPrint('usage: sudo [command]');
+          return;
+        }
+        
+        let subCommand = args.slice(1).join(' ');
+        if (asRoot) {
+          // Already root, execute directly
+          executeCommandLogic(subCommand, true);
+        } else {
+          // Prompt for password
+          isSudoPasswordPrompt = true;
+          sudoPendingCommand = subCommand;
+          updatePromptView();
+        }
+        return;
+      }
+
+      switch (mainCmd) {
+        case 'help':
+          termPrint(`Comandi disponibili:
+  ls [-l] [-a]  Elenca file e directory (opzioni: -l dettagli, -a nascosti)
+  cd [dir]      Cambia directory (es. cd .., cd ~)
+  pwd           Mostra la directory corrente
+  cat [file]    Mostra il contenuto di un file
+  touch [file]  Crea un file vuoto
+  mkdir [dir]   Crea una cartella
+  rm [file]     Cancella un file
+  rm -r [dir]   Cancella una cartella ricorsivamente
+  cp [src][dst] Copia un file
+  mv [src][dst] Sposta o rinomina un file/cartella
+  echo [testo]  Stampa il testo a schermo (funziona con > e >>)
+  chmod [perm]  Cambia permessi (es. chmod +x, chmod 755)
+  chown [user]  Cambia proprietario (es. chown root file)
+  sudo -i / su  Entra come utente amministratore root
+  whoami        Mostra l'utente attivo
+  clear         Pulisce lo schermo
+  exit          Esce dal terminale o torna ad ospite`);
+          break;
+          
+        case 'clear':
+          historyContainer.innerHTML = '';
+          break;
+          
+        case 'exit':
+          if (currentUser === 'root') {
+            currentUser = 'ospite';
+            currentDir = '/home/ospite';
+            termPrint('Logged out from root session.');
+          } else {
+            window.location.href = 'index.html';
+          }
+          break;
+          
+        case 'whoami':
+          termPrint(currentUser);
+          break;
+          
+        case 'pwd':
+          termPrint(currentDir);
+          break;
+          
+        case 'su':
+        case 'sudo su':
+        case 'sudo -i':
+          if (currentUser === 'root') {
+            termPrint('Already running as root.');
+          } else {
+            currentUser = 'root';
+            currentDir = '/root';
+            // Pre-create root home directory if missing
+            if (!fileSystem['/root']) {
+              fileSystem['/root'] = {
+                type: 'dir',
+                owner: 'root',
+                group: 'root',
+                permissions: 'drwx------',
+                children: []
+              };
+              fileSystem['/'].children.push('root');
+            }
+            termPrint('Welcome to root shell session. Type \'exit\' to go back.');
+          }
+          break;
+          
+        case 'echo':
+          let echoArgs = args.slice(1).join(' ');
+          // Strip enclosing quotes if present
+          if ((echoArgs.startsWith('"') && echoArgs.endsWith('"')) || 
+              (echoArgs.startsWith("'") && echoArgs.endsWith("'"))) {
+            echoArgs = echoArgs.substring(1, echoArgs.length - 1);
+          }
+          termPrint(echoArgs);
+          break;
+          
+        case 'cd':
+          let targetCd = args[1];
+          if (!targetCd) {
+            currentDir = currentUser === 'root' ? '/root' : '/home/ospite';
+            break;
+          }
+          let resolvedCd = resolvePath(targetCd);
+          let itemCd = fileSystem[resolvedCd];
+          if (itemCd && itemCd.type === 'dir') {
+            // Check read and execute permissions on folder
+            if (checkPermission(resolvedCd, 'r', currentUser) && checkPermission(resolvedCd, 'x', currentUser)) {
+              currentDir = resolvedCd;
+            } else {
+              termPrint(`bash: cd: ${targetCd}: Permission denied`);
+            }
+          } else {
+            termPrint(`bash: cd: ${targetCd}: No such file or directory`);
+          }
+          break;
+          
+        case 'ls':
+          let showAll = false;
+          let longFormat = false;
+          let targetPath = null;
+          
+          for (let i = 1; i < args.length; i++) {
+            let arg = args[i];
+            if (arg.startsWith('-')) {
+              if (arg.includes('a')) showAll = true;
+              if (arg.includes('l')) longFormat = true;
+            } else {
+              targetPath = arg;
+            }
+          }
+          
+          let folderToLs = currentDir;
+          if (targetPath) {
+            folderToLs = resolvePath(targetPath);
+          }
+          
+          let itemLs = fileSystem[folderToLs];
+          if (!itemLs || itemLs.type !== 'dir') {
+            termPrint(`ls: cannot access '${targetPath || ""}': No such file or directory`);
+            break;
+          }
+          
+          if (!checkPermission(folderToLs, 'r', currentUser)) {
+            termPrint(`ls: cannot open directory '${targetPath || "."}': Permission denied`);
+            break;
+          }
+          
+          let fileNames = [...itemLs.children];
+          if (showAll) {
+            fileNames.unshift('.', '..');
+          }
+          
+          if (longFormat) {
+            fileNames.forEach(name => {
+              let fullPath = folderToLs === '/' ? '/' + name : folderToLs + '/' + name;
+              
+              // Handle virtual . and .. details
+              let fileObj = fileSystem[fullPath];
+              if (name === '.') fileObj = itemLs;
+              if (name === '..') {
+                let parentP = getParentPath(folderToLs) || '/';
+                fileObj = fileSystem[parentP];
+              }
+              
+              if (fileObj) {
+                let p = fileObj.permissions;
+                let own = fileObj.owner;
+                let grp = fileObj.group;
+                let size = fileObj.type === 'dir' ? 4096 : (fileObj.content ? fileObj.content.length : 0);
+                
+                let styledName = name;
+                if (fileObj.type === 'dir') {
+                  styledName = `<span class="dir-name">${name}</span>`;
+                } else if (p.includes('x')) {
+                  styledName = `<span class="exec-name">${name}</span>`;
+                }
+                
+                termPrint(`${p} 1 ${own} ${grp} ${size} Aug 26 18:00 ${styledName}`, true);
+              }
+            });
+          } else {
+            let styledNames = fileNames.map(name => {
+              let fullPath = folderToLs === '/' ? '/' + name : folderToLs + '/' + name;
+              let fileObj = fileSystem[fullPath];
+              if (name === '.') fileObj = itemLs;
+              if (name === '..') {
+                let parentP = getParentPath(folderToLs) || '/';
+                fileObj = fileSystem[parentP];
+              }
+              
+              if (fileObj) {
+                if (fileObj.type === 'dir') {
+                  return `<span class="dir-name">${name}</span>`;
+                } else if (fileObj.permissions.includes('x')) {
+                  return `<span class="exec-name">${name}</span>`;
+                }
+              }
+              return name;
+            });
+            termPrint(styledNames.join('    '), true);
+          }
+          break;
+          
+        case 'cat':
+          let targetCat = args[1];
+          if (!targetCat) {
+            termPrint('cat: missing file operand');
+            break;
+          }
+          let resolvedCat = resolvePath(targetCat);
+          let fileCat = fileSystem[resolvedCat];
+          if (fileCat && fileCat.type === 'file') {
+            if (checkPermission(resolvedCat, 'r', currentUser)) {
+              termPrint(fileCat.content);
+            } else {
+              termPrint(`cat: ${targetCat}: Permission denied`);
+            }
+          } else if (fileCat && fileCat.type === 'dir') {
+            termPrint(`cat: ${targetCat}: Is a directory`);
+          } else {
+            termPrint(`cat: ${targetCat}: No such file or directory`);
+          }
+          break;
+          
+        case 'touch':
+          let targetTouch = args[1];
+          if (!targetTouch) {
+            termPrint('touch: missing file operand');
+            break;
+          }
+          let resolvedTouch = resolvePath(targetTouch);
+          let fileTouch = fileSystem[resolvedTouch];
+          if (fileTouch) {
+            // updates timestamp (noop in visual output)
+            break;
+          }
+          
+          let parentTouchPath = getParentPath(resolvedTouch);
+          let parentTouchObj = fileSystem[parentTouchPath];
+          if (!parentTouchObj || parentTouchObj.type !== 'dir') {
+            termPrint(`touch: cannot touch '${targetTouch}': No such file or directory`);
+            break;
+          }
+          
+          if (!checkPermission(parentTouchPath, 'w', currentUser)) {
+            termPrint(`touch: cannot touch '${targetTouch}': Permission denied`);
+            break;
+          }
+          
+          // Create file
+          let newFileName = getFilename(resolvedTouch);
+          fileSystem[resolvedTouch] = {
+            type: 'file',
+            owner: currentUser,
+            group: currentUser === 'root' ? 'root' : 'ospite',
+            permissions: '-rw-r--r--',
+            content: ''
+          };
+          parentTouchObj.children.push(newFileName);
+          break;
+          
+        case 'mkdir':
+          let targetMkdir = args[1];
+          if (!targetMkdir) {
+            termPrint('mkdir: missing operand');
+            break;
+          }
+          let resolvedMkdir = resolvePath(targetMkdir);
+          let fileMkdir = fileSystem[resolvedMkdir];
+          if (fileMkdir) {
+            termPrint(`mkdir: cannot create directory '${targetMkdir}': File exists`);
+            break;
+          }
+          
+          let parentMkdirPath = getParentPath(resolvedMkdir);
+          let parentMkdirObj = fileSystem[parentMkdirPath];
+          if (!parentMkdirObj || parentMkdirObj.type !== 'dir') {
+            termPrint(`mkdir: cannot create directory '${targetMkdir}': No such file or directory`);
+            break;
+          }
+          
+          if (!checkPermission(parentMkdirPath, 'w', currentUser)) {
+            termPrint(`mkdir: cannot create directory '${targetMkdir}': Permission denied`);
+            break;
+          }
+          
+          // Create directory
+          let newDirName = getFilename(resolvedMkdir);
+          fileSystem[resolvedMkdir] = {
+            type: 'dir',
+            owner: currentUser,
+            group: currentUser === 'root' ? 'root' : 'ospite',
+            permissions: 'drwxr-xr-x',
+            children: []
+          };
+          parentMkdirObj.children.push(newDirName);
+          break;
+          
+        case 'rm':
+          let recursive = args[1] === '-r' || args[1] === '-rf' || args[2] === '-r';
+          let targetRm = recursive ? (args[1].startsWith('-') ? args[2] : args[1]) : args[1];
+          
+          if (!targetRm) {
+            termPrint('rm: missing operand');
+            break;
+          }
+          
+          let resolvedRm = resolvePath(targetRm);
+          let fileRm = fileSystem[resolvedRm];
+          if (!fileRm) {
+            termPrint(`rm: cannot remove '${targetRm}': No such file or directory`);
+            break;
+          }
+          
+          let parentRmPath = getParentPath(resolvedRm);
+          if (!checkPermission(parentRmPath, 'w', currentUser)) {
+            termPrint(`rm: cannot remove '${targetRm}': Permission denied`);
+            break;
+          }
+          
+          if (fileRm.type === 'dir' && !recursive) {
+            termPrint(`rm: cannot remove '${targetRm}': Is a directory`);
+            break;
+          }
+          
+          // Delete recursively or singly
+          delete fileSystem[resolvedRm];
+          let parentRmObj = fileSystem[parentRmPath];
+          let nameRm = getFilename(resolvedRm);
+          parentRmObj.children = parentRmObj.children.filter(c => c !== nameRm);
+          break;
+          
+        case 'cp':
+          let srcCp = args[1];
+          let destCp = args[2];
+          if (!srcCp || !destCp) {
+            termPrint('cp: missing file operand');
+            break;
+          }
+          let resolvedSrcCp = resolvePath(srcCp);
+          let resolvedDestCp = resolvePath(destCp);
+          let fileSrcCp = fileSystem[resolvedSrcCp];
+          
+          if (!fileSrcCp) {
+            termPrint(`cp: cannot stat '${srcCp}': No such file or directory`);
+            break;
+          }
+          
+          if (fileSrcCp.type === 'dir') {
+            termPrint(`cp: -r not specified; omitting directory '${srcCp}'`);
+            break;
+          }
+          
+          // Check read source, write dest parent
+          if (!checkPermission(resolvedSrcCp, 'r', currentUser)) {
+            termPrint(`cp: cannot open '${srcCp}': Permission denied`);
+            break;
+          }
+          
+          let parentDestCp = getParentPath(resolvedDestCp);
+          if (!checkPermission(parentDestCp, 'w', currentUser)) {
+            termPrint(`cp: cannot create '${destCp}': Permission denied`);
+            break;
+          }
+          
+          // Perform copy
+          let newCpName = getFilename(resolvedDestCp);
+          fileSystem[resolvedDestCp] = {
+            type: 'file',
+            owner: currentUser,
+            group: currentUser === 'root' ? 'root' : 'ospite',
+            permissions: '-rw-r--r--',
+            content: fileSrcCp.content
+          };
+          
+          let parentDestCpObj = fileSystem[parentDestCp];
+          if (!parentDestCpObj.children.includes(newCpName)) {
+            parentDestCpObj.children.push(newCpName);
+          }
+          break;
+          
+        case 'mv':
+          let srcMv = args[1];
+          let destMv = args[2];
+          if (!srcMv || !destMv) {
+            termPrint('mv: missing file operand');
+            break;
+          }
+          let resolvedSrcMv = resolvePath(srcMv);
+          let resolvedDestMv = resolvePath(destMv);
+          let fileSrcMv = fileSystem[resolvedSrcMv];
+          
+          if (!fileSrcMv) {
+            termPrint(`mv: cannot stat '${srcMv}': No such file or directory`);
+            break;
+          }
+          
+          // Check write source parent, write dest parent
+          let parentSrcMv = getParentPath(resolvedSrcMv);
+          if (!checkPermission(parentSrcMv, 'w', currentUser)) {
+            termPrint(`mv: cannot remove '${srcMv}': Permission denied`);
+            break;
+          }
+          
+          let parentDestMv = getParentPath(resolvedDestMv);
+          if (!checkPermission(parentDestMv, 'w', currentUser)) {
+            termPrint(`mv: cannot create '${destMv}': Permission denied`);
+            break;
+          }
+          
+          // Perform move
+          fileSystem[resolvedDestMv] = fileSrcMv;
+          delete fileSystem[resolvedSrcMv];
+          
+          let parentSrcMvObj = fileSystem[parentSrcMv];
+          let nameMvSrc = getFilename(resolvedSrcMv);
+          parentSrcMvObj.children = parentSrcMvObj.children.filter(c => c !== nameMvSrc);
+          
+          let parentDestMvObj = fileSystem[parentDestMv];
+          let nameMvDest = getFilename(resolvedDestMv);
+          if (!parentDestMvObj.children.includes(nameMvDest)) {
+            parentDestMvObj.children.push(nameMvDest);
+          }
+          break;
+          
+        case 'chmod':
+          let mode = args[1];
+          let fileChmodName = args[2];
+          if (!mode || !fileChmodName) {
+            termPrint('usage: chmod [mode] [file]');
+            break;
+          }
+          let resolvedChmod = resolvePath(fileChmodName);
+          let fileChmod = fileSystem[resolvedChmod];
+          if (!fileChmod) {
+            termPrint(`chmod: cannot access '${fileChmodName}': No such file or directory`);
+            break;
+          }
+          
+          // Only owner or root can chmod
+          if (currentUser !== fileChmod.owner && currentUser !== 'root') {
+            termPrint(`chmod: changing permissions of '${fileChmodName}': Operation not permitted`);
+            break;
+          }
+          
+          let newPerms = '';
+          if (mode === '+x') {
+            let o = fileChmod.permissions;
+            newPerms = o[0] + o[1] + o[2] + 'x' + o[4] + o[5] + 'x' + o[7] + o[8] + 'x';
+            fileChmod.permissions = newPerms;
+          } else if (mode === '-x') {
+            let o = fileChmod.permissions;
+            newPerms = o[0] + o[1] + o[2] + '-' + o[4] + o[5] + '-' + o[7] + o[8] + '-';
+            fileChmod.permissions = newPerms;
+          } else if (/^\d{3}$/.test(mode)) {
+            let isDir = fileChmod.type === 'dir';
+            let parsed = octalToPermissions(mode, isDir);
+            if (parsed) {
+              fileChmod.permissions = parsed;
+            } else {
+              termPrint(`chmod: invalid mode: '${mode}'`);
+            }
+          } else {
+            termPrint(`chmod: invalid mode operand: '${mode}'`);
+          }
+          break;
+          
+        case 'chown':
+          let owner = args[1];
+          let fileChownName = args[2];
+          if (!owner || !fileChownName) {
+            termPrint('usage: chown [owner] [file]');
+            break;
+          }
+          let resolvedChown = resolvePath(fileChownName);
+          let fileChown = fileSystem[resolvedChown];
+          if (!fileChown) {
+            termPrint(`chown: cannot access '${fileChownName}': No such file or directory`);
+            break;
+          }
+          
+          // chown requires root privileges in Ubuntu
+          if (currentUser !== 'root') {
+            termPrint(`chown: changing ownership of '${fileChownName}': Operation not permitted`);
+            break;
+          }
+          
+          let splitOwner = owner.split(':');
+          fileChown.owner = splitOwner[0];
+          if (splitOwner[1]) {
+            fileChown.group = splitOwner[1];
+          }
+          break;
+          
+        default:
+          // Check script run execution
+          if (mainCmd.startsWith('./')) {
+            let scriptName = mainCmd.substring(2);
+            let resolvedScript = resolvePath(scriptName);
+            let scriptFile = fileSystem[resolvedScript];
+            if (scriptFile && scriptFile.type === 'file') {
+              // Execute requires 'x' permission
+              if (checkPermission(resolvedScript, 'x', currentUser)) {
+                // print content line by line using termPrint to support redirects
+                let lines = scriptFile.content.split('\n');
+                lines.forEach(l => {
+                  if (!l.startsWith('#!')) {
+                    // Simulates simple shell prints
+                    if (l.startsWith('echo ')) {
+                      let cleanEcho = l.substring(5).replace(/"/g, '');
+                      termPrint(cleanEcho);
+                    } else {
+                      termPrint(l);
+                    }
+                  }
+                });
+              } else {
+                termPrint(`<span class="err-text">bash: ${mainCmd}: Permission denied</span>`, true);
+              }
+            } else {
+              termPrint(`bash: ${mainCmd}: No such file or directory`);
+            }
+          } else {
+            termPrint(`bash: ${mainCmd}: command not found`);
+          }
+          break;
+      }
+    }
+    
+    // Auto-focus and start
+    window.addEventListener('DOMContentLoaded', () => {
+      showWelcomeMessage();
+      updatePromptView();
+      inputElement.focus();
+    });
+  </script>
+
+
+<!--In più -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btnMacchina = document.querySelector('a[href="oiss.html"]');
+    
+    if (btnMacchina) {
+      btnMacchina.addEventListener("click", function(e) {
+        // Richiede il fullscreen sull'intero documento
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari & Opera
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge vecchio
+          document.documentElement.msRequestFullscreen();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

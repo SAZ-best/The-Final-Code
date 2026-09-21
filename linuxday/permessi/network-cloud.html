@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PermissionOS — Sicurezza e Cloud</title>
+  
+  <!-- Google Fonts Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <main class="page">
+    <!-- Back to desktop button -->
+    <div>
+      <a class="button outline sm" href="index.html">
+        ← Torna al desktop
+      </a>
+    </div>
+
+    <!-- Page Header Card -->
+    <section class="hero card reveal" data-reveal>
+      <div class="hero-content">
+        <div class="headline-tag"><span></span>Rete e Archiviazione</div>
+        <h1>Sicurezza e Servizi Cloud</h1>
+        <p>Introduzione teorico-pratica alle reti informatiche in Ubuntu, alla gestione della sicurezza con firewall ed all'integrazione di servizi cloud e backup automatici.</p>
+      </div>
+    </section>
+
+    <!-- Content Card -->
+    <section class="card reveal" data-reveal>
+      <h2>Argomenti principali trattati</h2>
+      <p>I moduli didattici approfondiscono i seguenti temi legati alla rete ed alla sicurezza cloud:</p>
+      <ul class="section-list">
+        <li><strong>Fondamenti di rete</strong>: indirizzamento IP statico e dinamico, configurazione DNS e subnetting di base.</li>
+        <li><strong>Firewalling con UFW</strong>: configurazione guidata del firewall predefinito di Ubuntu (Uncomplicated Firewall) per proteggere le porte aperte.</li>
+        <li><strong>Cloud e Storage remoto</strong>: differenze tra Public, Private e Hybrid Cloud, e le modalità di interazione sicura tra server locali ed istanze cloud.</li>
+        <li><strong>Strategie di Backup</strong>: implementazione di backup crittografati regolari per garantire la sicurezza del dato contro incidenti e intrusioni.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+  <!--In più -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btnMacchina = document.querySelector('a[href="oiss.html"]');
+    
+    if (btnMacchina) {
+      btnMacchina.addEventListener("click", function(e) {
+        // Richiede il fullscreen sull'intero documento
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari & Opera
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge vecchio
+          document.documentElement.msRequestFullscreen();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

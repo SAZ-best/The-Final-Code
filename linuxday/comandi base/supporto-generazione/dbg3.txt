@@ -1,0 +1,42 @@
+﻿<script>
+"use strict";
+const CATS = [
+    {
+      id: "navigazione",
+      label: "Navigazione",
+      intro: "I primi comandi da imparare: servono per capire dove ti trovi, vedere cosa contiene una cartella e spostarti nel filesystem."
+    },
+    {
+      id: "file",
+      label: "File e cartelle",
+      intro: "Comandi per creare, copiare, spostare, rinominare, eliminare e leggere file e directory: il pane quotidiano del terminale."
+    },
+    {
+      id: "ricerca",
+      label: "Ricerca",
+      intro: "Quando non ricordi dove si trova un file o cerchi una parola dentro un testo, questi comandi ti fanno trovare tutto in pochi secondi."
+    },
+    {
+      id: "sistema",
+      label: "Sistema e informazioni",
+      intro: "Comandi per conoscere il tuo sistema: chi sei, come si chiama il computer, quale kernel usi e da quanto tempo Ã¨ acceso."
+    },
+    {
+      id: "processi",
+      label: "Processi",
+      intro: "Ogni programma in esecuzione Ã¨ un processo. Qui impari a vederli, monitorarli e, se serve, a chiuderli."
+    },
+    {
+      id: "permessi",
+      label: "Permessi",
+      intro: "In Linux ogni file ha un proprietario e dei permessi. Questi comandi ti permettono di cambiarli. Approfondisci l'argomento nella lezione dedicata ai permessi."
+    },
+    {
+      id: "pacchetti",
+      label: "Gestione software",
+      intro: "Su Linux i programmi si installano con i gestori di pacchetti, che scaricano e configurano il software in modo sicuro. Ogni famiglia di distribuzioni ha il suo."
+    },
+    {
+      id: "rete",
+      label: "Ret
+39794

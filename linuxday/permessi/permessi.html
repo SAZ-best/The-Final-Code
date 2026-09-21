@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PermissionOS — Lezione Permessi</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+  <div class="page">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <div class="brand">
+        PermissionOS — Permessi
+      </div>
+
+      <div class="nav">
+        <a class="nav-link" href="index.html">Desktop</a>
+      </div>
+
+    </div>
+
+
+    <!-- HEADER -->
+    <section class="hero">
+
+      <h1>Lezione Permessi</h1>
+
+      <p>
+        Qui imparerai cosa sono i permessi di Linux e come vengono
+        utilizzati per stabilire cosa un utente può fare con file e cartelle.
+      </p>
+
+    </section>
+
+
+    <!-- INTRODUZIONE -->
+    <section class="section-block">
+
+      <h2>Introduzione ai permessi</h2>
+
+      <p>
+        Come tutti i sistemi operativi, anche Linux, in questo caso la
+        distribuzione Ubuntu, utilizza delle autorizzazioni per stabilire
+        cosa un utente può fare all'interno del sistema.
+      </p>
+
+      <p>
+        In base al tipo di utente possono esserci diverse limitazioni.
+        In questa lezione analizzeremo tre ruoli principali:
+        <strong>Ospite</strong>, <strong>Utente</strong> e
+        <strong>Amministratore</strong>.
+      </p>
+
+      <p>
+        Ogni ruolo può avere un diverso livello di accesso.
+        L'amministratore dispone dei privilegi più elevati e può
+        modificare molte delle impostazioni del sistema.
+      </p>
+
+    </section>
+
+
+    <!-- RUOLI UTENTE -->
+    <section class="section-block">
+
+      <h2>Ruoli utente</h2>
+
+
+      <div class="role-card">
+
+        <h3>Ospite</h3>
+
+        <p>
+          È un profilo temporaneo e con accesso limitato.
+          Può utilizzare alcune funzioni del computer, ma non dovrebbe
+          poter modificare le impostazioni importanti del sistema
+          o accedere ai dati personali degli altri utenti.
+        </p>
+
+        <p>
+          L'account ospite viene generalmente utilizzato per un periodo
+          di tempo limitato. I dati creati durante la sessione possono
+          essere eliminati quando la sessione termina.
+        </p>
+
+      </div>
+
+
+      <div class="role-card">
+
+        <h3>Utente</h3>
+
+        <p>
+          È il profilo utilizzato normalmente da una persona.
+          L'utente può creare, modificare e salvare i propri file.
+          Può inoltre personalizzare il proprio ambiente e utilizzare
+          i programmi installati.
+        </p>
+
+        <p>
+          Non può però modificare liberamente le parti più importanti
+          del sistema. Per alcune operazioni sono necessari privilegi
+          maggiori.
+        </p>
+
+      </div>
+
+
+      <div class="role-card">
+
+        <h3>Amministratore</h3>
+
+        <p>
+          L'amministratore ha un livello di accesso molto elevato
+          all'interno del sistema.
+        </p>
+
+        <p>
+          Può installare e rimuovere programmi, modificare le impostazioni
+          del sistema, gestire gli account degli utenti e modificare
+          file importanti.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- PERMESSI -->
+    <section class="section-block">
+
+      <h2>I vari permessi</h2>
+
+      <p>
+        In Linux esistono tre permessi fondamentali.
+        Ogni permesso indica un'azione che un utente può o non può
+        fare con un file o una cartella.
+      </p>
+
+
+      <div class="permissions-grid">
+
+
+        <!-- READ -->
+        <div class="permission-card">
+
+          <div class="permission-letter">
+            r
+          </div>
+
+          <h3>
+            Read
+          </h3>
+
+          <p>
+            Lettura
+          </p>
+
+          <div class="permission-arrow">
+            ↓
+          </div>
+
+          <div class="permission-number">
+            4
+          </div>
+
+        </div>
+
+
+        <!-- WRITE -->
+        <div class="permission-card">
+
+          <div class="permission-letter">
+            w
+          </div>
+
+          <h3>
+            Write
+          </h3>
+
+          <p>
+            Scrittura
+          </p>
+
+          <div class="permission-arrow">
+            ↓
+          </div>
+
+          <div class="permission-number">
+            2
+          </div>
+
+        </div>
+
+
+        <!-- EXECUTE -->
+        <div class="permission-card">
+
+          <div class="permission-letter">
+            x
+          </div>
+
+          <h3>
+            Execute
+          </h3>
+
+          <p>
+            Esecuzione
+          </p>
+
+          <div class="permission-arrow">
+            ↓
+          </div>
+
+          <div class="permission-number">
+            1
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <p>
+        I numeri <strong>4, 2 e 1</strong> servono per rappresentare
+        i permessi utilizzando i numeri.
+      </p>
+
+      <p>
+        Quando vogliamo assegnare più permessi alla stessa persona,
+        possiamo sommare questi valori.
+      </p>
+
+    </section>
+
+
+    <!-- COMBINAZIONE DEI PERMESSI -->
+    <section class="section-block">
+
+      <h2>Come si combinano?</h2>
+
+      <p>
+        Possiamo combinare più permessi semplicemente sommando
+        i loro valori.
+      </p>
+
+
+      <div class="permission-table">
+
+        <div class="permission-row permission-header">
+          <span>Permessi</span>
+          <span>Somma</span>
+          <span>Numero</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Nessun permesso</span>
+          <span>0</span>
+          <span>0</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Esecuzione</span>
+          <span>1</span>
+          <span>1</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Scrittura</span>
+          <span>2</span>
+          <span>2</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Scrittura + Esecuzione</span>
+          <span>2 + 1</span>
+          <span>3</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Lettura</span>
+          <span>4</span>
+          <span>4</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Lettura + Esecuzione</span>
+          <span>4 + 1</span>
+          <span>5</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Lettura + Scrittura</span>
+          <span>4 + 2</span>
+          <span>6</span>
+        </div>
+
+
+        <div class="permission-row">
+          <span>Lettura + Scrittura + Esecuzione</span>
+          <span>4 + 2 + 1</span>
+          <span>7</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SPIEGAZIONE DEI VALORI -->
+    <section class="section-block">
+
+      <h2>Come funzionano i numeri?</h2>
+
+      <p>
+        Il valore massimo è <strong>7</strong>.
+        Questo numero rappresenta tutti e tre i permessi insieme:
+        lettura, scrittura ed esecuzione.
+      </p>
+
+
+      <div class="code-line">
+        <code>4 + 2 + 1 = 7</code>
+      </div>
+
+
+      <p>
+        Quindi il numero <strong>7</strong> corrisponde a:
+      </p>
+
+
+      <div class="code-line">
+        <code>rwx</code>
+      </div>
+
+
+      <p>
+        Se vogliamo soltanto la lettura e la scrittura:
+      </p>
+
+
+      <div class="code-line">
+        <code>4 + 2 = 6</code>
+      </div>
+
+
+      <p>
+        Il numero <strong>6</strong> corrisponde quindi a:
+      </p>
+
+
+      <div class="code-line">
+        <code>rw-</code>
+      </div>
+
+
+      <p>
+        Il simbolo <strong>-</strong> indica che quel permesso
+        non è presente.
+      </p>
+
+
+      <p>
+        Se vogliamo la lettura e l'esecuzione:
+      </p>
+
+
+      <div class="code-line">
+        <code>4 + 1 = 5</code>
+      </div>
+
+
+      <p>
+        Otteniamo:
+      </p>
+
+
+      <div class="code-line">
+        <code>r-x</code>
+      </div>
+
+
+      <p>
+        Infine, se vogliamo la scrittura e l'esecuzione:
+      </p>
+
+
+      <div class="code-line">
+        <code>2 + 1 = 3</code>
+      </div>
+
+
+      <p>
+        Otteniamo:
+      </p>
+
+
+      <div class="code-line">
+        <code>-wx</code>
+      </div>
+
+    </section>
+
+
+    <!-- USER GROUP OTHER -->
+    <section class="section-block">
+
+      <h2>A chi vengono assegnati i permessi?</h2>
+
+      <p>
+        I permessi vengono assegnati a tre categorie di utenti:
+        <strong>User</strong>, <strong>Group</strong> e
+        <strong>Other</strong>.
+      </p>
+
+
+      <div class="role-card">
+
+        <h3>User (u)</h3>
+
+        <p>
+          È il proprietario del file o della cartella.
+        </p>
+
+      </div>
+
+
+      <div class="role-card">
+
+        <h3>Group (g)</h3>
+
+        <p>
+          Sono gli utenti che appartengono al gruppo associato
+          al file o alla cartella.
+        </p>
+
+      </div>
+
+
+      <div class="role-card">
+
+        <h3>Other (o)</h3>
+
+        <p>
+          Sono tutti gli altri utenti che non sono il proprietario
+          e non appartengono al gruppo associato.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ESEMPIO -->
+    <section class="section-block">
+
+      <h2>Esempio pratico</h2>
+
+      <p>
+        Immaginiamo di avere un file con questi permessi:
+      </p>
+
+
+      <div class="code-line">
+        <code>rwx r-x r--</code>
+      </div>
+
+
+      <p>
+        I tre gruppi di lettere rappresentano rispettivamente
+        <strong>User</strong>, <strong>Group</strong> e
+        <strong>Other</strong>.
+      </p>
+
+
+      <ul>
+
+        <li>
+          <strong>User:</strong>
+          <code>rwx</code> → 4 + 2 + 1 = <strong>7</strong>
+        </li>
+
+        <li>
+          <strong>Group:</strong>
+          <code>r-x</code> → 4 + 1 = <strong>5</strong>
+        </li>
+
+        <li>
+          <strong>Other:</strong>
+          <code>r--</code> → 4 = <strong>4</strong>
+        </li>
+
+      </ul>
+
+
+      <p>
+        Possiamo quindi rappresentare questi permessi con il numero:
+      </p>
+
+
+      <div class="code-line">
+        <code>754</code>
+      </div>
+
+
+      <p>
+        In questo caso, il proprietario può leggere, modificare
+        ed eseguire il file. Il gruppo può leggerlo ed eseguirlo,
+        mentre gli altri utenti possono soltanto leggerlo.
+      </p>
+
+    </section>
+
+
+    <!-- CONCLUSIONE -->
+    <section class="section-block">
+
+      <h2>In sintesi</h2>
+
+      <p>
+        I permessi di Linux permettono di controllare cosa può fare
+        un utente con un file o una cartella.
+      </p>
+
+
+      <ul>
+
+        <li>
+          <strong>r = 4</strong> → lettura
+        </li>
+
+        <li>
+          <strong>w = 2</strong> → scrittura
+        </li>
+
+        <li>
+          <strong>x = 1</strong> → esecuzione
+        </li>
+
+        <li>
+          <strong>7 = rwx</strong> → lettura, scrittura ed esecuzione
+        </li>
+
+        <li>
+          <strong>6 = rw-</strong> → lettura e scrittura
+        </li>
+
+        <li>
+          <strong>5 = r-x</strong> → lettura ed esecuzione
+        </li>
+
+        <li>
+          <strong>3 = -wx</strong> → scrittura ed esecuzione
+        </li>
+
+      </ul>
+
+
+      <p>
+        Questi concetti saranno fondamentali per imparare
+        successivamente a visualizzare e modificare i permessi
+        utilizzando comandi come <code>ls -l</code> e <code>chmod</code>.
+      </p>
+
+    </section>
+
+
+    <!-- METTITI ALLA PROVA (STILE NATIVO DELLA PAGINA) -->
+    <section class="section-block">
+
+      <div class="role-card">
+
+        <h3>Mettiti alla prova!!</h3>
+
+        <p>
+          Ora che hai imparato la teoria sui permessi, è il momento di fare sul serio. 
+          Metti in pratica le tue conoscenze e sperimenta direttamente nel nostro ambiente simulato.
+        </p>
+        <br>
+        <a href="../oiss.html" class="button">
+          Accedi alla macchina virtuale
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <div>
+        PermissionOS — Sezione Didattica Permessi
+      </div>
+
+      <a href="index.html" class="button outline sm">
+        Torna al Desktop simulato
+      </a>
+
+    </div>
+
+  </div>
+
+  <!--In più -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btnMacchina = document.querySelector('a[href="oiss.html"]');
+    
+    if (btnMacchina) {
+      btnMacchina.addEventListener("click", function(e) {
+        // Richiede il fullscreen sull'intero documento
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari & Opera
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge vecchio
+          document.documentElement.msRequestFullscreen();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

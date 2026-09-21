@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PermissionOS — Hardware e File</title>
+  
+  <!-- Google Fonts Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <main class="page">
+    <!-- Back to desktop button -->
+    <div>
+      <a class="button outline sm" href="index.html">
+        ← Torna al desktop
+      </a>
+    </div>
+
+    <!-- Page Header Card -->
+    <section class="hero card reveal" data-reveal>
+      <div class="hero-content">
+        <div class="headline-tag"><span></span>Gestione File System</div>
+        <h1>Hardware e File System</h1>
+        <p>Esplora l'architettura logica delle partizioni Linux, il funzionamento del mount dei dischi rigidi e la gerarchia standard delle directory di Ubuntu.</p>
+      </div>
+    </section>
+
+    <!-- Content Card -->
+    <section class="card reveal" data-reveal>
+      <h2>Argomenti principali trattati</h2>
+      <p>I moduli didattici approfondiscono i seguenti temi legati all'archiviazione dati:</p>
+      <ul class="section-list">
+        <li><strong>Gerarchia standard</strong>: la logica dietro la ramificazione del filesystem partendo dalla radice <code>/</code>.</li>
+        <li><strong>Cartelle di sistema</strong>: studio dettagliato di <code>/etc</code> (configurazioni), <code>/var</code> (dati volatili) e <code>/usr</code> (programmi).</li>
+        <li><strong>Montaggio dischi (Mount)</strong>: come Linux mappa i dispositivi hardware fisici ed esterni (es. chiavette USB) tramite il comando <code>mount</code>.</li>
+        <li><strong>Diagnostica memoria</strong>: utilizzo dei comandi di misurazione spazio disco <code>df</code>, <code>du</code> e del gestore dischi <code>lsblk</code>.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
+</html>
